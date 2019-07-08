@@ -1,0 +1,55 @@
+
+Documentation du projet
+    un canal = une police
+    une note =
+                note de 0 à 127
+                velocity = volume = 0 à 100
+        note = (102, 89)
+        note = (minuscule, majuscule)
+        
+    abcdefghij = 10 lettres
+    0123456789
+
+    klmnopqrs = 9 lettres
+    123456789*10
+
+    t = 1 lettres
+    100
+
+    total de 20 lettres possibles de a à t
+
+    exemple:
+    lettres tlcDP de la police font_1
+    font_1 = police_1 = canal_1
+    note = t l c = 100 + 10 + 2 = 112
+    vol  = D P   = 3 + 60 = 63
+
+
+Ajoute obj à la place de Empty
+    position liste de 3
+    
+    addObject(object, reference, time=0)
+    Adds an object to the scene like the Add Object Actuator would.
+    Parameters:	
+        object (KX_GameObject or string) – The (name of the) object to add.
+        reference (KX_GameObject or string) – The (name of the) object which
+        position, orientation, and scale to copy (optional), if the object
+        to add is a light and there is not reference the light’s layer will be
+        the same that the active layer in the blender scene.
+        time (integer) – The lifetime of the added object, in frames. A time
+        of 0 means the object will last forever (optional).
+
+    Returns: The newly added object.
+    Return type: KX_GameObject
+
+
+Division d'un plan texturé:
+    https://blender.stackexchange.com/questions/1437/subdivide-and-separate-face-into-different-meshes
+
+    In Edit mode -> Select the face
+    W -> Subdivde -> tool shelf T or F6 -> Number of Cuts (in your case 3)
+    With the subdivided faces selected -> Ctrl + E -> mark sharp
+    Add edge split modifier -> uncheck edge angle
+    In Object mode apply the edge split modifier
+    (optional) in Edit mode -> select the faces if not selected -> Ctrl + E -> clear sharp
+    In Edit mode -> P -> separate by loose parts (séparer par partie mal fixée, pas attachées)

@@ -35,6 +35,7 @@ def main():
     apply_new_texture()
     print(gl.tempo["test"].tempo)
 
+
 def apply_new_texture():
     if gl.tempo["test"].tempo == 0:
         n = random.randint(0, 9)
