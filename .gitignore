@@ -8,8 +8,6 @@ old/
 libdarknet.so
 ttfs/
 pngs/
-/media/data/3D/projets/darknet-letters/letters/ttf_to_png/pngs/*
-/media/data/3D/projets/darknet-letters/letters/ttf_to_png/ttfs/*
 
 # Blender
 *.blend1
