@@ -6,8 +6,8 @@
 # divers
 old/
 libdarknet.so
-letters/ttf_to_png/ttfs/
-letters/ttf_to_png/pngs/
+ttfs/
+pngs/
 
 # Blender
 *.blend1
