@@ -4,10 +4,10 @@
 *.geanywb
 
 # divers
-old/*
+old/
 libdarknet.so
-ttfs/*
-pngs/*
+ttfs/
+pngs/
 
 # Blender
 *.blend1
