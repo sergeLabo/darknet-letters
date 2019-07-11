@@ -18,7 +18,14 @@
 
 
 """
-Les scripts pour faire des manips utiles au projet
+    Crée les images qui rassemble les images individuelles des lettres
+    dans le dossier textures.
+    
+Copier le dossier pngs
+de
+        /media/data/3D/projets/darknet-letters/letters/ttf_to_png
+dans
+        /media/data/3D/projets/darknet-letters/letters/game/textures
 """
 
 
@@ -31,6 +38,7 @@ from pymultilame import MyTools
 
 
 def directory_rename():
+
     mt = MyTools()
     rep_num = 0
     rep = "/media/data/3D/projets/darknet-letters/letters/game/textures/pngs"
@@ -302,7 +310,18 @@ def get_plane_vertices_position(obj):
 
 
 if __name__ == '__main__':
-    # #directory_rename()
-    # #get_square_image()
-    # #resize_at_biggest()
+    """
+    Crée les images qui rassemble les images individuelles des lettres
+    dans le dossier textures.
+    
+    Copier le dossier pngs
+    de
+            /media/data/3D/projets/darknet-letters/letters/ttf_to_png
+    dans
+            /media/data/3D/projets/darknet-letters/letters/game/textures
+    """
+
+    directory_rename()
+    get_square_image()
+    resize_at_biggest()
     regroupage_font_images()

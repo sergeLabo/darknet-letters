@@ -2,6 +2,6 @@
 # -*- coding: UTF-8 -*-
 
 
-cd game
+cd ./letters/game
 
 blenderplayer letters.blend

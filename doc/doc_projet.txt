@@ -6,13 +6,16 @@ Documentation du projet
                 velocity = volume = 0 à 100
         note = (102, 89)
         note = (minuscule, majuscule)
-        
+
+    unité
     abcdefghij = 10 lettres
     0123456789
 
+    dizaine
     klmnopqrs = 9 lettres
     123456789*10
 
+    centaine
     t = 1 lettres
     100
 
@@ -28,7 +31,7 @@ Documentation du projet
 Ajoute obj à la place de Empty
     position liste de 3
     
-    addObject(object, reference, time=0)
+    addObject(object, reference, 0)
     Adds an object to the scene like the Add Object Actuator would.
     Parameters:	
         object (KX_GameObject or string) – The (name of the) object to add.
@@ -53,3 +56,13 @@ Division d'un plan texturé:
     In Object mode apply the edge split modifier
     (optional) in Edit mode -> select the faces if not selected -> Ctrl + E -> clear sharp
     In Edit mode -> P -> separate by loose parts (séparer par partie mal fixée, pas attachées)
+
+
+def apply_new_texture():
+    """Le changement de texture se afit sur tous les objets avec la texture,
+    donc sur les objets dupliqués
+    """
+    if gl.tempo["test"].tempo == 0:
+        n = random.randint(0, 9)
+        new_tex = "//textures/pngs/font_" + str(n) + "/A.png"
+        gl.tc.texture_new(new_tex)
