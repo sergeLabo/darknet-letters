@@ -125,7 +125,7 @@ def get_all_lettres():
     
     obj_dict = {}
 
-    for i in range(5):  # nombre de font min et maj
+    for i in range(6):  # nombre de font min et maj
         obj_dict[i] = {}
         for l in minus:
             obj_dict[i][l] = "font_" + str(i) + "_" + l 
