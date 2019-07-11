@@ -6,6 +6,8 @@
 # divers
 old/
 libdarknet.so
+ttfs/
+pngs/
 
 # Blender
 *.blend1
