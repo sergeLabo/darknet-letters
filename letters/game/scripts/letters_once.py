@@ -27,6 +27,8 @@ Seuls les attributs de logic sont stockés en permanence.
 import os, sys
 import json
 import threading
+import pathlib
+from random import randint
 
 from bge import logic as gl
 
@@ -79,9 +81,19 @@ def get_midi_json():
     gl.instruments = {0: "Lead Strings", 1: ...}
     """
 
-    root = "/media/data/3D/projets/darknet-letters/letters/midi/"
-    gl.midi_json = root + "Yellow-Submarine.json"
-    #gl.midi_json = root + "Out of Africa.json"
+    root = "/media/data/3D/projets/darknet-letters/letters/midi/json/"
+
+    file_list = []
+    for path, subdirs, files in os.walk(root):
+        for name in files:
+            if name.endswith("json"):
+                file_list.append(str(pathlib.PurePath(path, name)))
+    
+    n = randint(0, len(file_list)-1)
+    print("Fichier en cours:", file_list[n])
+    
+    gl.midi_json = file_list[n]
+    
     with open(gl.midi_json) as f:
         data = json.load(f)
 
@@ -125,7 +137,7 @@ def get_all_lettres():
     
     obj_dict = {}
 
-    for i in range(6):  # nombre de font min et maj
+    for i in range(10):  # nombre de font min et maj
         obj_dict[i] = {}
         for l in minus:
             obj_dict[i][l] = "font_" + str(i) + "_" + l 

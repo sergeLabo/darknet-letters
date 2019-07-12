@@ -23,7 +23,8 @@ Lancé à chaque frame durant tout le jeu.
 
 
 import os
-import random
+from random import uniform
+import numpy
 
 from pymultilame import MyTools
 from pymultilame import get_all_objects, get_scene_with_name
@@ -81,15 +82,36 @@ def display(note_tuple, font):
 
     # Affichage des lettres
     for letter in to_display:
-        if font < 5:  # TODO
+        if font < 10:
             if letter:
                 ob = "font_" + str(font) + "_" + letter
                 gl.obj_name_list_to_display.append(ob)
                 #print(letter, type(letter))
                 letter_obj = gl.all_obj[ob]
-                # Correction du décalage du centre de l'objet
-                x, y, z = get_mesh_position(letter_obj)
-                letter_obj.worldPosition = x, y, z
+                set_letter_position(letter_obj)
+                
+
+def set_letter_position(letter_obj):
+    """Plage possible en position -9.6 à 9.6"""
+
+    # Correction du décalage du centre de l'objet
+    x, y, z = get_mesh_position(letter_obj)
+
+    plagex = 1
+    # #u = uniform(-plagex, plagex)
+    u = numpy.random.uniform(-plagex, plagex)
+    
+    plagey = 1
+    # #v = uniform(-plagey, plagey)
+    v = numpy.random.uniform(-plagey, plagey)
+    
+    # les plans qui ont créés les lettres sont décalés de dh vers le haut
+    # le rang du bas a été coupé
+    dh = 1
+    letter_obj.worldPosition = u - x, 0, v - z + dh
+    
+    size = uniform(0.3, 1.2)
+    letter_obj.worldScale = size, size, size
 
     
 def hide_unplayed_letters():
@@ -98,7 +120,9 @@ def hide_unplayed_letters():
     for k, v in gl.all_obj.items():
         if k not in gl.obj_name_list_to_display:
             if "font" in k:  # pas les cam, lamp ...
-                v.worldPosition = 20, 0, 0
+                # décalage aléatoire
+                dec = uniform(5, 50)
+                v.worldPosition = 20 + dec, 0, 0
                 v.worldScale = 1, 1, 1
 
 
@@ -203,7 +227,7 @@ def conversion(note, casse):
         c = CENTAINE[centaine-1] # pas de zéro
     else:
         c = None
-    print("Note", note, "=", centaine, dizaine, unite, "soit", c, d, u)
+    #print("Note", note, "=", centaine, dizaine, unite, "soit", c, d, u)
     
     return c, d, u
 

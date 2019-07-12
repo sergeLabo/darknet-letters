@@ -45,7 +45,19 @@ LETTRES = list(L)
 C = "0123456789"
 CHIFFRES = list(C)
 
-
+# https://www.imagemagick.org/script/color.php
+COLORS = [  "grey80",
+            "purple1",
+            "OliveDrab1",
+            "orange",
+            "red",
+            "yellow",
+            "GreenYellow",
+            "lime",
+            "DeepSkyBlue",
+            "magenta",
+            "PeachPuff2"]
+            
 class TtftoPng:
 
     def __init__(self, size):
@@ -53,12 +65,7 @@ class TtftoPng:
         self.tools = MyTools()
 
         # 10 polices possible seulement
-        # https://www.imagemagick.org/script/color.php
-        self.colors = [ "SaddleBrown", "GreenYellow", "gray60", "MediumBlue",
-                        "magenta2", "SpringGreen", "pink", "cyan3", "tomato",
-                        "orchid3", "DimGray", "salmon","NavajoWhite4",
-                        "goldenrod1", "SpringGreen", "DeepSkyBlue3",
-                        "red", "blue"]
+        self.colors = COLORS
         self.color_num = 0
         
         # Create pngs directory
@@ -76,6 +83,7 @@ class TtftoPng:
         for rep in self.ttf_list:
             # récup du ttf
             ttf = self.tools.get_all_files_list(rep, 'ttf')
+            print("Conversion de:", rep)
             self.convert_ttf(rep, ttf)
             self.color_num += 1
             
@@ -100,7 +108,7 @@ class TtftoPng:
         label:"A" A.png
         """
 
-        print("Conversion de {}".format(letter))
+        #print("Conversion de {}".format(letter))
         
         filename = "./pngs" + rep[6:] + "/" + letter + ".png"
 
@@ -111,10 +119,10 @@ class TtftoPng:
             font = font.replace(' ', '\\ ')
             color = self.colors[self.color_num]
             
-            print(  "Conversion de: ", font,
-                    " lettre: ", letter,
-                    " dans: ", filename,
-                    "color", color)
+            # #print(  "Conversion de: ", font,
+                    # #" lettre: ", letter,
+                    # #" dans: ", filename,
+                    # #"color", color)
 
             command = 'convert -background none -fill {4} -font {3} \
                        -pointsize {1} label:"{0}" {2}'.format(  letter,
@@ -122,7 +130,7 @@ class TtftoPng:
                                                                 filename,
                                                                 font,
                                                                 color)
-            print("command", command)
+            #print("command", command)
             
             subprocess.call(command, shell=True)
         

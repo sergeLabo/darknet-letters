@@ -77,10 +77,13 @@ def get_square_image():
             top, bottom= 0, 0
             b = int((h - w)/2)
             left = right = b
-            img = cv2.copyMakeBorder(img,
-                                     top, bottom, left, right,
-                                     cv2.BORDER_CONSTANT,
-                                     value=[0, 0, 0, 0])
+            try:
+                img = cv2.copyMakeBorder(img,
+                                         top, bottom, left, right,
+                                         cv2.BORDER_CONSTANT,
+                                         value=[0, 0, 0, 0])
+            except:
+                print("Largeur plus grande que hauteur pour l'image", img_file)
             cv2.imwrite(img_file, img)
 
 

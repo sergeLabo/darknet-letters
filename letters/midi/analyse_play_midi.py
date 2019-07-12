@@ -135,6 +135,9 @@ class AnalyseMidiFile:
     """Analyse le fichier midi,
     trouve le nombre et le nom des instruments.
     Retourne la liste des notes sur une time lapse de chaque instrument.
+
+    TODO: problème si tous les instruments sont:
+                                                untitled  !!!!
     """
 
     def __init__(self, midi_file, FPS):
@@ -175,9 +178,10 @@ class AnalyseMidiFile:
         # Tout dans un dict
         tout = {}
         for k, v in instruments_dict.items():
-            tout[v.name] = partitions[k]
+            tout[k] = partitions[k]
 
-        file_name = self.midi_file[8:-4] + ".json"
+        # TODO le fichier midi doit avoir l'extension midi de 4 lettres
+        file_name = "./json/" + self.midi_file[8:-3] + "json"
         
         with open(file_name, 'w') as f_out:
             json.dump(tout, f_out)
@@ -202,9 +206,9 @@ class AnalyseMidiFile:
 
         instruments_dict = {}
         for i in range(nbi):
-            nom = instruments[i].name
+            program = instruments[i].program
             instruments_dict[i] = instruments[i]
-            print("Instrument", i, "Nom:", nom)
+            print("Instrument", i, "program:", program)
 
         return instruments_dict
 
@@ -285,17 +289,11 @@ class AnalyseAndPlay:
         self.partitions, instruments_dict = amf.get_partitions()
         print("Fin de l'analyse des partitions")
         print("Nombre de partition", len(self.partitions))
-
-        # Affichage
-        disp = Display(self.partitions)
-        self.thread_display(disp)
-
+        print(instruments_dict)
         for i in range(len(self.partitions)):
-            # ligne au hasard
-            haz = randint(0, len(self.banks)-1)
-            line = self.banks[haz].split(" ")
-            # provisoire: piano imposé
-            bank, bank_number = 0, 0  # int(line[0]), int(line[1])
+            # #bank, bank_number = get_bank_bank_number()
+            bank = 0
+            bank_number = instruments_dict[i].program
             self.thread_play_partition(bank,
                                        bank_number,
                                        self.partitions[i],
@@ -304,6 +302,13 @@ class AnalyseAndPlay:
         sleep(len(self.partitions[0])/100)
         print("Fin du fichier", file_list[n])
 
+    def get_bank_bank_number(self):
+        # ligne au hasard
+        haz = randint(0, len(self.banks)-1)
+        line = self.banks[haz].split(" ")
+        bank, bank_number = int(line[0]), int(line[1])
+        return bank, bank_number
+            
     def play_partition(self, bank, bank_number, partition, instrument):
         pomc = PlayOneMidiChannel(self.fonts, bank, bank_number)
         pomc.play_partition(partition, self.FPS, instrument)
@@ -399,7 +404,7 @@ if __name__ == '__main__':
                 file_list.append(str(pathlib.PurePath(path, name)))
     
     n = randint(0, len(file_list)-1)
-    print("Fichier en cours:", "./" + file_list[n])
+    print("Fichier en cours:", file_list[n])
 
     # FPS de 10 (trop petit) à 100 (bien)
     FPS = 50
@@ -410,12 +415,14 @@ if __name__ == '__main__':
     # Le fichier bank_GM.txt doit être avec ce sript
     bank_GM_txt = "./bank_GM.txt"
 
-    midi = "./" + file_list[n]
+    # Création des json
+    # #for n in range(len(file_list)):
+        # #midi = "./" + file_list[n]
 
-    # pour créer un json
-    amf = AnalyseMidiFile(midi, FPS)
-    partitions, instruments_dict = amf.get_partitions()
-    amf.save_midi_json(partitions, instruments_dict)
+        # ## pour créer un json
+        # #amf = AnalyseMidiFile(midi, FPS)
+        # #partitions, instruments_dict = amf.get_partitions()
+        # #amf.save_midi_json(partitions, instruments_dict)
 
     # Joue un json
     # #midi_json = "/media/data/3D/projets/darknet-letters/letters/midi/Out of Africa.json"
@@ -423,4 +430,5 @@ if __name__ == '__main__':
     # #pjm.play()
 
     # Pour analyser et jouer
-    #aap = AnalyseAndPlay(midi, FPS, fonts, bank_GM_txt)
+    midi = "./" + file_list[n]
+    aap = AnalyseAndPlay(midi, FPS, fonts, bank_GM_txt)
