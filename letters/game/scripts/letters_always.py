@@ -25,6 +25,7 @@ Lancé à chaque frame durant tout le jeu.
 import os
 from random import uniform
 import numpy
+from time import time, sleep
 
 from pymultilame import MyTools
 from pymultilame import get_all_objects, get_scene_with_name
@@ -34,7 +35,8 @@ from bge import logic as gl
 
 def main():
     gl.tempo.update()
-    #print(gl.tempo["frame"].tempo)
+    print_frame_rate()
+    sleep(0.016)
     
     # Pratique ça
     gl.all_obj = get_all_objects()
@@ -43,30 +45,70 @@ def main():
     gl.obj_name_list_to_display = []
     
     # les notes de la frame
-    get_frame_data()
-    get_notes_in_frame_data()
+    get_frame_notes()
 
     # Décalage des lettres non jouées
     hide_unplayed_letters()
     
 
-def get_notes_in_frame_data():
-    """
-        gl.frame_data = [[[67, 64]], [], [[36, 64], [43, 40]], []]
-                     instrum 1   2    3   4                     5
+def print_frame_rate():
+    sec = gl.tempo["seconde"].tempo
+    if sec == 0:
+        fps = int(60 / (time() - gl.time))
+        print("Frame rate =", fps)
+        gl.time = time()
 
-        gl.notes = {0: [], 1: ....}
+
+def get_frame_notes():
     """
-    gl.notes = {}
-    for instrum in gl.frame_data:
-        # Une police par instrument
-        font = gl.frame_data.index(instrum)
+    gl.partitions  = [partition_1, partition_2 ......],
+    gl.instruments = [instrument_1.program,
+                      instrument_2.program, ...]
+    pour
+    frame_data = [[[67, 64], [25, 47]], [], [[36, 64], [43, 40]]], ...
+            instrum 1          2    3         4          5
+    il n'y a qu'une note par instrument et par frame
+    45: [67, 64],      8: [], 14: []}
+           
+    """
+
+    # Le numéro de frame de 0 à infini
+    fr = gl.tempo["frame"].tempo
+    frame_data = []
+    
+    # Si le morceau n'est pas fini
+    if fr < len(gl.partitions[0]):
+        # si gl.partitions à 6 listes soit 6 partitions
+        for partition in gl.partitions:
+            frame_data.append(partition[fr])
+    else:
+        # je kill
+        #os._exit(0)
+        frame_data = []
         
-        # instrum = [[67, 64]] ou [] ou [[36, 64], [43, 40]]
-        if instrum:  # Pas d'analyse si liste vide
-            for note_tuple in instrum:  # [67, 64]
-                display(note_tuple, font)
-                
+    # instrument est le numéro de la bank, valeur perdue non visualisée
+    # Une police par instrument
+    # frame_data = [[], []] note_tuple = [67, 64]
+    pretty = ""
+    if frame_data:
+        pretty = []
+        for note_partition in frame_data:
+            # frame_data = [[[67, 64]], [[25, 47]]]
+            # note_partition = [[67, 64]] 
+            if note_partition:
+                font = frame_data.index(note_partition)
+                # la liste est dans une liste
+                note = note_partition[0][0]
+                volume = note_partition[0][1]
+
+                # Affichage
+                display((note, volume), font)
+
+                # Terminal
+                pretty.append(((note, volume), font))
+    if fr % 60 == 0:
+        print("note_tuple, font:", pretty)
+
 
 def display(note_tuple, font):
 
@@ -86,65 +128,37 @@ def display(note_tuple, font):
             if letter:
                 ob = "font_" + str(font) + "_" + letter
                 gl.obj_name_list_to_display.append(ob)
-                #print(letter, type(letter))
                 letter_obj = gl.all_obj[ob]
                 set_letter_position(letter_obj)
                 
 
 def set_letter_position(letter_obj):
-    """Plage possible en position -9.6 à 9.6"""
+    """Réglage visuel"""
 
-    # Correction du décalage du centre de l'objet
-    x, y, z = get_mesh_position(letter_obj)
-
-    plagex = 1
-    # #u = uniform(-plagex, plagex)
+    plagex = 4.0
     u = numpy.random.uniform(-plagex, plagex)
     
-    plagey = 1
-    # #v = uniform(-plagey, plagey)
+    plagey = 4.0
     v = numpy.random.uniform(-plagey, plagey)
     
-    # les plans qui ont créés les lettres sont décalés de dh vers le haut
-    # le rang du bas a été coupé
-    dh = 1
-    letter_obj.worldPosition = u - x, 0, v - z + dh
-    
-    size = uniform(0.3, 1.2)
+    un_peu_haut = 0
+    letter_obj.worldPosition = u , 0, v - un_peu_haut
+
+    size = numpy.random.uniform(0.1, 1.1)
     letter_obj.worldScale = size, size, size
 
     
 def hide_unplayed_letters():
     """all_obj["font_1_f"] = obj_blender"""
 
+    dec = 0
     for k, v in gl.all_obj.items():
         if k not in gl.obj_name_list_to_display:
             if "font" in k:  # pas les cam, lamp ...
-                # décalage aléatoire
-                dec = uniform(5, 50)
-                v.worldPosition = 20 + dec, 0, 0
+                # décalage sur y
+                v.worldPosition = 50, dec, 0
                 v.worldScale = 1, 1, 1
-
-
-def get_frame_data():
-    """
-    gl.data = {0: [[52, 63], [46, 47], ...], 0: .....}
-    gl.instruments = {0: "Lead Strings", 1: ...}
-    pour
-    gl.frame_data = [[[67, 64]], [], [[36, 64], [43, 40]], []]
-                     instrum 1   2    3          4         5
-    """
-
-    # les notes de la parttition 0 seulement
-    f = gl.tempo["frame"].tempo
-    gl.frame_data = []
-    for i in range(gl.partition_nbr):
-        # [[], [], ....] [les notes de chaque instrument]
-        if f < len(gl.data[0]):  # TODO trop léger
-            gl.frame_data.append(gl.data[i][f])
-        else:
-            gl.frame_data = []
-            os._exit(0)
+                dec += 0.1
 
 
 def get_pos_nums(num):
@@ -232,38 +246,54 @@ def conversion(note, casse):
     return c, d, u
 
 
-def get_mesh_position(plan):
-    """Le centre de l'objet est 0,0,0
-    je calcule la position d e la moyenne des 4 vertices du plan
-    """
-    # Liste de 4 liste de 3
-    vl = get_plane_vertices_position(plan)
 
-    # Moyenne des x
-    x = (vl[0][0] + vl[2][0])/2
-    # Moyenne des y
-    y = (vl[0][1] + vl[1][1])/2
-    # Moyenne des z
-    z = (vl[0][2] + vl[1][2])/2
+    # ## Correction du décalage du centre de l'objet
+    # #x, y, z = get_mesh_position(letter_obj)
+    
+    # ## TODO Erreur sur z dû à ???
+    # #bad = "bcdefkpBCDEFKP"
+    # #z_error = 0
+    # #for l in bad:
+        # #a = "_" + l
+        # #if a in letter_obj.name: 
+            # #z_error = 2
+            # #break
+
+                # Pour debug
+    #letter_obj.worldPosition =  -x , -y, -z + z_error - un_peu_haut
+    
+# #def get_mesh_position(plan):
+    # #"""Le centre de l'objet est 0,0,0
+    # #je calcule la position d e la moyenne des 4 vertices du plan
+    # #"""
+    # ## Liste de 4 liste de 3
+    # #vl = get_plane_vertices_position(plan)
+
+    # ## Moyenne des x
+    # #x = (vl[0][0] + vl[2][0])/2
+    # ## Moyenne des y
+    # #y = (vl[0][1] + vl[1][1])/2
+    # ## Moyenne des z
+    # #z = (vl[0][2] + vl[1][2])/2
             
-    return x, y, z
+    # #return x, y, z
 
 
-def get_plane_vertices_position(obj):
-    """Retourne les coordonnées des vertices d'un plan
-    [[5.5, -4.125, 1.5], [5.5, -3.375, 1.5], [4.5, -3.375, 1.5],
-                                                    [4.5, -4.125, 1.5]]
-    """
-    verts = []
-    a = 0
-    for mesh in obj.meshes:
-        a += 1
-        for m_index in range(len(mesh.materials)):
-            for v_index in range(mesh.getVertexArrayLength(m_index)):
-                verts.append(mesh.getVertex(m_index, v_index))
+# #def get_plane_vertices_position(obj):
+    # #"""Retourne les coordonnées des vertices d'un plan
+    # #[[5.5, -4.125, 1.5], [5.5, -3.375, 1.5], [4.5, -3.375, 1.5],
+                                                    # #[4.5, -4.125, 1.5]]
+    # #"""
+    # #verts = []
+    # #a = 0
+    # #for mesh in obj.meshes:
+        # #a += 1
+        # #for m_index in range(len(mesh.materials)):
+            # #for v_index in range(mesh.getVertexArrayLength(m_index)):
+                # #verts.append(mesh.getVertex(m_index, v_index))
 
-    vertices_list = []
-    for i in range(4):
-        vertices_list.append([verts[i].x, verts[i].y, verts[i].z])
+    # #vertices_list = []
+    # #for i in range(4):
+        # #vertices_list.append([verts[i].x, verts[i].y, verts[i].z])
 
-    return vertices_list
+    # #return vertices_list

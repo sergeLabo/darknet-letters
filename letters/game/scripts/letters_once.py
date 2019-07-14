@@ -70,51 +70,73 @@ def get_conf():
 def set_tempo():
 
     # Création des objects
-    tempo_liste = [("test", 60), ("frame", 999999999)]
+    tempo_liste = [("seconde", 60), ("frame", 999999999)]
     gl.tempo = Tempo(tempo_liste)
+    gl.frame_rate = 0
+    gl.time = 0
 
-
-def get_midi_json():
-    """{"Lead Strings": [[[67, 64]], [[67, 64]], [[67, 64]], [[67, 64]], ...
-
-    gl.data = {0: [[52, 63], [46, 47], ...], 0: .....}
-    gl.instruments = {0: "Lead Strings", 1: ...}
+    
+def get_midi_json_test():
+    """
+    json_data = {"partitions":  [partition_1, partition_2 ......],
+                 "instruments": [instrument_1.program,
+                                 instrument_2.program, ...]
     """
 
-    root = "/media/data/3D/projets/darknet-letters/letters/midi/json/"
-
+    # TODO à revoir
     file_list = []
-    for path, subdirs, files in os.walk(root):
+    d = "/media/data/3D/projets/darknet-letters/letters/midi/json"
+    for path, subdirs, files in os.walk(d):
         for name in files:
             if name.endswith("json"):
                 file_list.append(str(pathlib.PurePath(path, name)))
-    
-    n = randint(0, len(file_list)-1)
-    print("Fichier en cours:", file_list[n])
-    
-    gl.midi_json = file_list[n]
-    
+
+    for midi_json in file_list:
+        print(midi_json)
+        with open(midi_json) as f:
+            data = json.load(f)
+
+            # TODO bizarre la liste data["partitions"] est dans une liste
+            gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
+            gl.instruments = data["instruments"]  # [instrument_1.program, ...
+            gl.partition_nbr = len(gl.partitions)
+            print("Nombre d'instrument:", len(gl.instruments),
+                  "Nombre de partitions:", len(gl.partitions))
+
+
+def get_midi_json():
+    """
+    json_data = {"partitions":  [partition_1, partition_2 ......],
+                 "instruments": [instrument_1.program,
+                                 instrument_2.program, ...]
+    """
+                  
+    # ## TODO chemin à revoir
+    json_f = "strauss ainsi parla zarathoustra.json"
+    json_f = "Capri.json"
+    json_f = "Michael_Jackson_-_Man_In_The_Mirror.json"
+    json_f = "ABBA_-_Gimme_Gimme_Gimme.json"
+    root = "/media/data/3D/projets/darknet-letters/letters/midi/json/"
+    gl.midi_json = root + json_f
+    print("Fichier midi en cours:", gl.midi_json)
+
     with open(gl.midi_json) as f:
         data = json.load(f)
 
-    # Remplacement du nom de l'instrument par numéro
-    gl.data = {}
-    gl.instruments = {}
-    i = 0
-    for k, v in data.items():
-        gl.data[i] = v
-        gl.instruments[i] = k
-        i += 1
-    gl.partition_nbr = len(gl.data)
+        # TODO bizarre la liste data["partitions"] est dans une liste
+        gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
+        gl.instruments = data["instruments"]  # [instrument_1.program, ...
+        gl.partition_nbr = len(gl.partitions)
+        print("Nombre d'instrument:", len(gl.instruments),
+              "Nombre de partitions:", len(gl.partitions))
 
-
+                  
 def play_json():
     """Play le json"""
 
     FPS = 50
     fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
-    bank_GM_txt = "/media/data/3D/projets/darknet-letters/letters/midi/bank_GM.txt"
-    gl.pjm = PlayJsonMidi(gl.midi_json, FPS, fonts, bank_GM_txt)
+    gl.pjm = PlayJsonMidi(gl.midi_json, FPS, fonts)
     thread_play_json()
 
 

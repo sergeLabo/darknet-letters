@@ -18,17 +18,15 @@
 
 
 """
-Utilise FluidR3_GM.sf2 uniquement
+Utilise FluidR3_GM.sf2 uniquement.
+
 Installation:
     numpy
     pretty_midi
     fluidsynth
     FluidR3_GM.sf2
-Le dossier music doit exister avec des morceaux midi
-Le fichier bank_GM.txt doit être avec ce script
-
-Excécution du script, pour jouer un morceau au hasard:
-    python3 analyse_play_midi.py
+    
+Le dossier music doit exister avec des morceaux midi.
 """
 
 
@@ -42,12 +40,15 @@ import numpy as np
 import pretty_midi
 import fluidsynth
 
+# TODO: chemin à revoir
 
 class PlayOneMidiChannel:
     """Ne fonctionne qu'avec FluidR3_GM.sf2"""
 
     def __init__(self, fonts, bank, bank_number):
-        """self.channel 1 to 16"""
+        """self.channel 1 to 16
+        TODO Sert à quoi ?
+        """
 
         self.fonts = fonts
         self.channel = 1
@@ -77,29 +78,27 @@ class PlayOneMidiChannel:
         self.fs.program_select(self.channel, sfid, self.bank, self.bank_number)
 
     def play_note(self, note, volume):
-
+        """Lance un thread"""
+        
         self.fs.noteon(self.channel, note, volume)
         while self.thread_dict[note]:
             sleep(0.0001)
         # Sinon fin de la note
-        # print("Fin du thread de la note:", note)
         self.fs.noteoff(self.channel, note)
 
     def thread_note(self, note, volume):
         """Le thread se termine si note_off"""
 
-        # print("Lancement du thread de la note:", note)
         self.thread_dict[note] = 1
         thread = threading.Thread(target=self.play_note, args=(note, volume))
         thread.start()
 
-    def play_partition(self, partition, FPS, instrument):
+    def play_partition(self, partition, FPS):
         """partition = liste de listes (note=82, velocity=100)
         [[(82,100)], [(82,100), (45,88)], [(0,0)], ...
         un item tous les 1/FPS
         """
 
-        print("Excécution de la partition de", instrument)
         for event in partition:
             # event sont les notes pour la frame
             nombre_de_note = len(event)
@@ -118,14 +117,13 @@ class PlayOneMidiChannel:
                 if v == 1:
                     if k not in note_en_cours:
                         self.thread_dict[k] = 0
-
+                        
             sleep(1/FPS)
 
-        print("The end of", instrument, "!")
         self.the_end()
 
     def the_end(self):
-        """Fin  de tous les threads"""
+        """Bombe atomique: Fin  de tous les threads"""
 
         for i in range(128):
             self.thread_dict[i] = 0
@@ -135,9 +133,10 @@ class AnalyseMidiFile:
     """Analyse le fichier midi,
     trouve le nombre et le nom des instruments.
     Retourne la liste des notes sur une time lapse de chaque instrument.
+    save_midi_json enregistre le midi en json
 
-    TODO: problème si tous les instruments sont:
-                                                untitled  !!!!
+    partitions = liste des partitions
+    instruments = liste des instruments soit objet avec .program et .name
     """
 
     def __init__(self, midi_file, FPS):
@@ -149,68 +148,69 @@ class AnalyseMidiFile:
         self.midi_file = midi_file
         self.FPS = FPS
         self.end_time = 0
-
+        print("\nAnalyse de", midi_file)
+        
     def get_partitions(self):
         """Fait les étapes pour tous les instruments"""
 
-        instruments_dict = self.get_instruments_dict()
+        instruments = self.get_instruments()
         partitions = []
-        for k, v in instruments_dict.items():
-            instrument_roll = self.get_instrument_roll(v)
-            partition = self.get_partition(instrument_roll, v)
+        for instrument in instruments:
+            print("Analyse de:", instrument.program, "soit", instrument.name)
+            instrument_roll = self.get_instrument_roll(instrument)
+            partition = self.get_partition(instrument_roll, instrument)
             partitions.append(partition)
 
-        return partitions, instruments_dict
+        return partitions, instruments
 
-    def save_midi_json(self, partitions, instruments_dict):
+    def save_midi_json(self, partitions, instruments):
         """
-        partitions = liste des partition
-        instruments_dict = {0: Bass}
-        partition = [[(54, 89), (68, 91)], ... [] ...]
-        tout = {"Lead Strings": [[[67, 64]], [[67, 64]],[[67, 64]], ...,
-                "Trombone":  [[[58, 79]], [[78, 46]],[[46, 80]], ...,
+        partitions = liste des partitions = [partition_1, partition_2 ...]
+        instruments = [Instrument(program=71, is_drum=False, name="mélodie"),
+                        ...]
+            
+        json_data = {"partitions":  [partition_1, partition_2 ......],
+                     "instruments": [instrument_1.program,
+                                     instrument_2.program, ...]
+                      instrument is not JSON serializable = objet pretty_midi           
         """
-        print(  "Nombre de partitions", len(partitions), "\n",
-                "Nombre de notes pour 0:", len(partitions[0]), "\n",
-                "Dict des intruments:", instruments_dict, "\n",
-                "Fichier:", self.midi_file)
                 
-        # Tout dans un dict
-        tout = {}
-        for k, v in instruments_dict.items():
-            tout[k] = partitions[k]
+        json_data = {}
+        json_data["partitions"] = partitions
 
-        # TODO le fichier midi doit avoir l'extension midi de 4 lettres
-        file_name = "./json/" + self.midi_file[8:-3] + "json"
+        json_data["instruments"] = []
+        # index ne marche pas
+        for i in range(len(instruments)):
+            # instruments[i].program est un attribut de pretty_midi
+            json_data["instruments"].append(int(instruments[i].program))
+            
+        #/media/data/3D/projets/darknet-letters/letters/midi/music/Quizas.mid
+        #/media/data/3D/projets/darknet-letters/letters/midi/json/Quizas.json
+        l = self.midi_file.split(".")
+        name = l[0]
+        name = name.replace("music", "json")
+        file_name =  name + ".json"
         
         with open(file_name, 'w') as f_out:
-            json.dump(tout, f_out)
+            json.dump(json_data, f_out)
     
         print('Enregistrement de:', file_name)
 
-    def get_instruments_dict(self):
-        """ Instrument 0 Nom: Bass
-            Instrument 1 Nom: Drums
-            Instrument 2 Nom: Piano
-            Instrument 3 Nom: Piano
-            Instrument 4 Nom: Guitar
+    def get_instruments(self):
+        """instruments =
+        [Instrument(program=71, is_drum=False, name="mélodie"), ...]
         """
 
+        # Récupération des datas avec pretty_midi
         midi_pretty_format = pretty_midi.PrettyMIDI(self.midi_file)
         self.end_time = midi_pretty_format.get_end_time()
-        print("Fin à:", self.end_time)
-
         instruments = midi_pretty_format.instruments
-        nbi = len(instruments)
-        print("Nombre d'intruments:", nbi)
 
-        instruments_dict = {}
-        for i in range(nbi):
-            program = instruments[i].program
-            instruments_dict[i] = instruments[i]
-            print("Instrument", i, "program:", program)
-
-        return instruments_dict
+        print("Liste des instruments:")
+        for instrument in instruments:
+            print("   ", instrument)
+        
+        return instruments
 
     def get_instrument_roll(self, partition):
         """Retourne un np.array de (128, FPS*durée du morceau en secondes)"""
@@ -249,36 +249,24 @@ class AnalyseMidiFile:
             for n in range(128):
                 if np.any(ligne[n] != np.float64(0)):
                     velocity = int(ligne[n])
-                    if velocity > 150:
-                        velocity = 150
+                    if velocity > 127:
+                        velocity = 127
                     notes.append((n, velocity))
             partition.append(notes)
 
-        print("Nombre de note {} dans la partition de l'instrument {}"
-              .format(len(partition), instrument))
         return partition
 
 
 class AnalyseAndPlay:
 
-    def __init__(self, midi, FPS, fonts, bank_GM_txt):
+    def __init__(self, midi, FPS, fonts):
         """Fichier midi et FPS"""
 
         self.midi = midi
         self.FPS = FPS
         self.fonts = fonts
-        self.bank_GM_txt = bank_GM_txt
-        self.banks = self.get_banks()
         self.partitions = []
         self.analyse_and_play()
-
-    def get_banks(self):
-        file_name = self.bank_GM_txt
-        with open(file_name) as f:
-            data = f.read()
-            f.close()
-        lines = data.splitlines()
-        return lines
 
     def thread_display(self, disp):
         thread = threading.Thread(target=disp.display)
@@ -286,79 +274,58 @@ class AnalyseAndPlay:
 
     def analyse_and_play(self):
         amf = AnalyseMidiFile(self.midi, self.FPS)
-        self.partitions, instruments_dict = amf.get_partitions()
-        print("Fin de l'analyse des partitions")
-        print("Nombre de partition", len(self.partitions))
-        print(instruments_dict)
+        self.partitions, self.instruments = amf.get_partitions()
+        print("Fin de l'analyse des partitions:")
+        print("    Nombre de partition", len(self.partitions))
+
         for i in range(len(self.partitions)):
-            # #bank, bank_number = get_bank_bank_number()
+            # On ne peut utiliser que la bank 0 qui comprend 128 instruments
             bank = 0
-            bank_number = instruments_dict[i].program
+            bank_number = self.instruments[i].program
             self.thread_play_partition(bank,
                                        bank_number,
-                                       self.partitions[i],
-                                       instruments_dict[i])
+                                       self.partitions[i])
 
         sleep(len(self.partitions[0])/100)
         print("Fin du fichier", file_list[n])
-
-    def get_bank_bank_number(self):
-        # ligne au hasard
-        haz = randint(0, len(self.banks)-1)
-        line = self.banks[haz].split(" ")
-        bank, bank_number = int(line[0]), int(line[1])
-        return bank, bank_number
             
-    def play_partition(self, bank, bank_number, partition, instrument):
+    def play_partition(self, bank, bank_number, partition):
         pomc = PlayOneMidiChannel(self.fonts, bank, bank_number)
-        pomc.play_partition(partition, self.FPS, instrument)
+        pomc.play_partition(partition, self.FPS)
 
-    def thread_play_partition(self, bank, bank_number, partition, instrument):
+    def thread_play_partition(self, bank, bank_number, partition):
         """Le thread se termine si note_off"""
 
         thread = threading.Thread(target=self.play_partition, args=(
                                                                 bank,
                                                                 bank_number,
-                                                                partition,
-                                                                instrument
-                                                                ))
+                                                                partition))
         thread.start()
 
 
 class PlayJsonMidi:
 
-    def __init__(self, midi_json, FPS, fonts, bank_GM_txt):
+    def __init__(self, midi_json, FPS, fonts):
         """midi_json créé avec AnalyseMidiFile"""
 
         self.midi_json = midi_json
         self.partitions, self.instruments = self.get_data_json(midi_json)
         self.FPS = FPS
         self.fonts = fonts
-        self.bank_GM_txt = bank_GM_txt
-        self.banks = self.get_banks()
 
     def get_data_json(self, midi_json):
+        """
+        json_data = {"partitions":  [partition_1, partition_2 ......],
+                     "instruments": [instrument_1.program,
+                                     instrument_2.program, ...]
+        """
+        
         with open(self.midi_json) as f:
             data = json.load(f)
 
-        # Remplacement du nom de l'instrument par numéro
-        partitions = {}
-        instruments = {}
-        i = 0
-        for k, v in data.items():
-            partitions[i] = v
-            instruments[i] = k
-            i += 1
-
+        partitions = data["partitions"]
+        instruments = data["instruments"]
         return partitions, instruments
-        
-    def get_banks(self):
-        file_name = self.bank_GM_txt
-        with open(file_name) as f:
-            data = f.read()
-            f.close()
-        lines = data.splitlines()
-        return lines
 
     def thread_display(self, disp):
         thread = threading.Thread(target=disp.display)
@@ -366,29 +333,27 @@ class PlayJsonMidi:
 
     def play(self):
         for i in range(len(self.partitions)):
-            # ligne au hasard
-            haz = randint(0, len(self.banks)-1)
-            line = self.banks[haz].split(" ")
-            bank, bank_number = int(line[0]), int(line[1])
+            bank = 0
+            bank_number = self.instruments[i]
+            self.thread_play_partition(bank,
+                                       bank_number,
+                                       self.partitions[i])
+                                       
             partition = self.partitions[i]
-            instrument = self.instruments[i]
-            self.thread_play_partition(bank, bank_number, partition, instrument)
+            self.thread_play_partition(bank, bank_number, partition)
 
-    def play_partition(self, bank, bank_number, partition, instrument):
+    def play_partition(self, bank, bank_number, partition):
         pomc = PlayOneMidiChannel(self.fonts, bank, bank_number)
-        pomc.play_partition(partition, self.FPS, instrument)
+        pomc.play_partition(partition, self.FPS)
 
-    def thread_play_partition(self, bank, bank_number, partition, instrument):
+    def thread_play_partition(self, bank, bank_number, partition):
         """Le thread se termine si note_off"""
 
         thread = threading.Thread(target=self.play_partition, args=(
                                                                 bank,
                                                                 bank_number,
-                                                                partition,
-                                                                instrument
-                                                                ))
+                                                                partition))
         thread.start()
-
 
 
 if __name__ == '__main__':
@@ -397,14 +362,14 @@ if __name__ == '__main__':
     """
 
     file_list = []
-    d = "./music"
+    d = "/media/data/3D/projets/darknet-letters/letters/midi/music"
     for path, subdirs, files in os.walk(d):
         for name in files:
             if name.endswith("mid"):
                 file_list.append(str(pathlib.PurePath(path, name)))
     
-    n = randint(0, len(file_list)-1)
-    print("Fichier en cours:", file_list[n])
+    # #n = randint(0, len(file_list)-1)
+    # #print("\nFichier en cours:", file_list[n])
 
     # FPS de 10 (trop petit) à 100 (bien)
     FPS = 50
@@ -412,23 +377,27 @@ if __name__ == '__main__':
     # Il faut installer FluidR3_GM.sf2
     fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
 
-    # Le fichier bank_GM.txt doit être avec ce sript
-    bank_GM_txt = "./bank_GM.txt"
-
     # Création des json
-    # #for n in range(len(file_list)):
-        # #midi = "./" + file_list[n]
+    for midi in file_list:
+        amf = AnalyseMidiFile(midi, FPS)
+        partitions, instruments = amf.get_partitions()
+        amf.save_midi_json(partitions, instruments)
 
-        # ## pour créer un json
-        # #amf = AnalyseMidiFile(midi, FPS)
-        # #partitions, instruments_dict = amf.get_partitions()
-        # #amf.save_midi_json(partitions, instruments_dict)
-
-    # Joue un json
-    # #midi_json = "/media/data/3D/projets/darknet-letters/letters/midi/Out of Africa.json"
-    # #pjm = PlayJsonMidi(midi_json, FPS, fonts, bank_GM_txt)
+    # #root = "/media/data/3D/projets/darknet-letters/letters/"
+    # #midi = root + "midi/music/Out of Africa.mid"
+    # #midi_json = root + "midi/json/Out of Africa.json"
+    
+    # Création d'un json
+    # #m = "/media/data/3D/projets/darknet-letters/letters/midi/music/Le grand blond.mid"
+    # #amf = AnalyseMidiFile(m, FPS)
+    # #partitions, instruments = amf.get_partitions()
+    # #amf.save_midi_json(partitions, instruments)
+        
+    # ## Joue un json
+    # #json = "/media/data/3D/projets/darknet-letters/letters/midi/json/Le grand blond.json"
+    # #pjm = PlayJsonMidi(json, FPS, fonts)
     # #pjm.play()
 
-    # Pour analyser et jouer
-    midi = "./" + file_list[n]
-    aap = AnalyseAndPlay(midi, FPS, fonts, bank_GM_txt)
+    # ## Pour analyser et jouer
+    # #midi = file_list[n]
+    # #aap = AnalyseAndPlay(midi, FPS, fonts)

@@ -8,6 +8,8 @@ old/
 libdarknet.so
 ttfs/
 pngs/
+json/
+midi/
 
 # Blender
 *.blend1
