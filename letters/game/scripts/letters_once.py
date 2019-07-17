@@ -36,7 +36,7 @@ from pymultilame import MyConfig, MyTools, Tempo
 from pymultilame import TextureChange, get_all_objects
 
 sys.path.append("/media/data/3D/projets/darknet-letters/letters/midi")
-from analyse_play_midi import PlayJsonMidi
+from analyse_play_midi import PlayJsonMidi, PlayOneMidiNote
 
 
 def get_conf():
@@ -75,34 +75,6 @@ def set_tempo():
     gl.frame_rate = 0
     gl.time = 0
 
-    
-def get_midi_json_test():
-    """
-    json_data = {"partitions":  [partition_1, partition_2 ......],
-                 "instruments": [instrument_1.program,
-                                 instrument_2.program, ...]
-    """
-
-    # TODO à revoir
-    file_list = []
-    d = "/media/data/3D/projets/darknet-letters/letters/midi/json"
-    for path, subdirs, files in os.walk(d):
-        for name in files:
-            if name.endswith("json"):
-                file_list.append(str(pathlib.PurePath(path, name)))
-
-    for midi_json in file_list:
-        print(midi_json)
-        with open(midi_json) as f:
-            data = json.load(f)
-
-            # TODO bizarre la liste data["partitions"] est dans une liste
-            gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
-            gl.instruments = data["instruments"]  # [instrument_1.program, ...
-            gl.partition_nbr = len(gl.partitions)
-            print("Nombre d'instrument:", len(gl.instruments),
-                  "Nombre de partitions:", len(gl.partitions))
-
 
 def get_midi_json():
     """
@@ -112,10 +84,18 @@ def get_midi_json():
     """
                   
     # ## TODO chemin à revoir
-    json_f = "strauss ainsi parla zarathoustra.json"
-    json_f = "Capri.json"
-    json_f = "Michael_Jackson_-_Man_In_The_Mirror.json"
-    json_f = "ABBA_-_Gimme_Gimme_Gimme.json"
+    # #json_f = "strauss ainsi parla zarathoustra.json"
+    # #json_f = "Capri.json"
+    # #json_f = "Michael_Jackson_-_Man_In_The_Mirror.json"
+    # #json_f = "ABBA_-_Gimme_Gimme_Gimme.json"
+    # #json_f = "Video_Game_Themes_-_Final_Fantasy_3.json"
+    # #json_f = "Le grand blond.json"
+    # #json_f = "Out of Africa.json"
+    # #json_f = "Pepito.json"
+    # #json_f = "Out of Africa.json"
+    # #json_f = "test.json"
+    json_f = "Yellow-Submarine.json"
+    
     root = "/media/data/3D/projets/darknet-letters/letters/midi/json/"
     gl.midi_json = root + json_f
     print("Fichier midi en cours:", gl.midi_json)
@@ -134,45 +114,69 @@ def get_midi_json():
 def play_json():
     """Play le json"""
 
-    FPS = 50
+    FPS = 50  # TODO
     fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
     gl.pjm = PlayJsonMidi(gl.midi_json, FPS, fonts)
-    thread_play_json()
+    gl.pjm.play()
 
 
-def thread_play_json():
-    thread = threading.Thread(target=gl.pjm.play)
-    thread.start()
-
-
-def get_all_lettres():
-    """obj_dict = {
-    0: "a": nom_de_l_objet_blender = "font_0_a",
-    1: ...
-    appel du nom d'un objet avec obj_dict[0]["a"]
+def init_midi():
+    # TODO bordel
+    """bank = 0
+    bank_number = instrument[]
+    Dans PlayOneMidiPartition, une note est jouée avec:
+        .thread_note(note, volume)
+    La note est stoppée si:
+        objet.thread_dict[i] = 0
     """
-
-    m = "abcdefghijklmnopqrst"
-    M = "ABCDEFGHIJKLMNOPQRST"
-    minus = list(m)
-    majus = list(M)
     
-    obj_dict = {}
+    FPS = 50  # TODO
+    fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
+    bank = 0
+    gl.pomn = {}
 
-    for i in range(10):  # nombre de font min et maj
-        obj_dict[i] = {}
-        for l in minus:
-            obj_dict[i][l] = "font_" + str(i) + "_" + l 
-        for l in majus:
-            obj_dict[i][l] = "font_" + str(i) + "_" + l
+    channel = 1
+    for instrum in gl.instruments:
+        bank_number = instrum 
+        gl.pomn[instrum] = PlayOneMidiNote(fonts,channel, bank, bank_number)
+        channel += 1
+        
+
+def set_all_letters_unvisible():
+    """Toutes les lettres sont invisible au départ"""
+    for k, v in gl.all_obj.items():
+        if "font" in k:
+            v.visible = False
 
         
-    gl.obj_dict = obj_dict
+def set_all_letters_suspendDynamics():
+    """Toutes les lettres sont sans Dynamics au départ"""
+    
+    for k, v in gl.all_obj.items():
+        if "font" in k:
+            v.suspendDynamics(False)
+
+
+def set_all_letters_position():
+    """Etalement des lettres name = k"""
+    
+    l = "abcdefghijklmnopqrstABCDEFGHIJKLMNOPQRST"
+    letters = list(l)
+    
+    for k, v in gl.all_obj.items():
+        if "font" in k:
+            # font_0_a
+            x = 25 + int(k[5])
+            y = letters.index(k[7]) 
+            v.position = x, y, 0
     
 
 def set_variable():
     gl.notes = {}
     gl.obj_name_list_to_display = []
+
+    # Pratique ça
+    gl.all_obj = get_all_objects()
 
     
 def main():
@@ -186,14 +190,19 @@ def main():
 
     set_tempo()
 
-    # Le dict avec le nom des objets
-    get_all_lettres()
-
     # midi
     get_midi_json()
-    play_json()
+    #play_json()
+    init_midi()
     
     set_variable()
+
+    # Pour accélérer le jeu, mais ne marche pas
+    set_all_letters_unvisible()
+    set_all_letters_suspendDynamics()
+
+    # En dehors de la vue caméra
+    set_all_letters_position()
     
     # Pour les mondoshawan
     print("\nBonjour des mondoshawans\n\n")

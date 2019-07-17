@@ -46,6 +46,17 @@ sudo pip3 install opencv-python
 sudo apt install blender
 ~~~
 
+#### Midi
+
+##### fluidsynth
+~~~text
+sudo apt install fluidsynth
+~~~
+
+##### FluidR3_GM.sf2
+~~~text
+sudo apt install fluid-soundfont-gm
+~~~  
 
 ### License and Copyright
 

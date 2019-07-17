@@ -5,6 +5,7 @@
 
 # divers
 old/
+.old/
 libdarknet.so
 ttfs/
 pngs/

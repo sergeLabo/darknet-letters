@@ -42,7 +42,74 @@ import fluidsynth
 
 # TODO: chemin à revoir
 
-class PlayOneMidiChannel:
+class PlayOneMidiNote:
+    """Ne fonctionne qu'avec FluidR3_GM.sf2"""
+
+    def __init__(self, fonts, channel, bank, bank_number):
+        """self.channel 1 to 16
+        fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
+        bank = 0, il y a d'autres bank dans FluidR3_GM.sf2
+                    mais pas toujours avec 128 instruments
+        bank_number = 0 à 127,
+                        idem pas toujours 128 instruments par bank_number
+
+        self.thread_dict = {69: 1, 48: 1, 78:0}           
+        """
+
+        # 1 objet PlayOneMidiNote = 1 channel
+        self.channel = channel
+        
+        self.fonts = fonts
+        self.bank = bank
+        self.bank_number = bank_number
+
+        self.set_audio()
+        self.thread_dict = {}
+
+    def set_audio(self):
+        """Spécifique à FluidR3_GM.sf2
+        note from 0 to 127 but all values are not possible in all bank
+        life 0 to ?
+        channel 1 to 16
+        volume 0 to 127
+
+        yamaha grand piano
+           program_select(channel,  sfid, bank, bank number)
+        fs.program_select(  1  ,    sfid,  0,      0       )
+        """
+
+        self.fs = fluidsynth.Synth()
+        self.fs.start(driver='alsa')
+        sfid = self.fs.sfload(self.fonts)
+        self.fs.program_select(self.channel, sfid, self.bank, self.bank_number)
+
+    def play_note(self, note, volume):
+        """Lancé par le thread thread_note
+        Se termine si self.thread_dict[note] = 0
+        """
+        
+        self.fs.noteon(self.channel, note, volume)
+        while self.thread_dict[note]:
+            # Pour rester dans cette boucle
+            sleep(0.0001)
+        # Sinon fin de la note
+        print("Fin du thread: channel=", self.channel, "note=", note)
+        self.fs.noteoff(self.channel, note)
+
+        # Supression de la clé du dict
+        del self.thread_dict[note]
+
+    def thread_note(self, note, volume):
+        """Le thread se termine si self.thread_dict[note]=0"""
+
+        print("Lancement du thread: channel=", self.channel, "note=", note)
+        
+        self.thread_dict[note] = 1
+        thread = threading.Thread(target=self.play_note, args=(note, volume))
+        thread.start()
+        
+            
+class PlayOneMidiPartition:
     """Ne fonctionne qu'avec FluidR3_GM.sf2"""
 
     def __init__(self, fonts, bank, bank_number):
@@ -61,7 +128,7 @@ class PlayOneMidiChannel:
             self.thread_dict[i] = 0
 
     def set_audio(self):
-        """Spécific à FluidR3_GM.sf2
+        """Spécifique à FluidR3_GM.sf2
         note from 0 to 127 but all values are not possible in all bank
         life 0 to ?
         channel 1 to 16
@@ -78,10 +145,13 @@ class PlayOneMidiChannel:
         self.fs.program_select(self.channel, sfid, self.bank, self.bank_number)
 
     def play_note(self, note, volume):
-        """Lance un thread"""
+        """Lancé par le thread thread_note
+        Se termine si self.thread_dict[note] = 0
+        """
         
         self.fs.noteon(self.channel, note, volume)
         while self.thread_dict[note]:
+            # Pour rester dans cette boucle
             sleep(0.0001)
         # Sinon fin de la note
         self.fs.noteoff(self.channel, note)
@@ -290,8 +360,8 @@ class AnalyseAndPlay:
         print("Fin du fichier", file_list[n])
             
     def play_partition(self, bank, bank_number, partition):
-        pomc = PlayOneMidiChannel(self.fonts, bank, bank_number)
-        pomc.play_partition(partition, self.FPS)
+        pomp = PlayOneMidiPartition(self.fonts, bank, bank_number)
+        pomp.play_partition(partition, self.FPS)
 
     def thread_play_partition(self, bank, bank_number, partition):
         """Le thread se termine si note_off"""
@@ -327,24 +397,21 @@ class PlayJsonMidi:
         instruments = data["instruments"]
         return partitions, instruments
 
-    def thread_display(self, disp):
-        thread = threading.Thread(target=disp.display)
-        thread.start()
-
     def play(self):
         for i in range(len(self.partitions)):
             bank = 0
             bank_number = self.instruments[i]
-            self.thread_play_partition(bank,
-                                       bank_number,
-                                       self.partitions[i])
-                                       
             partition = self.partitions[i]
             self.thread_play_partition(bank, bank_number, partition)
 
     def play_partition(self, bank, bank_number, partition):
-        pomc = PlayOneMidiChannel(self.fonts, bank, bank_number)
-        pomc.play_partition(partition, self.FPS)
+        """
+        bank = 0
+        bank_number = instrument[]
+        partition = [[(82,100)], [(82,100), (45,88)], [(0,0)], ...
+        """
+        pomp = PlayOneMidiPartition(self.fonts, bank, bank_number)
+        pomp.play_partition(partition, self.FPS)
 
     def thread_play_partition(self, bank, bank_number, partition):
         """Le thread se termine si note_off"""
@@ -357,9 +424,6 @@ class PlayJsonMidi:
 
 
 if __name__ == '__main__':
-    """Joue au hasard un morceau du dossier music
-    Il faut définir le chemin de FluidR3_GM.sf2
-    """
 
     file_list = []
     d = "/media/data/3D/projets/darknet-letters/letters/midi/music"
@@ -372,10 +436,11 @@ if __name__ == '__main__':
     # #print("\nFichier en cours:", file_list[n])
 
     # FPS de 10 (trop petit) à 100 (bien)
-    FPS = 50
+    FPS = 60
 
     # Il faut installer FluidR3_GM.sf2
     fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
+
 
     # Création des json
     for midi in file_list:
