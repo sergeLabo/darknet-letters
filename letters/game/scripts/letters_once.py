@@ -16,25 +16,25 @@
 #
 ########################################################################
 
-'''
+"""
 Ce script est appelé par main_init.main dans blender
-Il ne tourne qu'une seule fois pour initier lss variables
+Il ne tourne qu'une seule fois pour initier les variables
 qui seront toutes des attributs du bge.logic (gl)
 Seuls les attributs de logic sont stockés en permanence.
-'''
+
+Il est relancé par main de letters_always à la fin du morceau.
+"""
 
 
 import os, sys
 import json
-import threading
-import pathlib
-from random import randint
 
 from bge import logic as gl
 
 from pymultilame import MyConfig, MyTools, Tempo
 from pymultilame import TextureChange, get_all_objects
 
+# TODO chemin à revoir
 sys.path.append("/media/data/3D/projets/darknet-letters/letters/midi")
 from analyse_play_midi import PlayJsonMidi, PlayOneMidiNote
 
@@ -83,63 +83,81 @@ def get_midi_json():
                                  instrument_2.program, ...]
     """
                   
-    # ## TODO chemin à revoir
-    # #json_f = "strauss ainsi parla zarathoustra.json"
-    # #json_f = "Capri.json"
-    # #json_f = "Michael_Jackson_-_Man_In_The_Mirror.json"
-    # #json_f = "ABBA_-_Gimme_Gimme_Gimme.json"
-    # #json_f = "Video_Game_Themes_-_Final_Fantasy_3.json"
-    # #json_f = "Le grand blond.json"
-    # #json_f = "Out of Africa.json"
-    # #json_f = "Pepito.json"
-    # #json_f = "Out of Africa.json"
-    # #json_f = "test.json"
-    json_f = "Yellow-Submarine.json"
     
+    nbr = gl.conf["midi"]["file_nbr"]
+
+    # TODO chemin à revoir
     root = "/media/data/3D/projets/darknet-letters/letters/midi/json/"
-    gl.midi_json = root + json_f
+
+    all_json = gl.tools.get_all_files_list(root, ".json")
+
+    # Reset de nbr si fini
+    if nbr >= len(all_json):
+        nbr = 0
+
+    # Enregistrement du numéro du prochain fichier à lire
+    gl.ma_conf.save_config("midi", "file_nbr", nbr + 1)
+
+    gl.midi_json = all_json[nbr]
+    
     print("Fichier midi en cours:", gl.midi_json)
 
     with open(gl.midi_json) as f:
         data = json.load(f)
 
-        # TODO bizarre la liste data["partitions"] est dans une liste
         gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
         gl.instruments = data["instruments"]  # [instrument_1.program, ...
         gl.partition_nbr = len(gl.partitions)
+        
         print("Nombre d'instrument:", len(gl.instruments),
               "Nombre de partitions:", len(gl.partitions))
 
-                  
-def play_json():
-    """Play le json"""
 
-    FPS = 50  # TODO
-    fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
-    gl.pjm = PlayJsonMidi(gl.midi_json, FPS, fonts)
-    gl.pjm.play()
+def get_channel():
+    """16 channel maxi
+    channel 9 pour drums
+    Les channels sont attribués dans l'ordre des instruments de la liste
+    """
+    
+    channels = []
+    channels_no_drum = [1,2,3,4,5,6,7,8,10,11,12,13,14,15,16]
+    nbr = 0
+    for instrument in gl.instruments:
+        if not instrument[1]:  # instrument[1] = boolean
+            channels.append(channels_no_drum[nbr])
+            nbr += 1
+            if nbr > 14: nbr = 0
+        else:
+            channels.append(9)
+            
+    return channels
 
-
+                    
 def init_midi():
-    # TODO bordel
     """bank = 0
     bank_number = instrument[]
     Dans PlayOneMidiPartition, une note est jouée avec:
         .thread_note(note, volume)
     La note est stoppée si:
-        objet.thread_dict[i] = 0
+        objet.thread_dict[(note, volume)] = 0
+
+    gl.instruments = [[[0, 25], false, "Bass"], [[0, 116], true, "Drums2"]]
+        instrum = [[0, 25], false, "Bass"]
     """
     
-    FPS = 50  # TODO
-    fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
-    bank = 0
+    FPS = gl.conf["midi"]["fps"]
+    fonts = gl.conf["midi"]["fonts"]
     gl.pomn = {}
-
-    channel = 1
-    for instrum in gl.instruments:
-        bank_number = instrum 
-        gl.pomn[instrum] = PlayOneMidiNote(fonts,channel, bank, bank_number)
-        channel += 1
+    channels = get_channel()
+    
+    for i in range(len(gl.instruments)):
+        instrum = gl.instruments[i]
+        chan = channels[i]
+        is_drum = instrum[1]
+        bank = instrum[0][0]
+        bank_number = instrum[0][1]
+        print("channel, bank, bank_number:", chan, bank, bank_number)  
+        gl.pomn[i] = PlayOneMidiNote(fonts, chan, bank, bank_number)
         
 
 def set_all_letters_unvisible():
@@ -183,6 +201,7 @@ def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once.
     gl.tc = TextureChange(all_obj["Plane"], "A.png")"""
 
+    print("\n"*20)
     print("Initialisation des scripts lancée un seule fois au début du jeu.")
 
     # Récupération de la configuration
@@ -205,4 +224,4 @@ def main():
     set_all_letters_position()
     
     # Pour les mondoshawan
-    print("\nBonjour des mondoshawans\n\n")
+    print("Initialisation du jeu terminée\n\n")
