@@ -37,59 +37,67 @@ from scripts.letters_once import main as letters_once_main
 
 
 def main():
+    # Saisie clavier
+    keyboard()
+
+    # Tous les update par frame
     gl.tempo.update()
     print_frame_rate()
 
+    # Phase: intro, music and letters, get shot
+    if gl.phase == "intro":
+        main_intro()
+    if gl.phase == "music and letters":
+        main_music_and_letters()
+    if gl.phase == "get shot":
+        main_get_shot()
+    if gl.continu == 1:
+        gl.phase = "music and letters"
+
+def main_intro():
+    gl.all_obj["Cube"].visible = True
+    
+
+def main_music_and_letters():
+    gl.all_obj["Cube"].visible = False
+    
     # Reset de la liste des noms d'objet blender à afficher
     gl.obj_name_list_to_display = []
 
-    # les notes de la frame
-    get_frame_notes()
+    # Joue et affiche les notes de la frame
+    frame_notes = get_frame_notes()
+    notes = get_notes(frame_notes)
+    display_frame_notes(notes)
+    play_frame_notes(notes)
 
     # Décalage des lettres non jouées
     hide_unplayed_letters()
 
-    # Game restart si espace
-    keyboard()
+
+def main_get_shot():
+    gl.all_obj["Cube"].visible = False
+    
+    # Reset de la liste des noms d'objet blender à afficher
+    gl.obj_name_list_to_display = []
+
+    # Affiche les notes de la frame
+    frame_notes = get_frame_notes()
+    notes = get_notes(frame_notes)
+    display_frame_notes(notes)
+    
+    # Enregistre les shots
+    save_shot()
+    
+    # Décalage des lettres non jouées
+    hide_unplayed_letters()
 
 
 def new_music():
-    """relance du jeu avec une nouvelle musique"""
+    """Relance du jeu avec une nouvelle musique."""
     kill()
     letters_once_main()
 
-
-def kill():
-    """Kill de tous les threads: pas utilisé"""
-
-    # Fin des threads restants
-
-    for j in range(len(gl.instruments)):
-        for i in range(128):
-            gl.pomn[j].thread_dict[i] = 0
-            print("Fin de:", j, i)
     
-    del gl.pomn
-    
-    sleep(1)
-
-        
-def keyboard():
-    if gl.keyboard.events[events.SPACEKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        print("Restart Game")
-        print("\n"*20)
-        new_music()
-
-
-def print_frame_rate():
-    sec = gl.tempo["seconde"].tempo
-    if sec == 0:
-        fps = int(60 / (time() - gl.time))
-        print("\nFrame rate =", fps,
-              "de", gl.midi_json, "\n")
-        gl.time = time()
-
-
 def get_frame_notes():
     """
     gl.partitions  = [[partition_1, partition_2 ......],]
@@ -100,7 +108,7 @@ def get_frame_notes():
 
     gl.instruments = [[[0, 25], false, "Bass"], [[0, 116], true, "Drums2"]]
 
-    frame_data = [[[67, 64], [25, 47]], [[36, 64], [43, 40]]], ...
+    frame_notes = [[[67, 64], [25, 47]], [[36, 64], [43, 40]]], ...
             instrum 1         2           3         4
     il n'y a qu'une note par instrument et par frame
     45: [67, 64],      8: [], 14: []}
@@ -109,79 +117,68 @@ def get_frame_notes():
 
     # Le numéro de frame de 0 à infini
     fr = gl.tempo["frame"].tempo
-    frame_data = []
+    frame_notes = []
 
     # Si le morceau n'est pas fini
     if gl.partitions:
         if fr < len(gl.partitions[0]):
             # si gl.partitions à 6 listes soit 6 partitions
             for partition in gl.partitions:
-                frame_data.append(partition[fr])
+                frame_notes.append(partition[fr])
         else:
-            frame_data = []
+            frame_notes = []
             # Kill de tous les threads et restart
             new_music()
+            
+    return frame_notes
 
-    # instr_num est l'index de l'instrument dans gl.instruments
-    # gl.instruments = [[[0, 70], False, 'Bason'], [[0, 73], False, 'Flute']]
-    # une police par instrument
-    # frame_data = [[], [], [[67, 64], [71, 64]], ...]
 
-    last_notes = []
-    if frame_data:
-        for note_partition in frame_data:
+def get_notes(frame_notes):
+    """instr_num est l'index de l'instrument dans gl.instruments
+    gl.instruments = [[[0, 70], False, 'Bason'], [[0, 73], False, 'Flute']]
+    une police par instrument
+    frame_notes = [[], [], [[67, 64], [71, 64]], ...]
+    """
+
+    notes = []
+    
+    if frame_notes:
+        for note_partition in frame_notes:
             # note_partition = [[67, 64]]
             if note_partition:
-                font = frame_data.index(note_partition)
+                font = frame_notes.index(note_partition)
 
                 # la liste est dans une liste qui peut avoir plusieurs notes
                 # soit un accord, je ne garde que la première note
                 note = note_partition[0][0]
                 volume = note_partition[0][1]
 
-                # Affichage et play
-                display((note, volume), font)
-                play_note(font, note, volume)
-                last_notes.append((font, note))
+                notes.append((font, note, volume))
 
-        # Arrêt des notes si plus dans la liste
-        stop_notes(last_notes)
-
-
-def play_note(instr_num, note, volume):
-    """thread_dict = {69: 1, 48: 1, 78:0}
-    instrument = (0, 25)
-    """
-
-    # Vérification que la note n'est pas en cours
-    en_cours = 0
-    if note in gl.pomn[instr_num].thread_dict:
-        if gl.pomn[instr_num].thread_dict[note] == 1:
-            en_cours = 1
-            
-    # Lancement de la note si pas en cours
-    if not en_cours:
-        # Lancement d'une note
-        gl.pomn[instr_num].thread_note(note, volume)
-
-
-def stop_notes(last_notes):
-    """Stop des notes en cours qui ne sont plus dans last_notes
-    last_notes = [(instrument, note), ...]
-    thread_dict = {(69, 72): 1, (1, 78): 0}
-    """
-
-    for i in range(len(gl.pomn)):
-        for k, v in gl.pomn[i].thread_dict.items():
-            # k = 56 = note
-            if (i, k) not in last_notes:
-                gl.pomn[i].thread_dict[k] = 0
+    return notes
 
     
-def display(note_tuple, font):
+def play_frame_notes(notes):
+    last_notes = []
+    for note_tuple in notes:
+        font, note, volume = note_tuple[0], note_tuple[1], note_tuple[2]
+        # Play
+        play_note(note_tuple)
+        last_notes.append((font, note))
 
-    note = note_tuple[0]  # 35 = m f
-    volume = note_tuple[1]  # 32 = M  B
+    # Arrêt des notes si plus dans la liste
+    stop_notes(last_notes)
+
+
+def display_frame_notes(notes):
+    # Affichage et play
+    for note_tuple in notes:
+        font, note, volume = note_tuple[0], note_tuple[1], note_tuple[2]
+        display(font, note, volume)
+        
+
+def display(font, note, volume):
+    """Affiche ou cache les lettres"""
 
     # Lettres correspondantes
     cn, dn, un = conversion(note, "min")
@@ -200,13 +197,108 @@ def display(note_tuple, font):
                 set_letter_position(letter_obj)
 
 
+def save_shot():
+    pass
+
+
+def keyboard():
+    if gl.keyboard.events[events.SPACEKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Restart Game")
+        print("\n"*2)
+        new_music()
+        
+    if gl.keyboard.events[events.SKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Suppression du son")
+        gl.sound_on = 0
+        gl.all_obj["Text_info"]["Text"] = "Without Sound"
+        
+    if gl.keyboard.events[events.DKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Activation du son")
+        gl.sound_on = 1
+        gl.all_obj["Text_info"]["Text"] = "With sound"
+
+    if gl.keyboard.events[events.PKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Début de music and letters")
+        gl.phase = "music and letters"
+
+    if gl.keyboard.events[events.GKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Début de get shot")
+        gl.phase = "get shot"
+
+    if gl.keyboard.events[events.CKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Défilement des morceaux en continu")
+        if gl.continu == 0:
+            gl.phase = 1
+        else:
+            gl.phase = 0
+        
+
+def kill():
+    """Kill de tous les threads."""
+
+    # Fin des threads restants
+    n = len(gl.instruments)
+    # Seulement 10 instruments
+    if n > 10: n = 10
+
+    # Parcours de tous les threads
+    for j in range(n):
+        for i in range(128):
+            th = gl.instruments_player[j].thread_dict[i]
+            if th == 1:
+                print("thread en cours tué, instrument:", j, "thread:", j)
+            gl.instruments_player[j].thread_dict[i] = 0
+            sleep(0.001)
+    sleep(1)
+    print("Fin de tous les threads")
+
+    # Stop des fluidsynth.Synth() initiés
+    for i in range(n):
+        gl.instruments_player[i].stop_audio()
+
+            
+def print_frame_rate():
+    sec = gl.tempo["seconde"].tempo
+    if sec == 0:
+        fps = int(60 / (time() - gl.time))
+        print("\nFrame rate =", fps,
+              "de", gl.midi_json, "\n")
+        gl.time = time()
+
+
+def play_note(note_tuple):
+    """thread_dict = {69: 1, 48: 1, 78:0}
+    instrument = (0, 25)
+    """
+    
+    instr_num, note, volume = note_tuple
+    
+    # Lancement de la note si pas en cours
+    if not gl.instruments_player[instr_num].thread_dict[note]:
+        # Lancement d'une note
+        gl.instruments_player[instr_num].thread_play_note(note, volume)
+    
+
+def stop_notes(last_notes):
+    """Stop des notes en cours qui ne sont plus dans last_notes
+    last_notes = [(instrument, note), ...]
+    thread_dict = {(69, 72): 1, (1, 78): 0}
+    """
+
+    for i in range(len(gl.instruments_player)):
+        for k, v in gl.instruments_player[i].thread_dict.items():
+            # k = 56 = note
+            if (i, k) not in last_notes:
+                gl.instruments_player[i].thread_dict[k] = 0
+
+
 def set_letter_position(letter_obj):
     """Réglage visuel"""
 
-    plagex = 4.8
+    plagex = 4.6
     u = numpy.random.uniform(-plagex, plagex)
 
-    plagey = 4.8
+    plagey = 4.6
     v = numpy.random.uniform(-plagey, plagey)
 
     un_peu_haut = 0

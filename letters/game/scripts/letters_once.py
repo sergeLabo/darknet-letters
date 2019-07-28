@@ -28,38 +28,37 @@ Il est relancé par main de letters_always à la fin du morceau.
 
 import os, sys
 import json
+from pathlib import Path
 
 from bge import logic as gl
 
 from pymultilame import MyConfig, MyTools, Tempo
 from pymultilame import TextureChange, get_all_objects
 
-# TODO chemin à revoir
-sys.path.append("/media/data/3D/projets/darknet-letters/letters/midi")
-from analyse_play_midi import PlayJsonMidi, PlayOneMidiNote
+# Ajout du dossier courant dans lequel se trouve le dossier my_pretty_midi
+CUR_DIR = Path.cwd()
+
+# Pour retrouver le début du jeu dans le terminal
+print("\n"*20)
+
+print("Chemin du dossier courant dans le BGE:", CUR_DIR.resolve())  # game
+
+# Chemin du dossier letters
+LETTERS_DIR = CUR_DIR.parent
+sys.path.append(str(LETTERS_DIR) + "/midi")
+
+# analyse_play_midi est dans /midi
+from analyse_play_midi import PlayJsonMidi, OneInstrumentPlayer
 
 
 def get_conf():
     """Récupère la configuration depuis le fichier *.ini."""
     gl.tools =  MyTools()
+
+    gl.letters_dir = str(LETTERS_DIR.resolve())
     
-    # Chemin courrant
-    abs_path = gl.tools.get_absolute_path(__file__)
-    print("Chemin courrant", abs_path)
-
-    # Nom du script
-    name = os.path.basename(abs_path)
-    print("Nom de ce script:", name)
-
-    # Abs path de semaphore sans / à la fin
-    parts = abs_path.split("/letters/")
-    print("Recherche de letters:", parts)
-    gl.root = os.path.join(parts[0], "letters")
-    print("Path de letters: ", gl.root)
-
     # Dossier *.ini
-    ini_file = gl.root + "/global.ini"
-    print("Fichier de configuration:", ini_file)
+    ini_file = gl.letters_dir + "/global.ini"
     gl.ma_conf = MyConfig(ini_file)
     gl.conf = gl.ma_conf.conf
 
@@ -85,11 +84,8 @@ def get_midi_json():
                   
     
     nbr = gl.conf["midi"]["file_nbr"]
-
-    # TODO chemin à revoir
-    root = "/media/data/3D/projets/darknet-letters/letters/midi/json/"
-
-    all_json = gl.tools.get_all_files_list(root, ".json")
+    js = gl.letters_dir + "/midi/json"
+    all_json = gl.tools.get_all_files_list(js, ".json")
 
     # Reset de nbr si fini
     if nbr >= len(all_json):
@@ -109,8 +105,7 @@ def get_midi_json():
         gl.instruments = data["instruments"]  # [instrument_1.program, ...
         gl.partition_nbr = len(gl.partitions)
         
-        print("Nombre d'instrument:", len(gl.instruments),
-              "Nombre de partitions:", len(gl.partitions))
+        print("Nombre d'instrument:", len(gl.instruments))
 
 
 def get_channel():
@@ -137,7 +132,7 @@ def init_midi():
     """bank = 0
     bank_number = instrument[]
     Dans PlayOneMidiPartition, une note est jouée avec:
-        .thread_note(note, volume)
+        .thread_play_note(note, volume)
     La note est stoppée si:
         objet.thread_dict[(note, volume)] = 0
 
@@ -147,17 +142,18 @@ def init_midi():
     
     FPS = gl.conf["midi"]["fps"]
     fonts = gl.conf["midi"]["fonts"]
-    gl.pomn = {}
     channels = get_channel()
-    
+
+    # Création d'un dict des objets pour jouer chaque instrument
+    gl.instruments_player = {}
     for i in range(len(gl.instruments)):
         instrum = gl.instruments[i]
         chan = channels[i]
         is_drum = instrum[1]
         bank = instrum[0][0]
         bank_number = instrum[0][1]
-        print("channel, bank, bank_number:", chan, bank, bank_number)  
-        gl.pomn[i] = PlayOneMidiNote(fonts, chan, bank, bank_number)
+        print("Instrument:", chan, bank, bank_number)  
+        gl.instruments_player[i] = OneInstrumentPlayer(fonts, chan, bank, bank_number)
         
 
 def set_all_letters_unvisible():
@@ -190,20 +186,23 @@ def set_all_letters_position():
     
 
 def set_variable():
+    # Phases du jeu
+    gl.phase = "intro"
+    gl.continu = 1
+
+    # Musique
     gl.notes = {}
     gl.obj_name_list_to_display = []
-
-    # Pratique ça
+    
+    # Tous les objets
     gl.all_obj = get_all_objects()
-
+    gl.all_obj["Text_info"]["Text"] = ""
     
 def main():
-    """Lancé une seule fois à la 1ère frame au début du jeu par main_once.
-    gl.tc = TextureChange(all_obj["Plane"], "A.png")"""
+    """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""
 
-    print("\n"*20)
-    print("Initialisation des scripts lancée un seule fois au début du jeu.")
-
+    print("Initialisation des scripts lancée un seule fois au début du jeu:")
+    
     # Récupération de la configuration
     get_conf()
 
