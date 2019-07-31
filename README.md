@@ -47,6 +47,9 @@ sudo apt install blender
 ~~~
 
 #### Midi
+~~~text
+sudo pip3 install mido
+~~~
 
 ##### fluidsynth
 ~~~text

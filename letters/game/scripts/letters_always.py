@@ -32,17 +32,19 @@ from pymultilame import get_all_objects, get_scene_with_name
 
 from bge import logic as gl
 from bge import events
+from bge import render
 
 from scripts.letters_once import main as letters_once_main
 
 
 def main():
+    #print(gl.phase)
     # Saisie clavier
     keyboard()
 
     # Tous les update par frame
     gl.tempo.update()
-    print_frame_rate()
+    #print_frame_rate()
 
     # Phase: intro, music and letters, get shot
     if gl.phase == "intro":
@@ -51,9 +53,8 @@ def main():
         main_music_and_letters()
     if gl.phase == "get shot":
         main_get_shot()
-    if gl.continu == 1:
-        gl.phase = "music and letters"
 
+        
 def main_intro():
     gl.all_obj["Cube"].visible = True
     
@@ -75,27 +76,120 @@ def main_music_and_letters():
 
 
 def main_get_shot():
+    """Shot tous les 20 frames
+     5 = reset, nouvelle image de notes
+    affichage fixe
+    10 = enregistrement des positions
+    15 = shot
+    affichage fixe
+    """
+    
     gl.all_obj["Cube"].visible = False
-    
-    # Reset de la liste des noms d'objet blender à afficher
-    gl.obj_name_list_to_display = []
 
-    # Affiche les notes de la frame
-    frame_notes = get_frame_notes()
-    notes = get_notes(frame_notes)
-    display_frame_notes(notes)
-    
+    if gl.tempo['shot'].tempo == 5:
+        # Reset de la liste des noms d'objets blender à afficher
+        gl.obj_name_list_to_display = []
+
+        # Affiche les notes de la frame
+        frame_notes = get_frame_notes()
+        notes = get_notes(frame_notes)
+        display_frame_notes(notes)
+
+        # Décalage des lettres non jouées
+        hide_unplayed_letters()
+
+    # Save position des lettres frame avant d'enreg
+    if gl.tempo['shot'].tempo == 10:
+        gl.previous_datas = get_objets_position_size()
+        
     # Enregistre les shots
-    save_shot()
+    if gl.tempo['shot'].tempo == 15:
+        if gl.previous_datas:
+            sub_dir = get_sub_dir()
+            save_txt_file(gl.previous_datas, sub_dir)
+            sleep(0.01)
+            save_shot(sub_dir)
+            sleep(0.01)
+            gl.numero += 1
+
+    if gl.numero == gl.total:
+        gl.endGame
+
+
+def get_sub_dir():
+    """60000/100=600 fichiers par dossier
+    12345/600=20
+    """
+    n = gl.total/100
+    sub_dir = int(gl.numero/n)
+    if sub_dir < 0:
+        print("Sous dossier négatif")
+    if sub_dir > 99:
+        print("Sous dossier > 99")
+    return sub_dir
     
-    # Décalage des lettres non jouées
-    hide_unplayed_letters()
+            
+def get_objets_position_size():
+    """De tous les objets
+    Blender:
+        Dimension des lettres sans scale: 2,0,2
+        Centre: 0,0,0
+        Vue caméra: x = -5 à 5, y = 5 à -5
+    Dans l'image:
+        Origine en haut à gauche
+    """
+
+    # absolu = 10 relatif = 1
+    relatif = 0.1
+    
+    # Liste des lettres affichées
+    datas = ""
+    for ob in gl.obj_name_list_to_display:
+        # ob = nom de l'objet
+        p = gl.all_obj[ob].worldPosition
+        s = gl.all_obj[ob].worldScale
+        
+        # origine en 5, -5, le y est le z du centre
+        x = round((p[0] + 5) * relatif, 2)
+        # 3 +5 8 1-8
+        y = round(1 - ((p[2] + 5) * relatif), 2)
+        # Dimension
+        dim = round(s[0] * 2 * relatif, 2)
+        
+        data =  ob + " " \
+                + str(x) + " " \
+                + str(y) + " " \
+                + str(dim) + " " \
+                + str(dim) + " " \
+                + "\n"
+        datas += data
+
+    # Suppr du dernier fin de ligne
+    datas = datas[:-2]
+    return datas
+
+    
+def save_txt_file(datas, sub_dir):
+    """<object-class> <x> <y> <width> <height>"""
+
+    fichier = os.path.join(gl.shot_directory,
+                            str(sub_dir),
+                            'shot_' + str(gl.numero) + '.txt')
+    gl.tools.write_data_in_file(datas, fichier, "w")
 
 
-def new_music():
-    """Relance du jeu avec une nouvelle musique."""
-    kill()
-    letters_once_main()
+def save_shot(sub_dir):
+    name_file_shot = get_name_file_shot(sub_dir)
+    render.makeScreenshot(name_file_shot)
+    print("Shot n°", gl.numero, "dans", name_file_shot)
+
+
+def get_name_file_shot(sub_dir):
+    """./shot/5/shot_41254.png"""
+
+    return os.path.join(gl.shot_directory,
+                            str(sub_dir),
+                            'shot_' + str(gl.numero) + '.png')
 
     
 def get_frame_notes():
@@ -116,22 +210,35 @@ def get_frame_notes():
     """
 
     # Le numéro de frame de 0 à infini
-    fr = gl.tempo["frame"].tempo
     frame_notes = []
 
     # Si le morceau n'est pas fini
-    if gl.partitions:
-        if fr < len(gl.partitions[0]):
+    if gl.frame < len(gl.partitions[0]):
+        # Je passe les frames sans notes
+        while not frame_notes: 
             # si gl.partitions à 6 listes soit 6 partitions
             for partition in gl.partitions:
-                frame_notes.append(partition[fr])
-        else:
-            frame_notes = []
-            # Kill de tous les threads et restart
-            new_music()
+                frame_notes.append(partition[gl.frame])
+        gl.frame += 1
+    else:
+        # Kill de tous les threads et restart
+        new_music()
+
+    # Renouvellement de la musique tous les 350 images
+    reset_music()
             
     return frame_notes
 
+
+def reset_music():
+    """ Changement tous les 350 images"""
+
+    # Tous les 350 et pas au début du jeu
+    if gl.numero % gl.conf['blend']['music_change'] == 0:
+        if gl.frame > 100:
+            print("\n\n\n\nReset de la musique\n\n\n\n")
+            new_music()
+    
 
 def get_notes(frame_notes):
     """instr_num est l'index de l'instrument dans gl.instruments
@@ -197,8 +304,44 @@ def display(font, note, volume):
                 set_letter_position(letter_obj)
 
 
-def save_shot():
-    pass
+def new_music():
+    """Relance du jeu avec une nouvelle musique."""
+    kill()
+    
+    # Enregistrement du numéro du prochain fichier à lire
+    gl.ma_conf.save_config("blend", "numero", gl.numero)
+
+    # Relance du tout
+    print("Relance du jeu")
+    letters_once_main()
+
+
+def kill():
+    """Kill de tous les threads."""
+
+    # Fin des threads restants
+    n = len(gl.instruments)
+    # Seulement 10 instruments
+    if n > 10: n = 10
+
+    # Parcours de tous les threads
+    for j in range(n):
+        for i in range(128):
+            try:
+                th = gl.instruments_player[j].thread_dict[i]
+                if th == 1:
+                    print("thread en cours tué, instrument:", j, "thread:", j)
+                gl.instruments_player[j].thread_dict[i] = 0
+            except:
+                pass
+    sleep(1)
+    print("Fin de tous les threads")
+
+    if gl.phase == "music and letters":
+        # Stop des fluidsynth.Synth() initiés
+        if len(gl.instruments_player) > 0:
+            for i in range(n):
+                gl.instruments_player[i].stop_audio()
 
 
 def keyboard():
@@ -224,39 +367,8 @@ def keyboard():
     if gl.keyboard.events[events.GKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de get shot")
         gl.phase = "get shot"
-
-    if gl.keyboard.events[events.CKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        print("Défilement des morceaux en continu")
-        if gl.continu == 0:
-            gl.phase = 1
-        else:
-            gl.phase = 0
         
 
-def kill():
-    """Kill de tous les threads."""
-
-    # Fin des threads restants
-    n = len(gl.instruments)
-    # Seulement 10 instruments
-    if n > 10: n = 10
-
-    # Parcours de tous les threads
-    for j in range(n):
-        for i in range(128):
-            th = gl.instruments_player[j].thread_dict[i]
-            if th == 1:
-                print("thread en cours tué, instrument:", j, "thread:", j)
-            gl.instruments_player[j].thread_dict[i] = 0
-            sleep(0.001)
-    sleep(1)
-    print("Fin de tous les threads")
-
-    # Stop des fluidsynth.Synth() initiés
-    for i in range(n):
-        gl.instruments_player[i].stop_audio()
-
-            
 def print_frame_rate():
     sec = gl.tempo["seconde"].tempo
     if sec == 0:
@@ -304,7 +416,7 @@ def set_letter_position(letter_obj):
     un_peu_haut = 0
     letter_obj.worldPosition = u , 0, v - un_peu_haut
 
-    size = numpy.random.uniform(0.2, 1.1)
+    size = numpy.random.uniform(0.4, 1.1)
     letter_obj.worldScale = size, size, size
     letter_obj.visible = True
 
@@ -424,3 +536,8 @@ def conversion(note, casse):
 def set_letter_unvisible(lettre):
     """Toutes les lettres sont invisible au départ"""
     lettre.visible = False
+
+    
+def end():
+    if gl.numero == gl.nombre_shot_total:
+        gl.endGame()

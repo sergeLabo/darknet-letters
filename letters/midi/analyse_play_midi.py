@@ -2,14 +2,14 @@
 # -*- coding: utf8 -*-
 
 ########################################################################
-# This file is part of Darknet Midi.
+# This file is part of Darknet Letters.
 #
-# Darknet Midi is free software: you can redistribute it and/or modify
+# Darknet Letters is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Darknet Midi is distributed in the hope that it will be useful,
+# Darknet Letters is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -38,14 +38,11 @@ import json
 from random import choice
 import numpy as np
 
-import mido
-
 # Ajout du dossier courant dans lequel se trouve le dossier my_pretty_midi
 from pathlib import Path
 cur_dir = Path.cwd().resolve()
 print("Chemin du dossier courant", cur_dir)
 sys.path.append(str(cur_dir))
-
 import my_pretty_midi
 
 import fluidsynth
@@ -183,42 +180,6 @@ class AnalyseMidi:
 
         return self.partitions, self.instruments
 
-    def get_partition_old(self, instrument_roll, instrument):
-        """Conversion du numpy array en liste de note à toutes les frames:
-
-        une ligne par frame
-
-        une ligne du array: (0.0 0.0 0.0 ... 89 ... 91 ... 0.0)
-                                             89 est à la position 54
-                                                    91 est à la position 68
-
-        une ligne de la liste: 2 notes du même instrument 54 et 68
-            [(54, 89), (68, 91)] = [(note=54, volume=89), (note=68, volume=91)]
-        """
-
-        # Copie des lignes du array dans une liste de ligne
-        lignes = []
-        for i in range(instrument_roll.shape[1]):
-            ligne = instrument_roll[:, i]
-            lignes.append(ligne)
-
-        # Analyse des lignes pour ne garder que les non nuls
-        partition = []
-        for ligne in lignes:
-            notes = []
-            for n in range(128):
-                if np.any(ligne[n] != np.float64(0)):
-                    if not np.isnan(ligne[n]): # nan <class 'numpy.float64'>
-                        velocity = int(ligne[n])
-                        notes.append((n, velocity))
-
-            partition.append(notes)
-
-        # velocity maxi entre 0 et 127
-        partition = normalize_velocity(partition)
-
-        return partition
-
     def get_partition(self, instrument_roll, instrument):
         """entrée:
         une ligne du array = (0.0 0.0 0.0 ... 89 ... 91 ... 0.0)
@@ -280,12 +241,17 @@ class AnalyseMidi:
         l = self.midi_file.split(".")
         name = l[0]
         name = name.replace("music", "json")
-        file_name =  name + ".json"
-
-        with open(file_name, 'w') as f_out:
+        
+        json_name =  name + ".json"
+        
+        with open(json_name, 'w') as f_out:
             json.dump(json_data, f_out)
-
-        print('\nEnregistrement de:', file_name)
+        print('\nEnregistrement de:', json_name)
+        
+        # #zip_name = name + ".zip"
+        # #with open(zip_name, 'w') as f_out:
+            # #json_zip(json.dump(json_data, f_out))
+        # #print('\nEnregistrement de:', zip_name)
 
 
 class PlayMidi:
@@ -422,7 +388,8 @@ class OneInstrumentPlayer:
 
     Ne fonctionne qu'avec FluidR3_GM.sf2
     note et volume entre 0 et 127
-    Pas de variation de volume en cours de note
+    Pas de variation de volume en cours de note,
+    une seule note par instrument à la fois.
     """
 
     def __init__(self, fonts, channel, bank, bank_number):
@@ -576,6 +543,7 @@ class PlayJsonMidi:
                         self.end_file.append(i)
             sleep(10)
         print("Fin du morceau:", self.midi_json)
+
 
 def get_channel(instruments):
     """16 channel maxi
@@ -735,7 +703,7 @@ if __name__ == '__main__':
     # #play_all_midi_files_in_music_directory(root, FPS, fonts)
         
     # Création des json
-    # #create_all_json(root, FPS)
+    create_all_json(root, FPS)
     
-    # Joue les json
-    play_all_json(root, FPS, fonts)
+    # ## Joue les json
+    # #play_all_json(root, FPS, fonts)

@@ -29,6 +29,7 @@ Il est relancé par main de letters_always à la fin du morceau.
 import os, sys
 import json
 from pathlib import Path
+import random
 
 from bge import logic as gl
 
@@ -69,12 +70,15 @@ def get_conf():
 def set_tempo():
 
     # Création des objects
-    tempo_liste = [("seconde", 60), ("frame", 999999999)]
+    tempo_liste = [ ("seconde", 60),
+                    ("frame", 999999999),
+                    ("shot", int(gl.conf['blend']['shot_every']))]
+                    
     gl.tempo = Tempo(tempo_liste)
     gl.frame_rate = 0
     gl.time = 0
-
-
+    
+    
 def get_midi_json():
     """
     json_data = {"partitions":  [partition_1, partition_2 ......],
@@ -83,30 +87,49 @@ def get_midi_json():
     """
                   
     
-    nbr = gl.conf["midi"]["file_nbr"]
+    gl.nbr = gl.conf["midi"]["file_nbr"]
     js = gl.letters_dir + "/midi/json"
     all_json = gl.tools.get_all_files_list(js, ".json")
 
-    # Reset de nbr si fini
-    if nbr >= len(all_json):
-        nbr = 0
+    # Reset de gl.nbr si fini
+    if gl.nbr >= len(all_json):
+        gl.nbr = 0
 
     # Enregistrement du numéro du prochain fichier à lire
-    gl.ma_conf.save_config("midi", "file_nbr", nbr + 1)
+    gl.ma_conf.save_config("midi", "file_nbr", gl.nbr + 1)
 
-    gl.midi_json = all_json[nbr]
+    gl.midi_json = all_json[gl.nbr]
     
     print("Fichier midi en cours:", gl.midi_json)
 
     with open(gl.midi_json) as f:
         data = json.load(f)
 
-        gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
-        gl.instruments = data["instruments"]  # [instrument_1.program, ...
-        gl.partition_nbr = len(gl.partitions)
-        
-        print("Nombre d'instrument:", len(gl.instruments))
+    gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
+    gl.instruments = data["instruments"]  # [instrument_1.program, ...
+    gl.partition_nbr = len(gl.partitions)
+    partitions_shuffle()
+    print("Nombre d'instrument:", len(gl.instruments))
+    
 
+def partitions_shuffle():
+    """Le désordre des partitions (et instruments) permet de rendre aléatoire
+    le choix des polices pour chaque instrument
+    """
+    
+    L = [*range(gl.partition_nbr)]
+    random.shuffle(L)
+    print("Liste en désordre:", L)
+    
+    partitions_new = list(range(gl.partition_nbr))
+    instruments_new = list(range(gl.partition_nbr))
+    for i in range(len(L)):
+        partitions_new[i]  = gl.partitions[L[i]]
+        instruments_new[i] = gl.instruments[L[i]]
+        
+    gl.partitions  = partitions_new
+    gl.instruments = instruments_new
+    
 
 def get_channel():
     """16 channel maxi
@@ -187,17 +210,46 @@ def set_all_letters_position():
 
 def set_variable():
     # Phases du jeu
-    gl.phase = "intro"
-    gl.continu = 1
+    gl.phase = "get shot"
 
     # Musique
+    gl.frame = 0
     gl.notes = {}
     gl.obj_name_list_to_display = []
     
     # Tous les objets
     gl.all_obj = get_all_objects()
     gl.all_obj["Text_info"]["Text"] = ""
+
+    # nombre de shot total
+    gl.nombre_shot_total = gl.conf['blend']['total']
+    gl.sleep = gl.conf['blend']['sleep']
+    gl.previous_datas = ""
+
+    # Numero conservé au changement de morceau
+    gl.numero = gl.conf['blend']['numero']
+    gl.total = gl.conf['blend']['total']
     
+    
+def create_directories():
+    """
+    Création de n dossiers
+    /media/data/3D/projets/semaphore_blend_yolo/shot/a/shot_0_a.png
+    """
+
+    # Dossier d'enregistrement des images
+    gl.shot_directory = os.path.join(gl.letters_dir, 'shot')
+    print("Dossier des shots:", gl.shot_directory)
+
+    # Si le dossier n'existe pas, je le crée
+    gl.tools.create_directory(gl.shot_directory)
+
+    # Un dossier réparti dans 100 sous dossiers
+    for l in range(100):
+        directory = os.path.join(gl.shot_directory, str(l))
+        gl.tools.create_directory(directory)
+
+        
 def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""
 
@@ -206,18 +258,14 @@ def main():
     # Récupération de la configuration
     get_conf()
 
+    set_variable()
+    create_directories()
     set_tempo()
 
     # midi
     get_midi_json()
-    #play_json()
-    init_midi()
-    
-    set_variable()
-
-    # Pour accélérer le jeu, mais ne marche pas
-    set_all_letters_unvisible()
-    set_all_letters_suspendDynamics()
+    if gl.numero == gl.conf['midi']['sound']:
+        init_midi()
 
     # En dehors de la vue caméra
     set_all_letters_position()
