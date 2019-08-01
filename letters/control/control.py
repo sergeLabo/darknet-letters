@@ -5,6 +5,7 @@
 from time import sleep
 import numpy as np
 import cv2
+from random import randint
 
 from pymultilame import MyTools
 
@@ -32,35 +33,38 @@ def cvDrawBoxes(img, coords):
 
 
 def verif():
-    rep = "/media/data/3D/projets/darknet-letters/letters/shot/"
+    rep = "/media/serge/data/shot"
     pngs = tools.get_all_files_list(rep, "png")
     nom = "/media/data/3D/projets/darknet-letters/letters/control/shot_rect/"
 
     loop = 1
     a = 0
+    x = 13000  #len(pngs)
     while loop:
-        img = cv2.imread(pngs[a])
+        ar = randint(0, x)
+        img = cv2.imread(pngs[ar])
         # Toutes les lignes
-        lines = tools.read_file(pngs[a][:-4] + ".txt")
+        lines = tools.read_file(pngs[ar][:-4] + ".txt")
         # Les lignes en list
         lines = lines.splitlines()
-        # #print(lines)
+
         for line in lines:
-            # #print(line)
             line = line.split(" ")
             img = cvDrawBoxes(img, line)
                 
         if lines:
-            n = pngs[a].split(rep)
+            n = pngs[ar].split(rep)
             m = n[1][2:-4]
             name = nom + m + "_rect.png"
-            # #print(m)
+            print(name)
             cv2.imwrite(name, img)
             sleep(0.01)
-            
+
+        # Stop à la fin
         a += 1
-        if a == len(pngs):
+        if a == 100:  #len(pngs):
             loop = 0
+            
         # Echap, attente
         k = cv2.waitKey(33)
         if k == 27:
@@ -81,7 +85,7 @@ def display():
         if a == len(pngs):
             loop = 0    
          # Echap, attente
-        k = cv2.waitKey(100)
+        k = cv2.waitKey(300)
         if k == 27:
             loop = 0   
 

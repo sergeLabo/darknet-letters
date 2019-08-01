@@ -271,6 +271,7 @@ def find_item(liste, item):
     for l in liste:  # abcde
         # abcde
         if item in l:
+            # index ok
             a = l.index(item)
             b = liste.index(l)
 

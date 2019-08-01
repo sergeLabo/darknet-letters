@@ -23,9 +23,10 @@ Lancé à chaque frame durant tout le jeu.
 
 
 import os
-from random import uniform
+from random import uniform, randint
 import numpy
 from time import time, sleep
+import json
 
 from pymultilame import MyTools
 from pymultilame import get_all_objects, get_scene_with_name
@@ -38,7 +39,6 @@ from scripts.letters_once import main as letters_once_main
 
 
 def main():
-    #print(gl.phase)
     # Saisie clavier
     keyboard()
 
@@ -112,10 +112,79 @@ def main_get_shot():
             sleep(0.01)
             gl.numero += 1
 
+    # Vérification
+    save_count()
+
+    # Fin du jeu
     if gl.numero == gl.total:
         gl.endGame
 
 
+def get_frame_notes():
+    """
+    gl.partitions  = [[partition_1, partition_2 ......],]
+
+    gl.partitions[0] = [[], [], [], [[64, 90]], [[64, 90]], [[64, 90]],
+        [[64, 90]], [[66, 90]], [[66, 90]], [[66, 90]], [[66, 90]], [], [],
+        [], [], [[68, 90]], [[68, 90]], [[68, 90]], ...]
+
+    gl.instruments = [[[0, 25], false, "Bass"], [[0, 116], true, "Drums2"]]
+
+    frame_notes = [[[67, 64], [25, 47]], [[36, 64], [43, 40]]], ...
+            instrum 1         2           3         4
+    il n'y a qu'une note par instrument et par frame
+    45: [67, 64],      8: [], 14: []}
+    """
+
+    # Le numéro de frame de 0 à infini
+    frame_notes = []
+
+    # Si le morceau n'est pas fini
+    if gl.frame < len(gl.partitions[0]):
+        # Je passe les frames sans notes
+        while not frame_notes: 
+            # si gl.partitions à 6 listes soit 6 partitions
+            for partition in gl.partitions:
+                frame_notes.append(partition[gl.frame])
+            gl.frame += 1
+    else:
+        if gl.phase != "get shot":
+            # Kill de tous les threads et restart
+            new_music()
+        else:
+            # Je repart au hazard
+            gl.frame = randint(6, len(gl.partitions[0]))
+
+    # Renouvellement de la musique tous les 350 images sauf "get shot"
+    if gl.phase != "get shot":
+        reset_music()
+            
+    return frame_notes
+
+
+def get_notes(frame_notes):
+    """instr_num est l'index de l'instrument dans gl.instruments
+    gl.instruments = [[[0, 70], False, 'Bason'], [[0, 73], False, 'Flute']]
+    une police par instrument
+    frame_notes = [[[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]],
+    [[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]]]
+    """
+
+    notes = []
+    
+    if frame_notes:
+        for i in range(len(frame_notes)):
+            font = i
+            # la liste est dans une liste qui pourrait avoir plusieurs notes
+            # soit un accord, je ne garde que la première note
+            # frame_notes[i] = [[1, 4]]
+            note = frame_notes[i][0][0]
+            volume = frame_notes[i][0][1]
+            notes.append((font, note, volume))
+
+    return notes
+
+    
 def get_sub_dir():
     """60000/100=600 fichiers par dossier
     12345/600=20
@@ -181,7 +250,7 @@ def save_txt_file(datas, sub_dir):
 def save_shot(sub_dir):
     name_file_shot = get_name_file_shot(sub_dir)
     render.makeScreenshot(name_file_shot)
-    print("Shot n°", gl.numero, "dans", name_file_shot)
+    print(gl.frame, "Shot n°", gl.numero, "dans", name_file_shot)
 
 
 def get_name_file_shot(sub_dir):
@@ -190,44 +259,6 @@ def get_name_file_shot(sub_dir):
     return os.path.join(gl.shot_directory,
                             str(sub_dir),
                             'shot_' + str(gl.numero) + '.png')
-
-    
-def get_frame_notes():
-    """
-    gl.partitions  = [[partition_1, partition_2 ......],]
-
-    gl.partitions[0] = [[], [], [], [[64, 90]], [[64, 90]], [[64, 90]],
-        [[64, 90]], [[66, 90]], [[66, 90]], [[66, 90]], [[66, 90]], [], [],
-        [], [], [[68, 90]], [[68, 90]], [[68, 90]], ...]
-
-    gl.instruments = [[[0, 25], false, "Bass"], [[0, 116], true, "Drums2"]]
-
-    frame_notes = [[[67, 64], [25, 47]], [[36, 64], [43, 40]]], ...
-            instrum 1         2           3         4
-    il n'y a qu'une note par instrument et par frame
-    45: [67, 64],      8: [], 14: []}
-
-    """
-
-    # Le numéro de frame de 0 à infini
-    frame_notes = []
-
-    # Si le morceau n'est pas fini
-    if gl.frame < len(gl.partitions[0]):
-        # Je passe les frames sans notes
-        while not frame_notes: 
-            # si gl.partitions à 6 listes soit 6 partitions
-            for partition in gl.partitions:
-                frame_notes.append(partition[gl.frame])
-        gl.frame += 1
-    else:
-        # Kill de tous les threads et restart
-        new_music()
-
-    # Renouvellement de la musique tous les 350 images
-    reset_music()
-            
-    return frame_notes
 
 
 def reset_music():
@@ -239,32 +270,7 @@ def reset_music():
             print("\n\n\n\nReset de la musique\n\n\n\n")
             new_music()
     
-
-def get_notes(frame_notes):
-    """instr_num est l'index de l'instrument dans gl.instruments
-    gl.instruments = [[[0, 70], False, 'Bason'], [[0, 73], False, 'Flute']]
-    une police par instrument
-    frame_notes = [[], [], [[67, 64], [71, 64]], ...]
-    """
-
-    notes = []
-    
-    if frame_notes:
-        for note_partition in frame_notes:
-            # note_partition = [[67, 64]]
-            if note_partition:
-                font = frame_notes.index(note_partition)
-
-                # la liste est dans une liste qui peut avoir plusieurs notes
-                # soit un accord, je ne garde que la première note
-                note = note_partition[0][0]
-                volume = note_partition[0][1]
-
-                notes.append((font, note, volume))
-
-    return notes
-
-    
+ 
 def play_frame_notes(notes):
     last_notes = []
     for note_tuple in notes:
@@ -276,12 +282,14 @@ def play_frame_notes(notes):
     # Arrêt des notes si plus dans la liste
     stop_notes(last_notes)
 
-
+    
 def display_frame_notes(notes):
-    # Affichage et play
+    """Affichage"""
+
     for note_tuple in notes:
         font, note, volume = note_tuple[0], note_tuple[1], note_tuple[2]
-        display(font, note, volume)
+        if font < 10:
+            display(font, note, volume)
         
 
 def display(font, note, volume):
@@ -296,13 +304,44 @@ def display(font, note, volume):
 
     # Affichage des lettres
     for letter in to_display:
-        if font < 10:
-            if letter:
-                ob = "font_" + str(font) + "_" + letter
-                gl.obj_name_list_to_display.append(ob)
-                letter_obj = gl.all_obj[ob]
-                set_letter_position(letter_obj)
+        if letter:
+            ob = "font_" + str(font) + "_" + letter
+            gl.obj_name_list_to_display.append(ob)
+            letter_obj = gl.all_obj[ob]
+            set_letter_position(letter_obj)
+            letters_count(ob)
 
+                
+def letters_count(ob):
+    """Comptage des lettres affichées:"""
+    
+    try:
+        gl.count
+    except:
+        print("Création de gl.count")
+        gl.count = {}
+        
+    if ob in gl.count:
+        gl.count[ob] += 1
+    else:
+        gl.count[ob] = 1
+
+
+def save_count():
+    if gl.tempo["count"].tempo == 0:
+        try:
+            print("Vérification de la bonne répartition des polices:")
+            print("    ", len(gl.count))
+            a = 1
+        except:
+            a = 0
+
+        # #if a ==1:
+            # #json_name = "./scripts/count.json"
+            # #with open(json_name, 'w') as f_out:
+                # #json.dump(gl.count, f_out)
+    pass
+    
 
 def new_music():
     """Relance du jeu avec une nouvelle musique."""
@@ -432,11 +471,13 @@ def hide_unplayed_letters():
 
 
 def hide_letter(lettre):
+    """lettre = font_1_q, récup du 1 et du q"""
+    
     l = "abcdefghijklmnopqrstABCDEFGHIJKLMNOPQRST"
     letters = list(l)
 
-    # font_0_a
     x = int(lettre.name[5])
+    # index ok
     y = letters.index(lettre.name[7])
     lettre.position = x, y, 0
     lettre.visible = False

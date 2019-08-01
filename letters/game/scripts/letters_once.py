@@ -72,11 +72,26 @@ def set_tempo():
     # Création des objects
     tempo_liste = [ ("seconde", 60),
                     ("frame", 999999999),
-                    ("shot", int(gl.conf['blend']['shot_every']))]
+                    ("shot", int(gl.conf['blend']['shot_every'])),
+                    ("count", int(gl.conf['blend']['count']))]
                     
     gl.tempo = Tempo(tempo_liste)
     gl.frame_rate = 0
     gl.time = 0
+
+    
+def get_get_shot_json():
+
+    gl.midi_json = "/media/data/3D/projets/darknet-letters/letters/midi/json/get_shot.json"
+    
+    with open(gl.midi_json) as f:
+        data = json.load(f)
+
+    gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
+    gl.instruments = data["instruments"]  # [instrument_1.program, ...
+    gl.partition_nbr = len(gl.partitions)
+    partitions_shuffle()
+    print("Nombre d'instrument:", gl.partition_nbr)
     
     
 def get_midi_json():
@@ -114,9 +129,9 @@ def get_midi_json():
 
 def partitions_shuffle():
     """Le désordre des partitions (et instruments) permet de rendre aléatoire
-    le choix des polices pour chaque instrument
+    le choix des polices pour chaque instrument.
     """
-    
+
     L = [*range(gl.partition_nbr)]
     random.shuffle(L)
     print("Liste en désordre:", L)
@@ -204,6 +219,7 @@ def set_all_letters_position():
         if "font" in k:
             # font_0_a
             x = 25 + int(k[5])
+            # index ok
             y = letters.index(k[7]) 
             v.position = x, y, 0
     
@@ -213,7 +229,7 @@ def set_variable():
     gl.phase = "get shot"
 
     # Musique
-    gl.frame = 0
+    gl.frame = 13458
     gl.notes = {}
     gl.obj_name_list_to_display = []
     
@@ -231,6 +247,26 @@ def set_variable():
     gl.total = gl.conf['blend']['total']
     
     
+def get_shuffle():
+    """
+    0: 9,
+    1: 2,
+    key = 0 à nombre d'instrument
+    value = 0 à 9 sans répétition
+    Il n'y a que 10 polices !
+    """
+    shuff = {}
+    
+    L = [*range(10)]
+    random.shuffle(L)
+    print("Liste en désordre:", L)
+
+    for n in range(10):
+        shuff[n] = L[n]
+    
+    return shuff
+    
+    
 def create_directories():
     """
     Création de n dossiers
@@ -238,7 +274,8 @@ def create_directories():
     """
 
     # Dossier d'enregistrement des images
-    gl.shot_directory = os.path.join(gl.letters_dir, 'shot')
+    # #gl.shot_directory = os.path.join(gl.letters_dir, 'shot')
+    gl.shot_directory = gl.conf['blend']["shot_dir"]
     print("Dossier des shots:", gl.shot_directory)
 
     # Si le dossier n'existe pas, je le crée
@@ -263,10 +300,18 @@ def main():
     set_tempo()
 
     # midi
-    get_midi_json()
-    if gl.numero == gl.conf['midi']['sound']:
+    get_get_shot_json()
+    # #if gl.phase == "get shot":
+        # #get_get_shot_json()
+    # #else:
+        # #get_midi_json()
+    
+    if gl.conf['midi']['sound']:
         init_midi()
-
+        
+    # Dict d' aléa des polices:
+    gl.shuffle = get_shuffle()
+    
     # En dehors de la vue caméra
     set_all_letters_position()
     

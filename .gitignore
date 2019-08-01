@@ -11,6 +11,8 @@ ttfs/
 pngs/
 json/
 midi/
+shot/
+shot_rect/
 
 # Blender
 *.blend1

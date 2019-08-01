@@ -92,10 +92,9 @@ class AnalyseMidi:
         self.get_instruments_with_drums()
 
         print("\nListe des instruments:")
-        for instrument in self.instruments_without_drums:
-            ind = self.instruments_without_drums.index(instrument)
-            ins = self.instruments[ind]
-            print("   ", instrument, "soit", ins)
+        for i in range(len(self.instruments_without_drums)):
+            ins = self.instruments[i]
+            print("   ", ins, "soit", i)
         print("\n")
 
         return self.instruments
@@ -247,11 +246,6 @@ class AnalyseMidi:
         with open(json_name, 'w') as f_out:
             json.dump(json_data, f_out)
         print('\nEnregistrement de:', json_name)
-        
-        # #zip_name = name + ".zip"
-        # #with open(zip_name, 'w') as f_out:
-            # #json_zip(json.dump(json_data, f_out))
-        # #print('\nEnregistrement de:', zip_name)
 
 
 class PlayMidi:
@@ -579,11 +573,10 @@ def normalize_velocity(partition):
     # Correction du volume
     if volume_maxi > 127:
         print("    Correction du volume")
-        for couple in partition[0]:
-            note = couple[0]
-            # print(couple, couple[0])  # (77, 45) 77
-            correct = (couple[1] * 127) / volume_maxi
-            partition[0][partition[0].index(couple)] = (note, correct)
+        for c in range(len(partition[0])):
+            note = partition[0][0]
+            correct = (c[1] * 127) / volume_maxi
+            partition[0][c] = (note, correct)
 
     return partition
 
@@ -675,7 +668,7 @@ def analyse_play_one_midi(midi_file, FPS, fonts):
     pm = PlayMidi(midi_file, FPS, fonts)
 
 
-def play_all_midi_files_in_music_directory(root):
+def play_all_midi_files_in_music_directory(root, FPS, fonts):
     # Analyse et play les midi de music
     directory = root + "/music"
     extentions = [".mid", ".midi", "MID"]
@@ -699,11 +692,16 @@ if __name__ == '__main__':
     root = str(Path.cwd().resolve())
     print("Chemin du dossier courant de analyse_play_midi:", root)
 
-    # Analyse et play les midi de music
+    # ## Analyse et play d'une music
+    # #r = "/media/data/3D/projets/darknet-letters/letters/midi/music/"
+    # #midi_file = r + "doors-the_end.mid"
+    # #analyse_play_one_midi(midi_file, FPS, fonts)
+
+    # ## Analyse et play les midi de music
     # #play_all_midi_files_in_music_directory(root, FPS, fonts)
         
-    # Création des json
-    create_all_json(root, FPS)
+    # ## Création des json
+    # #create_all_json(root, FPS)
     
-    # ## Joue les json
-    # #play_all_json(root, FPS, fonts)
+    # Joue les json
+    play_all_json(root, FPS, fonts)
