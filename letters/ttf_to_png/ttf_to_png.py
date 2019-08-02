@@ -52,11 +52,12 @@ COLORS = [  "grey80",
             "orange",
             "red",
             "yellow",
-            "GreenYellow",
+            "blue",
             "lime",
             "DeepSkyBlue",
             "magenta",
             "PeachPuff2"]
+
             
 class TtftoPng:
 

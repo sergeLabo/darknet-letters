@@ -23,6 +23,8 @@ qui seront toutes des attributs du bge.logic (gl)
 Seuls les attributs de logic sont stockés en permanence.
 
 Il est relancé par main de letters_always à la fin du morceau.
+
+suspendDynamics(False) 
 """
 
 
@@ -32,6 +34,7 @@ from pathlib import Path
 import random
 
 from bge import logic as gl
+from bge import render
 
 from pymultilame import MyConfig, MyTools, Tempo
 from pymultilame import TextureChange, get_all_objects
@@ -73,7 +76,8 @@ def set_tempo():
     tempo_liste = [ ("seconde", 60),
                     ("frame", 999999999),
                     ("shot", int(gl.conf['blend']['shot_every'])),
-                    ("count", int(gl.conf['blend']['count']))]
+                    ("count", int(gl.conf['blend']['count'])),
+                    ("info", 180)]
                     
     gl.tempo = Tempo(tempo_liste)
     gl.frame_rate = 0
@@ -194,21 +198,6 @@ def init_midi():
         gl.instruments_player[i] = OneInstrumentPlayer(fonts, chan, bank, bank_number)
         
 
-def set_all_letters_unvisible():
-    """Toutes les lettres sont invisible au départ"""
-    for k, v in gl.all_obj.items():
-        if "font" in k:
-            v.visible = False
-
-        
-def set_all_letters_suspendDynamics():
-    """Toutes les lettres sont sans Dynamics au départ"""
-    
-    for k, v in gl.all_obj.items():
-        if "font" in k:
-            v.suspendDynamics(False)
-
-
 def set_all_letters_position():
     """Etalement des lettres name = k"""
     
@@ -225,21 +214,20 @@ def set_all_letters_position():
     
 
 def set_variable():
-    # Phases du jeu
-    gl.phase = "get shot"
 
     # Musique
-    gl.frame = 13458
+    gl.frame = 0
     gl.notes = {}
     gl.obj_name_list_to_display = []
     
     # Tous les objets
     gl.all_obj = get_all_objects()
-    gl.all_obj["Text_info"]["Text"] = ""
+    gl.info = ""
+    gl.info_news = 0
+    gl.all_obj["Text_info"]["Text"] = gl.info
 
     # nombre de shot total
     gl.nombre_shot_total = gl.conf['blend']['total']
-    gl.sleep = gl.conf['blend']['sleep']
     gl.previous_datas = ""
 
     # Numero conservé au changement de morceau
@@ -247,31 +235,8 @@ def set_variable():
     gl.total = gl.conf['blend']['total']
     
     
-def get_shuffle():
-    """
-    0: 9,
-    1: 2,
-    key = 0 à nombre d'instrument
-    value = 0 à 9 sans répétition
-    Il n'y a que 10 polices !
-    """
-    shuff = {}
-    
-    L = [*range(10)]
-    random.shuffle(L)
-    print("Liste en désordre:", L)
-
-    for n in range(10):
-        shuff[n] = L[n]
-    
-    return shuff
-    
-    
 def create_directories():
-    """
-    Création de n dossiers
-    /media/data/3D/projets/semaphore_blend_yolo/shot/a/shot_0_a.png
-    """
+    """Création de 100 dossiers."""
 
     # Dossier d'enregistrement des images
     # #gl.shot_directory = os.path.join(gl.letters_dir, 'shot')
@@ -286,7 +251,24 @@ def create_directories():
         directory = os.path.join(gl.shot_directory, str(l))
         gl.tools.create_directory(directory)
 
+
+def intro_init():
+    # Phases du jeu "intro" "music and letters" "get shot"
+    gl.phase = "intro"
+
+
+def music_and_letters_init():
+    get_midi_json()
+    init_midi()
+    gl.phase = "music and letters"
+
         
+def get_shot_init():
+    create_directories()
+    get_get_shot_json()
+    gl.phase = "get shot"
+
+    
 def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""
 
@@ -294,26 +276,13 @@ def main():
     
     # Récupération de la configuration
     get_conf()
-
     set_variable()
-    create_directories()
-    set_tempo()
+    set_tempo()        
 
-    # midi
-    get_get_shot_json()
-    # #if gl.phase == "get shot":
-        # #get_get_shot_json()
-    # #else:
-        # #get_midi_json()
-    
-    if gl.conf['midi']['sound']:
-        init_midi()
-        
-    # Dict d' aléa des polices:
-    gl.shuffle = get_shuffle()
-    
-    # En dehors de la vue caméra
+    # Carrés en dehors de la vue caméra
     set_all_letters_position()
+
+    intro_init()
     
     # Pour les mondoshawan
     print("Initialisation du jeu terminée\n\n")
