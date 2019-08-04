@@ -42,7 +42,7 @@ from scripts.letters_once import intro_init
 
 
 HELP = """
-SPACE pour relancer et changer de music\n
+SPACE pour changer de music\n
 1 Affichage du logo\n
 2 Lancement de music and letters\n
 3 Lancement de get shot\n
@@ -72,6 +72,9 @@ def main():
 
 
 def main_intro():
+    # Aggrandissement de la fenêtre
+    render.setWindowSize(gl.shot_size, gl.shot_size)
+        
     if gl.info == "":
         gl.all_obj["Cube"].visible = True
         gl.info = "H = Help"  
@@ -79,7 +82,7 @@ def main_intro():
 
 def main_music_and_letters():
     # Aggrandissement de la fenêtre
-    render.setWindowSize(1300, 1300)
+    render.setWindowSize(gl.music_size, gl.music_size)
     
     gl.all_obj["Cube"].visible = False
 
@@ -105,6 +108,9 @@ def main_get_shot():
     affichage fixe
     """
 
+    # Aggrandissement de la fenêtre
+    render.setWindowSize(gl.shot_size, gl.shot_size)
+    
     gl.all_obj["Cube"].visible = False
 
     if gl.tempo['shot'].tempo == 5:
@@ -165,11 +171,11 @@ def get_frame_notes():
                 frame_notes.append(partition[gl.frame])
             gl.frame += 1
     else:
-        if gl.phase != "get shot":
+        if gl.phase == "get shot":
             # Relance de get_shot.json à une frame au hazard
             gl.frame = randint(500, 2000)
             frame_notes = []
-        if gl.phase != "music and letters":    
+        if gl.phase == "music and letters":    
             # Kill de tous les threads et restart
             new_music()
 
@@ -206,13 +212,16 @@ def get_notes(frame_notes):
 def get_sub_dir():
     """60000/100=600 fichiers par dossier
     12345/600=20
+    59623/100=596
+    600 = 60000/100
+    59950/(60000/100) 59950/600=99
     """
-    n = gl.total/100
-    sub_dir = int(gl.numero/n)
+
+    sub_dir = int(gl.numero/(gl.total/100))
     if sub_dir < 0:
-        print("Sous dossier négatif")
+        print("Sous dossier négatif", gl.numero)
     if sub_dir > 99:
-        print("Sous dossier > 99")
+        print("Sous dossier > 99", gl.numero)
     return sub_dir
 
 
@@ -349,32 +358,30 @@ def letters_count(ob):
         gl.count[ob] = 1
 
     if gl.tempo["count"].tempo == 0:
-        try:
-            print("Vérification de la bonne répartition des polices:")
-            print("    ", len(gl.count))
-        except:
-            pass
+        if gl.phase == "get shot":
+            try:
+                print("Vérification de la bonne répartition des polices:")
+                print("    ", len(gl.count))
+            except:
+                pass
 
 
 def save_count():
     """Save à la fin du jeu"""
 
     json_name = "./scripts/count.json"
-    with open(json_name, 'w') as f_out:
-        json.dump(gl.count, f_out)
+    if hasattr(gl, 'count'):
+        with open(json_name, 'w') as f_out:
+            json.dump(gl.count, f_out)
 
 
 def new_music():
     """Relance du jeu avec une nouvelle musique."""
     kill()
 
-    # Enregistrement du numéro de shot déjà fait
-    if gl.phase == "get shot":
-        gl.ma_conf.save_config("blend", "numero", gl.numero)
-
-    # Relance du tout
-    print("Relance du jeu")
-    letters_once_main()
+    if gl.phase == "music and letters":
+        print("Changement de musique")
+        music_and_letters_init()
 
 
 def kill():
@@ -407,7 +414,7 @@ def kill():
 
 def keyboard():
     """
-    SPACE pour relancer et changer de music
+    SPACE pour changer de music
     0 pour stop du son
     1 pour start du son
     2 start de music and letters
@@ -418,8 +425,9 @@ def keyboard():
 
     # Changement de music
     if gl.keyboard.events[events.SPACEKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        print("\n"*2, "Restart Game")
-        new_music()
+        if gl.phase == "music and letters":
+            print("\n"*2, "Changemnt de musique")
+            new_music()
 
     # intro
     if gl.keyboard.events[events.PAD1] == gl.KX_INPUT_JUST_ACTIVATED:
@@ -443,6 +451,7 @@ def keyboard():
         print("Début de get shot")
         gl.phase = "get shot"
         gl.info = "Début de get shot"
+        kill()
         gl.info_news = 1    
         get_shot_init()
         
@@ -642,4 +651,6 @@ def set_letter_unvisible(lettre):
 def end():
     if gl.numero == gl.nombre_shot_total:
         save_count()
+        gl.endGame()
+    elif gl.numero > gl.nombre_shot_total:
         gl.endGame()

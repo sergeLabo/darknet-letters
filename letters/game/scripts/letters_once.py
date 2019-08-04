@@ -41,10 +41,6 @@ from pymultilame import TextureChange, get_all_objects
 
 # Ajout du dossier courant dans lequel se trouve le dossier my_pretty_midi
 CUR_DIR = Path.cwd()
-
-# Pour retrouver le début du jeu dans le terminal
-print("\n"*20)
-
 print("Chemin du dossier courant dans le BGE:", CUR_DIR.resolve())  # game
 
 # Chemin du dossier letters
@@ -53,6 +49,10 @@ sys.path.append(str(LETTERS_DIR) + "/midi")
 
 # analyse_play_midi est dans /midi
 from analyse_play_midi import PlayJsonMidi, OneInstrumentPlayer
+
+
+# Pour retrouver le début du jeu dans le terminal
+print("\n"*20)
 
 
 def get_conf():
@@ -96,6 +96,7 @@ def get_get_shot_json():
     gl.partition_nbr = len(gl.partitions)
     partitions_shuffle()
     print("Nombre d'instrument:", gl.partition_nbr)
+    print("Nombre de frame:", len(gl.partitions[0]))
     
     
 def get_midi_json():
@@ -219,6 +220,8 @@ def set_variable():
     gl.frame = 0
     gl.notes = {}
     gl.obj_name_list_to_display = []
+    gl.partitions = []
+    gl.instruments = []
     
     # Tous les objets
     gl.all_obj = get_all_objects()
@@ -233,13 +236,20 @@ def set_variable():
     # Numero conservé au changement de morceau
     gl.numero = gl.conf['blend']['numero']
     gl.total = gl.conf['blend']['total']
+    if gl.numero >= gl.total:
+        gl.numero = gl.total
     
-    
+    # Dimension des fenêtres
+    gl.music_size = gl.conf["blend"]["music_size"]
+    gl.shot_size = gl.conf["darknet"]["shot_size"]
+
+
 def create_directories():
     """Création de 100 dossiers."""
 
     # Dossier d'enregistrement des images
     # #gl.shot_directory = os.path.join(gl.letters_dir, 'shot')
+    # TODO le dossier shot doit exister: le créer si n'existe pas
     gl.shot_directory = gl.conf['blend']["shot_dir"]
     print("Dossier des shots:", gl.shot_directory)
 
@@ -258,6 +268,7 @@ def intro_init():
 
 
 def music_and_letters_init():
+    get_conf()
     get_midi_json()
     init_midi()
     gl.phase = "music and letters"
