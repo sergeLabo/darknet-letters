@@ -42,6 +42,7 @@ def verif():
     loop = 1
     a = 0
     x = len(pngs)
+    print(x)
     while loop:
         ar = randint(0, x)
         img = cv2.imread(pngs[ar])
@@ -55,20 +56,21 @@ def verif():
             img = cvDrawBoxes(img, line)
 
         if lines:
-            n = pngs[ar].split(rep)
-            m = n[1][2:-4]
+            n = pngs[ar].split("/")
+            print(n)
+            m = n[-1][:-4]
             name = nom + m + "_rect.png"
             print(name)
             cv2.imwrite(name, img)
             sleep(0.01)
 
-        # Stop à 100
+        # Stop à 1000
         a += 1
-        if a == 100:
+        if a == 200:
             loop = 0
 
         # Echap, attente
-        k = cv2.waitKey(33)
+        k = cv2.waitKey(1000)
         if k == 27:
             loop = 0
 
