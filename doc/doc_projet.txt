@@ -66,3 +66,36 @@ def apply_new_texture():
         n = random.randint(0, 9)
         new_tex = "//textures/pngs/font_" + str(n) + "/A.png"
         gl.tc.texture_new(new_tex)
+
+###############################################################################
+DARKNET YOLO V3 - Test 1
+
+Téléchargement du pre-trained weights
+    wget -c https://pjreddie.com/media/files/darknet53.conv.74
+
+For training for both small and large objects use modified models:
+    Full-model: 5 yolo layers: https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov3_5l.cfg
+
+Training Yolo v3:
+
+    change line batch to batch=64
+    change line subdivisions to subdivisions=8
+    change line max_batches to (classes*2000), soit 800 000
+    change line steps to 80% and 90% of max_batches, f.e. steps=640000,720000
+
+    change line classes=80 to your number of objects in each of 3 [yolo]-layers:
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L610
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L696
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L783
+        classes=400
+        
+    change [filters=255] to filters=(classes + 5)x3 in the 3 [convolutional] before each [yolo] layer
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L603
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L689
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L776
+        filters = (classes + 5)x3 = (400 + 5) * 3 = 1215
+
+Distinction main gauche main droite
+ligne 17    flip = 0
+
+###############################################################################

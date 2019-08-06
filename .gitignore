@@ -3,7 +3,7 @@
 *.geany
 *.geanywb
 
-# divers
+# divers, darknet
 old/
 .old/
 libdarknet.so
@@ -14,6 +14,7 @@ midi/
 shot/
 shot_jpg/
 shot_rect/
+darknet53.conv.74
 
 # Blender
 *.blend1
