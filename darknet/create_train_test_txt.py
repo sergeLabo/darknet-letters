@@ -7,10 +7,10 @@ from pymultilame import MyTools
 mt = MyTools()
 
 # Dossier des images et txt
-shot_dir = '/media/data/projets/shot_jpg_blur/'
+shot_jpg = '/media/data/projets/shot_jpg/'
 
 # liste de toutes les images
-files = mt.get_all_files_list(shot_dir, '.jpg')
+files = mt.get_all_files_list(shot_jpg, '.jpg')
 # Rebat les cartes pour prendre les fichiers au hazard dans les sous-dossiers
 random.shuffle(files)
 print("Nombre de fichiers", len(files))

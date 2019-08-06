@@ -24,7 +24,8 @@ Installation:
     numpy
     fluidsynth
     FluidR3_GM.sf2
-
+    mido
+    
 my_pretty_midi est le module pretty_midi modifié pour récupérer les notes
 des percussions, mais il ne permet pas d'en avoir les instruments (program).
 """
@@ -700,8 +701,8 @@ if __name__ == '__main__':
     # ## Analyse et play les midi de music
     # #play_all_midi_files_in_music_directory(root, FPS, fonts)
         
-    # ## Création des json
-    # #create_all_json(root, FPS)
+    # Création des json
+    create_all_json(root, FPS)
     
-    # Joue les json
-    play_all_json(root, FPS, fonts)
+    # ## Joue les json
+    # #play_all_json(root, FPS, fonts)
