@@ -194,7 +194,6 @@ def get_notes(frame_notes):
 
     if frame_notes:
         for i in range(len(frame_notes)):
-            # TODO bug ici
             font = i
             # la liste est dans une liste qui pourrait avoir plusieurs notes
             # soit un accord, je ne garde que la première note

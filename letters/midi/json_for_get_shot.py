@@ -59,15 +59,6 @@ print("Nombre de notes par partition", len(json_dict["partitions"][0]))
 data = json.dumps(json_dict)
 
 f = "get_shot.json"
-fichier = "/media/data/3D/projets/darknet-letters/letters/midi/json/"
+fichier = "/media/data/3D/projets/darknet-letters/letters/midi/"
 mode = "w"
 tools.write_data_in_file(data, fichier + f, mode)
-
-
-# #FPS = 60
-# #fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
-# #root = "/media/data/3D/projets/darknet-letters/letters"
-# ## Joue le json
-# #json_file = fichier + f
-# #pjm = PlayJsonMidi(json_file, FPS, fonts)
-# #pjm.play()

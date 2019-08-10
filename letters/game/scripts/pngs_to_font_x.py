@@ -23,9 +23,9 @@
     
 Copier le dossier pngs
 de
-        /media/data/3D/projets/darknet-letters/letters/ttf_to_png
+        ... darknet-letters/letters/ttf_to_png
 dans
-        /media/data/3D/projets/darknet-letters/letters/game/textures
+        ... darknet-letters/letters/game/textures
 """
 
 
@@ -320,9 +320,9 @@ if __name__ == '__main__':
     
     Copier le dossier pngs
     de
-            /media/data/3D/projets/darknet-letters/letters/ttf_to_png
+            ... darknet-letters/letters/ttf_to_png
     dans
-            /media/data/3D/projets/darknet-letters/letters/game/textures
+            ... darknet-letters/letters/game/textures
     """
 
     directory_rename()

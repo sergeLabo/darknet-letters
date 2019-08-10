@@ -86,7 +86,7 @@ def set_tempo():
     
 def get_get_shot_json():
 
-    gl.midi_json = "/media/data/3D/projets/darknet-letters/letters/midi/json/get_shot.json"
+    gl.midi_json = "/media/data/3D/projets/darknet-letters/letters/midi/get_shot.json"
     
     with open(gl.midi_json) as f:
         data = json.load(f)
@@ -248,9 +248,11 @@ def create_directories():
     """Création de 100 dossiers."""
 
     # Dossier d'enregistrement des images
-    # #gl.shot_directory = os.path.join(gl.letters_dir, 'shot')
-    # TODO le dossier shot doit exister: le créer si n'existe pas
     gl.shot_directory = gl.conf['blend']["shot_dir"]
+    
+    # Création du dossier si n'existe pas
+    gl.tools.create_directory(gl.shot_directory)
+    
     print("Dossier des shots:", gl.shot_directory)
 
     # Si le dossier n'existe pas, je le crée
@@ -284,6 +286,9 @@ def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""
 
     print("Initialisation des scripts lancée un seule fois au début du jeu:")
+
+    # Le couteau suisse
+    gl.tools = MyTools()
     
     # Récupération de la configuration
     get_conf()

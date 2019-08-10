@@ -15,10 +15,15 @@ Le Blender Game engine ne permet d'enregistrer les shot qu'en png.
 Darknet n'accepte que des jpg.
 Bizarrement, darknet est plus efficace avec des images un peu floutées.
 Ce script floute et enregistre en jpg.
-Il faut définir les chemins in et out.
+Il faut définir le chemin de shot ligne 81.
 """
 
 
+# Définir le chemin de /shot
+# TODO Reste ainsi !
+SHOT = '/media/data/3D/projets/darknet-letters/letters/shot'
+
+    
 class BlurAndConvert:
 
     def __init__(self, shot):
@@ -76,8 +81,5 @@ class BlurAndConvert:
 
 
 if __name__ == "__main__":
-
-    # Définir le chemin de /shot
-    shot = '/media/data/3D/projets/darknet-letters/letters/shot'
     
-    BlurAndConvert(shot)
+    BlurAndConvert(SHOT)

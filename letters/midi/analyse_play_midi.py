@@ -28,12 +28,16 @@ Installation:
     
 my_pretty_midi est le module pretty_midi modifié pour récupérer les notes
 des percussions, mais il ne permet pas d'en avoir les instruments (program).
+
+Les fichiers midi sont dans ... darknet-letters/letters/midi/music/
+et peuvent être dans des sous-dossiers
+
+Les json seront dans darknet-letters/letters/midi/json/
 """
 
 
 import os, sys
 from time import sleep
-import pathlib
 import threading
 import json
 from random import choice
@@ -230,20 +234,29 @@ class AnalyseMidi:
                      "instruments": [instrument_1.program,
                                      instrument_2.program, ...]
                       instrument is not JSON serializable = objet pretty_midi
+
+        midi dans /media/data/3D/projets/darknet-letters/letters/midi/music
+                     sous dossiers possible
+        json dans /media/data/3D/projets/darknet-letters/letters/midi/json
         """
 
         json_data = {}
         json_data["partitions"] = self.partitions
         json_data["instruments"] = self.instruments
 
-        # /media/data/3D/projets/darknet-letters/letters/midi/json/Quizas.json
-        # TODO revoir si sous dossier dans music
-        l = self.midi_file.split(".")
-        name = l[0]
-        name = name.replace("music", "json")
+        racine = self.midi_file.split("/midi/")
+        # racine = ['/media/data/.../darknet-letters', 'music/Summit.mid']
         
-        json_name =  name + ".json"
+        json_dir = racine[0] + "/midi/json/"
         
+        n = racine[-1].split("/")
+
+        # n = ['music', 'Summit.mid'] ou
+        # ['music', 'sous-dossier', 'The world is yours.mid']
+        m = n[-1].split(".")
+        name = m[0] + ".json"
+        json_name = json_dir + name
+
         with open(json_name, 'w') as f_out:
             json.dump(json_data, f_out)
         print('\nEnregistrement de:', json_name)
@@ -536,7 +549,8 @@ class PlayJsonMidi:
                 if pomp[i].end == 1:
                     if i not in self.end_file:
                         self.end_file.append(i)
-            sleep(10)
+            sleep(0.1)
+            
         print("Fin du morceau:", self.midi_json)
 
 
@@ -603,7 +617,7 @@ def get_file_list(directory, extentions):
         for name in files:
             for extention in extentions:
                 if name.endswith(extention):
-                    file_list.append(str(pathlib.PurePath(path, name)))
+                    file_list.append(str(Path(path, name)))
 
     return file_list
 
@@ -687,7 +701,6 @@ if __name__ == '__main__':
     # Il faut installer FluidR3_GM.sf2
     fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
 
-    # TODO à améliorer avec pathlib
     # Le dossier music doit exister avec des morceaux midi
     # /media/data/3D/projets/darknet-letters/letters/midi"
     root = str(Path.cwd().resolve())
@@ -701,8 +714,8 @@ if __name__ == '__main__':
     # ## Analyse et play les midi de music
     # #play_all_midi_files_in_music_directory(root, FPS, fonts)
         
-    # Création des json
-    create_all_json(root, FPS)
+    # ## Création des json
+    # #create_all_json(root, FPS)
     
-    # ## Joue les json
-    # #play_all_json(root, FPS, fonts)
+    # Joue les json
+    play_all_json(root, FPS, fonts)

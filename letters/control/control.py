@@ -6,6 +6,7 @@ from time import sleep
 import numpy as np
 import cv2
 from random import randint
+from pathlib import Path
 
 from pymultilame import MyTools
 
@@ -32,17 +33,12 @@ def cvDrawBoxes(img, coords):
     return img
 
 
-def verif():
-    # TODO chemin auto
-    rep = "/media/serge/data/shot"
-    pngs = tools.get_all_files_list(rep, "png")
-    # TODO chemin auto
-    nom = "/media/data/3D/projets/darknet-letters/letters/control/shot_rect/"
-
+def verif(root, shot):
+    pngs = tools.get_all_files_list(shot, "png")
     loop = 1
     a = 0
     x = len(pngs)
-    print(x)
+    print("Nombre de fichiers à contrôler:", x)
     while loop:
         ar = randint(0, x)
         img = cv2.imread(pngs[ar])
@@ -56,17 +52,21 @@ def verif():
             img = cvDrawBoxes(img, line)
 
         if lines:
+            # darknet-letters/letters/control/shot_rect/shot_1_rect.png
             n = pngs[ar].split("/")
-            print(n)
             m = n[-1][:-4]
-            name = nom + m + "_rect.png"
+            
+            # m = shot_1
+            shot_rect = root + "/shot_rect/"
+            name = shot_rect + m + "_rect.png"
             print(name)
+            
             cv2.imwrite(name, img)
             sleep(0.01)
 
         # Stop à 1000
         a += 1
-        if a == 200:
+        if a == 200 or a == x:
             loop = 0
 
         # Echap, attente
@@ -77,9 +77,9 @@ def verif():
     cv2.destroyAllWindows()
 
 
-def display():
-    nom = "/media/data/3D/projets/darknet-letters/letters/control/shot_rect/"
-    pngs = tools.get_all_files_list(nom, "png")
+def display(root):
+    shot_rect = root + "/shot_rect/"
+    pngs = tools.get_all_files_list(shot_rect, "png")
     loop = 1
     a = 0
     while loop:
@@ -95,5 +95,13 @@ def display():
 
 
 if __name__ == '__main__':
-    verif()
-    display()
+
+    # Définir ce chemin
+    shot = "/media/data/3D/projets/darknet-letters/letters/shot"
+
+    root = str(Path.cwd().resolve())
+    print("Chemin du dossier courant de analyse_play_midi:", root)
+    
+    # root = .... /control
+    verif(root, shot)
+    display(root)
