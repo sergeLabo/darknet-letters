@@ -77,7 +77,7 @@ class BlurAndConvert:
             
             # Ecriture
             cv2.imwrite(name, img, [int(cv2.IMWRITE_JPEG_QUALITY), 98])
-
+            sleep(0.01)
 
 
 if __name__ == "__main__":
