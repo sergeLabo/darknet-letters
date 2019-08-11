@@ -1,15 +1,20 @@
-
 # Geany
 *.geany
 *.geanywb
 
-# divers, darknet
+# divers
 old/
 .old/
-libdarknet.so
+
+# images
 ttfs/
 pngs/
+fonts_chooser/
+
+# darknet
 darknet53.conv.74
+backup/
+libdarknet.so
 
 # Blender
 *.blend1
