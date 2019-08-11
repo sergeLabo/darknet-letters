@@ -10,57 +10,12 @@ Réalisé avec:
 * Debian 10 Buster
 * Blender 2.79b
 
-### La documentation sur ressources.labomedia.org
+### La documentation sur le wiki ressources.labomedia.org
 
-[]()
+[Darknet Letters](https://ressources.labomedia.org/darknet_letters)
 
-### Installation
-
-#### pip3
-
-~~~text
-sudo apt install python3-pip
-~~~
-
-#### pymultilame
-
-~~~text
-sudo pip3 install -e git+https://github.com/sergeLabo/pymultilame.git#egg=pymultilame
-~~~
-
-Mise à jour:
-~~~text
-sudo pip3 install --upgrade git+https://github.com/sergeLabo/pymultilame.git#egg=pymultilame
-~~~
-
-#### Opencv et numpy
-
-~~~text
-sudo pip3 install numpy
-sudo pip3 install opencv-python
-~~~
-
-#### Blender 2.79b mais pas 2.80 qui n'a plus de BGE
-
-~~~text
-sudo apt install blender
-~~~
-
-#### Midi
-~~~text
-sudo pip3 install mido
-~~~
-
-##### fluidsynth
-~~~text
-sudo apt install fluidsynth
-~~~
-
-##### FluidR3_GM.sf2
-~~~text
-sudo apt install fluid-soundfont-gm
-~~~  
-
+Comment installer, tester ..., utiliser Yolo V3 Darknet ...
+ 
 ### License and Copyright
 
 This game is under Creative Commons Attribution-ShareAlike 3.0 Unported License.
@@ -74,4 +29,4 @@ More in file License GPL V3.
 
 ### Merci à:
 
-* [Labomedia]( https://labomedia.org/)
+* [Labomedia](https://labomedia.org/)

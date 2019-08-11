@@ -22,21 +22,9 @@ counter = 0
 train = ""
 test = ""
 
-a,b,c,d,e = 0,0,0,0,0
-
 for f in files:
     if counter < train_num:
         train += f + "\n"
-        if "_a.jpg" in f:
-            a += 1
-        if "_b.jpg" in f:
-            b += 1
-        if "_c.jpg" in f:
-            c += 1
-        if "_d.jpg" in f:
-            d += 1
-        if "_e.jpg" in f:
-            e += 1
     else:
         test += f + "\n"
     counter += 1

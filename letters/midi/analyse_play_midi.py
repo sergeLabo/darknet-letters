@@ -99,7 +99,7 @@ class AnalyseMidi:
         print("\nListe des instruments:")
         for i in range(len(self.instruments_without_drums)):
             ins = self.instruments[i]
-            print("   ", ins, "soit", i)
+            print("   ", ins, "soit numéro:", i)
         print("\n")
 
         return self.instruments
@@ -172,8 +172,8 @@ class AnalyseMidi:
 
         for instrument in self.instruments_without_drums:
             print("Analyse du numéro d'instrument:", instrument.program,
-                  "is_drum:", instrument.is_drum,
-                  "name", instrument.name)
+                  "; is_drum:", instrument.is_drum,
+                  "; name:", instrument.name)
 
             # Array de 128 x nombre de frames
             instrument_roll = self.get_instrument_roll(instrument)
@@ -452,9 +452,9 @@ class OneInstrumentPlayer:
         Se termine si self.thread_dict[note] = 0
         """
 
-        # #print("Lancement du thread: channel =", self.channel,
-                                    # #"note =", note,
-                                    # #"volume =", volume)
+        print("Lancement du thread: channel =", self.channel,
+                                    "note =", note,
+                                    "volume =", volume)
 
         # Excécution de la note
         self.fs.noteon(self.channel, note, volume)
@@ -463,10 +463,10 @@ class OneInstrumentPlayer:
         while self.thread_dict[note]:
             sleep(0.0001)
 
-        # ## Sinon fin de la note
-        # #print("      Fin du thread: channel =", self.channel,
-                                      # #"note =", note,
-                                    # #"volume =", volume)
+        # Sinon fin de la note
+        print("      Fin du thread: channel =", self.channel,
+                                      "note =", note,
+                                    "volume =", volume)
 
         self.fs.noteoff(self.channel, note)
 
@@ -549,7 +549,7 @@ class PlayJsonMidi:
                 if pomp[i].end == 1:
                     if i not in self.end_file:
                         self.end_file.append(i)
-            sleep(0.1)
+            sleep(1)
             
         print("Fin du morceau:", self.midi_json)
 
@@ -565,9 +565,9 @@ def get_channel(instruments):
     nbr = 0
     for instrument in instruments:
         if not instrument[1]:  # instrument[1] = boolean
+            if nbr >= 15: nbr = 0
             channels.append(channels_no_drum[nbr])
             nbr += 1
-            if nbr == 16: nbr = 0
         else:
             channels.append(9)
     return channels
@@ -587,11 +587,14 @@ def normalize_velocity(partition):
 
     # Correction du volume
     if volume_maxi > 127:
-        print("    Correction du volume")
-        for c in range(len(partition[0])):
-            note = partition[0][0]
-            correct = (c[1] * 127) / volume_maxi
-            partition[0][c] = (note, correct)
+        print("    Nombre de notes:", len(partition))
+        print("    Correction du volume de l'instrument")
+        for c in range(len(partition)):
+            if partition[c]:
+                note = partition[c][0][0]
+                volume = partition[c][0][1]
+                correct = int((volume * 127) / volume_maxi)
+                partition[c] = [(note, correct)]
 
     return partition
 
@@ -670,7 +673,7 @@ def play_all_json(root, FPS, fonts):
     directory = root + "/json"
     extentions = [".json"]
     file_list = get_file_list(directory, extentions)
-    for i in range(len(file_list)):
+    for i in range(1):  # len(file_list)):
         json_file = file_list[i]
         print("\nPlay:", json_file)
         pjm = PlayJsonMidi(json_file, FPS, fonts)
@@ -686,6 +689,7 @@ def analyse_play_one_midi(midi_file, FPS, fonts):
 def play_all_midi_files_in_music_directory(root, FPS, fonts):
     # Analyse et play les midi de music
     directory = root + "/music"
+    directory = root + "/music_guillaume"
     extentions = [".mid", ".midi", "MID"]
     file_list = get_file_list(directory, extentions)
     for i in range(len(file_list)):
@@ -695,8 +699,10 @@ def play_all_midi_files_in_music_directory(root, FPS, fonts):
     
 if __name__ == '__main__':
 
-    # FPS de 10 (trop petit) à 100 (très bien)
-    FPS = 60
+    # TODO faire menu terminal
+    
+    # FPS de 10 (trop petit) à 100 (très bien), 60 dans Blender
+    FPS = 120
 
     # Il faut installer FluidR3_GM.sf2
     fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
@@ -708,8 +714,13 @@ if __name__ == '__main__':
 
     # ## Analyse et play d'une music
     # #r = "/media/data/3D/projets/darknet-letters/letters/midi/music/"
-    # #midi_file = r + "doors-the_end.mid"
+    # #midi_file = r + "march-funebre.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)
+
+    # Play un midi
+    d = root + "/music_guillaume/"
+    midi_file = d + "michael_jackson-beatit.mid"
+    PlayMidi(midi_file, FPS, fonts)
 
     # ## Analyse et play les midi de music
     # #play_all_midi_files_in_music_directory(root, FPS, fonts)
@@ -717,5 +728,5 @@ if __name__ == '__main__':
     # ## Création des json
     # #create_all_json(root, FPS)
     
-    # Joue les json
-    play_all_json(root, FPS, fonts)
+    # ## Joue les json
+    # #play_all_json(root, FPS, fonts)

@@ -10,6 +10,10 @@ from pathlib import Path
 
 from pymultilame import MyTools
 
+
+# Définir ce chemin
+SHOT = "/media/data/3D/projets/darknet-letters/letters/shot"
+    
 tools = MyTools()
 
 
@@ -96,12 +100,9 @@ def display(root):
 
 if __name__ == '__main__':
 
-    # Définir ce chemin
-    shot = "/media/data/3D/projets/darknet-letters/letters/shot"
-
     root = str(Path.cwd().resolve())
     print("Chemin du dossier courant de analyse_play_midi:", root)
     
     # root = .... /control
-    verif(root, shot)
+    verif(root, SHOT)
     display(root)

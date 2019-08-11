@@ -6,6 +6,9 @@
 old/
 .old/
 
+# music
+music_guillaume/
+
 # images
 ttfs/
 pngs/
