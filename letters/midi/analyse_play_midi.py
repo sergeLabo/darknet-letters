@@ -244,18 +244,7 @@ class AnalyseMidi:
         json_data["partitions"] = self.partitions
         json_data["instruments"] = self.instruments
 
-        racine = self.midi_file.split("/midi/")
-        # racine = ['/media/data/.../darknet-letters', 'music/Summit.mid']
-        
-        json_dir = racine[0] + "/midi/json/"
-        
-        n = racine[-1].split("/")
-
-        # n = ['music', 'Summit.mid'] ou
-        # ['music', 'sous-dossier', 'The world is yours.mid']
-        m = n[-1].split(".")
-        name = m[0] + ".json"
-        json_name = json_dir + name
+        json_name = get_json_name(self.midi_file)
 
         with open(json_name, 'w') as f_out:
             json.dump(json_data, f_out)
@@ -554,6 +543,28 @@ class PlayJsonMidi:
         print("Fin du morceau:", self.midi_json)
 
 
+def get_json_name(midi_file):
+    """Le fichier midi_file est le chemin absolu du fichier dans :
+    /media/data/3D/projets/darknet-letters/letters/midi/music/
+         ou 
+    /media/data/3D/projets/darknet-letters/letters/midi/music/pas_pour_github/
+
+    Le json sera dans le dossier 
+    /media/data/3D/projets/darknet-letters/letters/midi/json/
+    ou
+    /media/data/3D/projets/darknet-letters/letters/midi/json/pas_pour_github/
+    """
+
+    # Remplacement de music par json
+    with_json_dir = midi_file.replace("/midi/music/", "/midi/json/")
+    
+    # Suppression de l'extension
+    without_extension = with_json_dir.split(".")[0]
+    json_name = without_extension + ".json"
+
+    return json_name
+
+        
 def get_channel(instruments):
     """16 channel maxi
     channel 9 pour drums
@@ -702,7 +713,7 @@ if __name__ == '__main__':
     # TODO faire menu terminal
     
     # FPS de 10 (trop petit) à 100 (très bien), 60 dans Blender
-    FPS = 120
+    FPS = 60
 
     # Il faut installer FluidR3_GM.sf2
     fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
@@ -717,16 +728,16 @@ if __name__ == '__main__':
     # #midi_file = r + "march-funebre.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)
 
-    # Play un midi
-    d = root + "/music_guillaume/"
-    midi_file = d + "michael_jackson-beatit.mid"
-    PlayMidi(midi_file, FPS, fonts)
+    # ## Play un midi
+    # #d = root + "/music_guillaume/"
+    # #midi_file = d + "michael_jackson-beatit.mid"
+    # #PlayMidi(midi_file, FPS, fonts)
 
     # ## Analyse et play les midi de music
     # #play_all_midi_files_in_music_directory(root, FPS, fonts)
         
-    # ## Création des json
-    # #create_all_json(root, FPS)
+    # Création des json
+    create_all_json(root, FPS)
     
     # ## Joue les json
     # #play_all_json(root, FPS, fonts)

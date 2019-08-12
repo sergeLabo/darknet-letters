@@ -22,11 +22,13 @@ Lancé à chaque frame durant tout le jeu.
 """
 
 
-import os
+import os, sys
 from random import uniform, randint
 import numpy
 from time import time, sleep
 import json
+from pathlib import Path
+import textwrap
 
 from pymultilame import MyTools
 from pymultilame import get_all_objects, get_scene_with_name
@@ -35,10 +37,22 @@ from bge import logic as gl
 from bge import events
 from bge import render
 
+# Ajout du dossier courant dans lequel se trouve le dossier my_pretty_midi
+CUR_DIR = Path.cwd()
+print("Chemin du dossier courant dans le BGE:", CUR_DIR.resolve())  # game
+
+# Chemin du dossier letters
+LETTERS_DIR = CUR_DIR.parent
+sys.path.append(str(LETTERS_DIR) + "/midi")
+
+# analyse_play_midi est dans /midi
+from analyse_play_midi import AnalyseMidi
+
 from scripts.letters_once import main as letters_once_main
 from scripts.letters_once import get_shot_init
 from scripts.letters_once import music_and_letters_init
 from scripts.letters_once import intro_init
+from scripts.letters_once import get_json_init
 
 
 HELP = """
@@ -46,6 +60,7 @@ SPACE pour changer de music\n
 1 Affichage du logo\n
 2 Lancement de music and letters\n
 3 Lancement de get shot\n
+4 Lancement de get json\n
 H help\n
 Echap Quitter
 """
@@ -69,6 +84,8 @@ def main():
         main_music_and_letters()
     if gl.phase == "get shot":
         main_get_shot()
+    if gl.phase == "get json":
+        main_get_json()
 
 
 def main_intro():
@@ -141,6 +158,23 @@ def main_get_shot():
 
     # Fin du jeu
     end()
+
+
+def main_get_json():
+    """
+
+    """
+
+    midi_file = gl.all_midi_files[gl.json_file_nbr]
+    gl.json_file_nbr += 1
+        
+    am = AnalyseMidi(midi_file, gl.FPS)
+    am.get_partitions_and_instruments()
+    am.save_midi_json()
+
+    if gl.json_file_nbr == len(gl.all_midi_files):
+        gl.phase == "intro"
+    gl.info = "Fichier en cours:\n\n" + midi_file.split("/")[-1]
 
 
 def get_frame_notes():
@@ -450,9 +484,15 @@ def keyboard():
         print("Début de get shot")
         gl.phase = "get shot"
         gl.info = "Début de get shot"
-        kill()
-        gl.info_news = 1    
+        kill()   
         get_shot_init()
+
+    # get json from midi file
+    if gl.keyboard.events[events.PAD4] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Début de conversion des midi en json")
+        gl.phase = "get json"
+        kill()   
+        get_json_init()
         
     # Help
     if gl.keyboard.events[events.HKEY] == gl.KX_INPUT_JUST_ACTIVATED:
@@ -467,13 +507,14 @@ def display_info():
 
     gl.all_obj["Text_info"]["Text"] = gl.info
 
-    if gl.info_news:
-        gl.tempo["info"].reset()
-        gl.info_news = 0
-        
-    if gl.tempo["info"].tempo > 175:
-        gl.info = ""
-        
+    if not gl.phase == "get json":
+        if gl.info_news:
+            gl.tempo["info"].reset()
+            gl.info_news = 0
+            
+        if gl.tempo["info"].tempo > 175:
+            gl.info = ""
+
 
 def print_frame_rate():
     sec = gl.tempo["seconde"].tempo

@@ -128,7 +128,10 @@ def get_midi_json():
     gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
     gl.instruments = data["instruments"]  # [instrument_1.program, ...
     gl.partition_nbr = len(gl.partitions)
+    
+    # Choix de la police au hazard
     partitions_shuffle()
+    
     print("Nombre d'instrument:", len(gl.instruments))
     
 
@@ -183,7 +186,6 @@ def init_midi():
         instrum = [[0, 25], false, "Bass"]
     """
     
-    FPS = gl.conf["midi"]["fps"]
     fonts = gl.conf["midi"]["fonts"]
     channels = get_channel()
 
@@ -281,6 +283,33 @@ def get_shot_init():
     get_get_shot_json()
     gl.phase = "get shot"
 
+
+def get_file_list(directory, extentions):
+    """Retourne la liste de tous les fichiers avec les extentions de
+    la liste extentions
+    """
+
+    file_list = []
+    for path, subdirs, files in os.walk(directory):
+        for name in files:
+            for extention in extentions:
+                if name.endswith(extention):
+                    file_list.append(str(Path(path, name)))
+
+    return file_list
+
+    
+def get_json_init():
+    """Pour créer les json, 
+    """
+    gl.FPS = gl.conf["midi"]["fps"]
+    gl.json_file_nbr = 0
+
+    midi = gl.letters_dir + "/midi/music"
+    extentions = [".midi", "mid", "kar", "Mid", "MID"]
+    gl.all_midi_files = get_file_list(midi, extentions)
+    print("Liste des fichiers midi:")
+    print("    ", gl.all_midi_files)
     
 def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""
