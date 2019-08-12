@@ -99,3 +99,6 @@ Distinction main gauche main droite
 ligne 17    flip = 0
 
 ###############################################################################
+
+ligne 873 et 962
+classes=400
