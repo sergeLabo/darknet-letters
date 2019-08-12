@@ -16,7 +16,6 @@ fonts_chooser/
 
 # darknet
 darknet53.conv.74
-backup/
 libdarknet.so
 
 # Blender
