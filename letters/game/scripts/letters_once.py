@@ -29,6 +29,7 @@ suspendDynamics(False)
 
 
 import os, sys
+from time import sleep
 import json
 from pathlib import Path
 import random
@@ -76,130 +77,12 @@ def set_tempo():
     tempo_liste = [ ("seconde", 60),
                     ("frame", 999999999),
                     ("shot", int(gl.conf['blend']['shot_every'])),
-                    ("count", int(gl.conf['blend']['count'])),
                     ("info", 180)]
                     
     gl.tempo = Tempo(tempo_liste)
     gl.frame_rate = 0
     gl.time = 0
 
-    
-def get_get_shot_json():
-
-    gl.midi_json = "/media/data/3D/projets/darknet-letters/letters/midi/get_shot.json"
-    
-    with open(gl.midi_json) as f:
-        data = json.load(f)
-
-    gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
-    gl.instruments = data["instruments"]  # [instrument_1.program, ...
-    gl.partition_nbr = len(gl.partitions)
-    partitions_shuffle()
-    print("Nombre d'instrument:", gl.partition_nbr)
-    print("Nombre de frame:", len(gl.partitions[0]))
-    
-    
-def get_midi_json():
-    """
-    json_data = {"partitions":  [partition_1, partition_2 ......],
-                 "instruments": [instrument_1.program,
-                                 instrument_2.program, ...]
-    """
-                  
-    
-    gl.nbr = gl.conf["midi"]["file_nbr"]
-    js = gl.letters_dir + "/midi/json"
-    all_json = gl.tools.get_all_files_list(js, ".json")
-
-    # Reset de gl.nbr si fini
-    if gl.nbr >= len(all_json):
-        gl.nbr = 0
-
-    # Enregistrement du numéro du prochain fichier à lire
-    gl.ma_conf.save_config("midi", "file_nbr", gl.nbr + 1)
-
-    gl.midi_json = all_json[gl.nbr]
-    
-    print("Fichier midi en cours:", gl.midi_json)
-
-    with open(gl.midi_json) as f:
-        data = json.load(f)
-
-    gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
-    gl.instruments = data["instruments"]  # [instrument_1.program, ...
-    gl.partition_nbr = len(gl.partitions)
-    
-    # Choix de la police au hazard
-    partitions_shuffle()
-    
-    print("Nombre d'instrument:", len(gl.instruments))
-    
-
-def partitions_shuffle():
-    """Le désordre des partitions (et instruments) permet de rendre aléatoire
-    le choix des polices pour chaque instrument.
-    """
-
-    L = [*range(gl.partition_nbr)]
-    random.shuffle(L)
-    print("Liste en désordre:", L)
-    
-    partitions_new = list(range(gl.partition_nbr))
-    instruments_new = list(range(gl.partition_nbr))
-    for i in range(len(L)):
-        partitions_new[i]  = gl.partitions[L[i]]
-        instruments_new[i] = gl.instruments[L[i]]
-        
-    gl.partitions  = partitions_new
-    gl.instruments = instruments_new
-    
-
-def get_channel():
-    """16 channel maxi
-    channel 9 pour drums
-    Les channels sont attribués dans l'ordre des instruments de la liste
-    """
-    
-    channels = []
-    channels_no_drum = [1,2,3,4,5,6,7,8,10,11,12,13,14,15,16]
-    nbr = 0
-    for instrument in gl.instruments:
-        if not instrument[1]:  # instrument[1] = boolean
-            channels.append(channels_no_drum[nbr])
-            nbr += 1
-            if nbr > 14: nbr = 0
-        else:
-            channels.append(9)
-            
-    return channels
-
-                    
-def init_midi():
-    """bank = 0
-    bank_number = instrument[]
-    Dans PlayOneMidiPartition, une note est jouée avec:
-        .thread_play_note(note, volume)
-    La note est stoppée si:
-        objet.thread_dict[(note, volume)] = 0
-
-    gl.instruments = [[[0, 25], false, "Bass"], [[0, 116], true, "Drums2"]]
-        instrum = [[0, 25], false, "Bass"]
-    """
-    
-    fonts = gl.conf["midi"]["fonts"]
-    channels = get_channel()
-
-    # Création d'un dict des objets pour jouer chaque instrument
-    gl.instruments_player = {}
-    for i in range(len(gl.instruments)):
-        instrum = gl.instruments[i]
-        chan = channels[i]
-        is_drum = instrum[1]
-        bank = instrum[0][0]
-        bank_number = instrum[0][1]
-        print("Instrument:", chan, bank, bank_number)  
-        gl.instruments_player[i] = OneInstrumentPlayer(fonts, chan, bank, bank_number)
-        
 
 def set_all_letters_position():
     """Etalement des lettres name = k"""
@@ -266,24 +149,6 @@ def create_directories():
         gl.tools.create_directory(directory)
 
 
-def intro_init():
-    # Phases du jeu "intro" "music and letters" "get shot"
-    gl.phase = "intro"
-
-
-def music_and_letters_init():
-    get_conf()
-    get_midi_json()
-    init_midi()
-    gl.phase = "music and letters"
-
-        
-def get_shot_init():
-    create_directories()
-    get_get_shot_json()
-    gl.phase = "get shot"
-
-
 def get_file_list(directory, extentions):
     """Retourne la liste de tous les fichiers avec les extentions de
     la liste extentions
@@ -298,8 +163,162 @@ def get_file_list(directory, extentions):
 
     return file_list
 
+
+def get_get_shot_json():
+
+    gl.midi_json = "/media/data/3D/projets/darknet-letters/letters/midi/get_shot.json"
     
-def get_json_init():
+    with open(gl.midi_json) as f:
+        data = json.load(f)
+
+    gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
+    gl.instruments = data["instruments"]  # [instrument_1.program, ...
+    gl.partition_nbr = len(gl.partitions)
+    
+    print("Nombre d'instrument:", gl.partition_nbr)
+    print("Nombre de frame:", len(gl.partitions[0]))
+    
+    
+def get_midi_json():
+    """
+    json_data = {"partitions":  [partition_1, partition_2 ......],
+                 "instruments": [instrument_1.program,
+                                 instrument_2.program, ...]
+    """
+                  
+    
+    gl.nbr = gl.conf["midi"]["file_nbr"]
+    js = gl.letters_dir + "/midi/json"
+    all_json = gl.tools.get_all_files_list(js, ".json")
+
+    # Reset de gl.nbr si fini
+    if gl.nbr >= len(all_json):
+        gl.nbr = 0
+
+    # Enregistrement du numéro du prochain fichier à lire
+    gl.ma_conf.save_config("midi", "file_nbr", gl.nbr + 1)
+
+    gl.midi_json = all_json[gl.nbr]
+    
+    print("Fichier midi en cours:", gl.midi_json)
+
+    with open(gl.midi_json) as f:
+        data = json.load(f)
+
+    gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
+    gl.instruments = data["instruments"]  # [instrument_1.program, ...
+    gl.partition_nbr = len(gl.partitions)
+    
+    # Pour choix 2 et 3
+    fonts_shuffle()
+    
+    print("Nombre d'instrument:", len(gl.instruments))
+    
+
+def fonts_shuffle():
+    """Le désordre des polices permet de rendre aléatoire
+    le choix de la police pour chaque instrument.
+    liste en désordre = [9, 5, 1, 4 ...] 10 items
+    gl.fonts_dict = {numéro de piste soit 0 à nombre d'instruments:
+                        police assignée}
+    """
+
+    L = [*range(10)]
+    random.shuffle(L)
+
+    gl.fonts_dict = {}
+    n = gl.partition_nbr
+    if n >= 10: n = 10
+    for i in range(n):
+        gl.fonts_dict[i] = L[i]
+    print("Dict des polices:", gl.fonts_dict)
+
+
+def get_channel():
+    """16 channel maxi
+    channel 9 pour drums
+    Les channels sont attribués dans l'ordre des instruments de la liste
+    """
+    
+    channels = []
+    channels_no_drum = [1,2,3,4,5,6,7,8,10,11,12,13,14,15,16]
+    nbr = 0
+    for instrument in gl.instruments:
+        if not instrument[1]:  # instrument[1] = boolean
+            channels.append(channels_no_drum[nbr])
+            nbr += 1
+            if nbr > 14: nbr = 0
+        else:
+            channels.append(9)
+            
+    return channels
+
+                    
+def init_midi():
+    """bank = 0
+    bank_number = instrument[]
+    Dans PlayOneMidiPartition, une note est jouée avec:
+        .thread_play_note(note, volume)
+    La note est stoppée si:
+        objet.thread_dict[(note, volume)] = 0
+
+    gl.instruments = [[[0, 25], false, "Bass"], [[0, 116], true, "Drums2"]]
+        instrum = [[0, 25], false, "Bass"]
+    """
+    
+    fonts = gl.conf["midi"]["fonts"]
+    channels = get_channel()
+
+    # TODO provoque erreur de segmentation
+    # ## Pour être sûr que les audio initiés soit bien stoppé
+    # #for i in range(10):
+        # #try:
+            # ## Stop des fluidsynth.Synth() initiés
+            # #gl.instruments_player[i].stop_audio()
+        # #except:
+            # #print("Erreur dans stop des fluidsynth.Synth()")
+        
+    # Création d'un dict des objets pour jouer chaque instrument
+    gl.instruments_player = {}
+
+    # Limitation du nombre d'instruments
+    n = len(gl.instruments)
+    if n > 10: n = 10
+    for i in range(n):
+        instrum = gl.instruments[i]
+        chan = channels[i]
+        is_drum = instrum[1]
+        bank = instrum[0][0]
+        bank_number = instrum[0][1]
+        print("Instrument:", chan, bank, bank_number)  
+        gl.instruments_player[i] = OneInstrumentPlayer(fonts, chan, bank,
+                                                       bank_number)
+        
+
+def intro_init():
+    # Phases du jeu "intro" "music and letters" "get shot"
+    gl.phase = "intro"
+
+
+def music_and_letters_init():
+    get_conf()
+    get_midi_json()
+    sleep(0.1)
+    init_midi()
+    gl.phase = "music and letters"
+
+        
+def get_shot_init():
+    create_directories()
+    get_get_shot_json()
+    # Pas de shuffle des polices, elles y passent toutes
+    gl.fonts_dict = {}
+    for i in range(10):
+        gl.fonts_dict[i] = i
+    gl.phase = "get shot"
+
+    
+def convert_to_json_init():
     """Pour créer les json, 
     """
     gl.FPS = gl.conf["midi"]["fps"]
@@ -308,8 +327,15 @@ def get_json_init():
     midi = gl.letters_dir + "/midi/music"
     extentions = [".midi", "mid", "kar", "Mid", "MID"]
     gl.all_midi_files = get_file_list(midi, extentions)
-    print("Liste des fichiers midi:")
-    print("    ", gl.all_midi_files)
+    print("Nombre de fichiers à convertir:", len(gl.all_midi_files))
+    
+    # #print("Liste des fichiers midi:")
+    # #print("    ", gl.all_midi_files)
+    
+    # Pour la fin de la conversion
+    gl.convert_to_json_end = 1
+    gl.conversion = None
+
     
 def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""

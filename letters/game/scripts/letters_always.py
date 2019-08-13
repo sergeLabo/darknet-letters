@@ -29,6 +29,7 @@ from time import time, sleep
 import json
 from pathlib import Path
 import textwrap
+import threading
 
 from pymultilame import MyTools
 from pymultilame import get_all_objects, get_scene_with_name
@@ -52,16 +53,17 @@ from scripts.letters_once import main as letters_once_main
 from scripts.letters_once import get_shot_init
 from scripts.letters_once import music_and_letters_init
 from scripts.letters_once import intro_init
-from scripts.letters_once import get_json_init
+from scripts.letters_once import convert_to_json_init
 
 
 HELP = """
-SPACE pour changer de music\n
 1 Affichage du logo\n
-2 Lancement de music and letters\n
-3 Lancement de get shot\n
-4 Lancement de get json\n
-H help\n
+2 Lancement de letters\n
+    SPACE pour changer de musique\n
+3 Fabrication des shot pour l'IA\n
+4 Conversion en json\n
+H Help\n
+R Reset\n
 Echap Quitter
 """
 
@@ -85,7 +87,7 @@ def main():
     if gl.phase == "get shot":
         main_get_shot()
     if gl.phase == "get json":
-        main_get_json()
+        main_convert_to_json()
 
 
 def main_intro():
@@ -160,21 +162,39 @@ def main_get_shot():
     end()
 
 
-def main_get_json():
+def main_convert_to_json():
+    """Conversion en json
+    Ne marche pas: pendant la conversion le script et le jeu s'arrête ... !
+    Si dans un thread, de nombreux threads vont tourner en même temps ... !
+    Il faut un truc dans AnalyseMidi qui informe de la fin d'une conversion. 
     """
 
-    """
-
-    midi_file = gl.all_midi_files[gl.json_file_nbr]
-    gl.json_file_nbr += 1
+    # Si plus de midi
+    if gl.json_file_nbr > len(gl.all_midi_files):
+        gl.phase = "intro"
         
-    am = AnalyseMidi(midi_file, gl.FPS)
-    am.get_partitions_and_instruments()
-    am.save_midi_json()
+    midi_file = gl.all_midi_files[gl.json_file_nbr]
 
+    # Nouvelle conversion si le précédent est fini
+    if gl.convert_to_json_end:
+        thread_convert_to_json(midi_file)
+        gl.json_file_nbr += 1
+        gl.info = "Fichier en cours:\n\n" + midi_file.split("/")[-1]
+        
+    # Retour au menu à la fin
     if gl.json_file_nbr == len(gl.all_midi_files):
         gl.phase == "intro"
-    gl.info = "Fichier en cours:\n\n" + midi_file.split("/")[-1]
+
+    # La conversion en cours est-elle finie ?
+    gl.convert_to_json_end = gl.conversion.end
+
+    
+def thread_convert_to_json(midi_file):
+
+    print("Conversion de:", midi_file)
+    gl.conversion = AnalyseMidi(midi_file, gl.FPS)
+    thread_convert = threading.Thread(target=gl.conversion.save_midi_json)
+    thread_convert.start()
 
 
 def get_frame_notes():
@@ -220,22 +240,22 @@ def get_notes(frame_notes):
     """instr_num est l'index de l'instrument dans gl.instruments
     gl.instruments = [[[0, 70], False, 'Bason'], [[0, 73], False, 'Flute']]
     une police par instrument
-    frame_notes = [[[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]],
-    [[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]]]
+    frame_notes = [[[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]], [[1, 4]]]
     """
 
     notes = []
 
     if frame_notes:
         for i in range(len(frame_notes)):
-            font = i
+            # intrument dans l'ordre
+            instrum = i
             # la liste est dans une liste qui pourrait avoir plusieurs notes
             # soit un accord, je ne garde que la première note
-            # frame_notes[i] = [[1, 4]]
+            # frame_notes[i] = [[81, 44], [69, 24]]
             try:
                 note = frame_notes[i][0][0]
                 volume = frame_notes[i][0][1]
-                notes.append((font, note, volume))
+                notes.append((instrum, note, volume))
             except:
                 pass
 
@@ -299,21 +319,7 @@ def get_objets_position_size():
 
 
 def save_txt_file(datas, sub_dir):
-    """<object-class> <x> <y> <width> <height>
-    Sous dossier > 99
-    Python script error - object 'Cube', controller 'Python1':
-    Traceback (most recent call last):
-      File "/media/data/3D/projets/darknet-letters/letters/game/letters.blend/labomedia_always.py", line 41, in main
-      File "/media/data/3D/projets/darknet-letters/letters/game/scripts/letters_always.py", line 55, in main
-        main_get_shot()
-      File "/media/data/3D/projets/darknet-letters/letters/game/scripts/letters_always.py", line 109, in main_get_shot
-        save_txt_file(gl.previous_datas, sub_dir)
-      File "/media/data/3D/projets/darknet-letters/letters/game/scripts/letters_always.py", line 247, in save_txt_file
-        gl.tools.write_data_in_file(datas, fichier, "w")
-      File "/usr/local/lib/python3.7/dist-packages/pymultilame/mytools.py", line 89, in write_data_in_file
-        with open(fichier, mode) as fd:
-    FileNotFoundError: [Errno 2] No such file or directory: '/media/serge/data/shot/100/shot_60000.txt'
-    """
+    """<object-class> <x> <y> <width> <height>"""
 
     fichier = os.path.join(gl.shot_directory,
                             str(sub_dir),
@@ -351,12 +357,12 @@ def display_frame_notes(notes):
     """Affichage"""
 
     for note_tuple in notes:
-        font, note, volume = note_tuple[0], note_tuple[1], note_tuple[2]
-        if font < 10:
-            display(font, note, volume)
+        instrum, note, volume = note_tuple[0], note_tuple[1], note_tuple[2]
+        if instrum < 10:
+            display(instrum, note, volume)
 
 
-def display(font, note, volume):
+def display(instrum, note, volume):
     """Affiche ou cache les lettres"""
 
     # Lettres correspondantes
@@ -369,43 +375,12 @@ def display(font, note, volume):
     # Affichage des lettres
     for letter in to_display:
         if letter:
+            # Polices shuffle
+            font = gl.fonts_dict[instrum]
             ob = "font_" + str(font) + "_" + letter
             gl.obj_name_list_to_display.append(ob)
             letter_obj = gl.all_obj[ob]
             set_letter_position(letter_obj)
-            letters_count(ob)
-
-
-def letters_count(ob):
-    """Comptage des lettres affichées:"""
-
-    try:
-        gl.count
-    except:
-        print("Création de gl.count")
-        gl.count = {}
-
-    if ob in gl.count:
-        gl.count[ob] += 1
-    else:
-        gl.count[ob] = 1
-
-    if gl.tempo["count"].tempo == 0:
-        if gl.phase == "get shot":
-            try:
-                print("Vérification de la bonne répartition des polices:")
-                print("    ", len(gl.count))
-            except:
-                pass
-
-
-def save_count():
-    """Save à la fin du jeu"""
-
-    json_name = "./scripts/count.json"
-    if hasattr(gl, 'count'):
-        with open(json_name, 'w') as f_out:
-            json.dump(gl.count, f_out)
 
 
 def new_music():
@@ -435,14 +410,17 @@ def kill():
                 gl.instruments_player[j].thread_dict[i] = 0
             except:
                 pass
-    sleep(1)
+    sleep(0.1)
     print("Fin de tous les threads")
 
-    if gl.phase == "music and letters":
+    try:
         # Stop des fluidsynth.Synth() initiés
         if len(gl.instruments_player) > 0:
             for i in range(n):
                 gl.instruments_player[i].stop_audio()
+                sleep(0.1)
+    except:
+        print("Erreur dans stop des fluidsynth.Synth()")
 
 
 def keyboard():
@@ -492,7 +470,7 @@ def keyboard():
         print("Début de conversion des midi en json")
         gl.phase = "get json"
         kill()   
-        get_json_init()
+        convert_to_json_init()
         
     # Help
     if gl.keyboard.events[events.HKEY] == gl.KX_INPUT_JUST_ACTIVATED:
@@ -500,6 +478,11 @@ def keyboard():
         gl.all_obj["Cube"].visible = False     
         gl.info = HELP
         gl.info_news = 1    
+
+    # Reset
+    if gl.keyboard.events[events.RKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Reset ...............")
+        gl.game.restart()
 
         
 def display_info():
@@ -532,10 +515,12 @@ def play_note(note_tuple):
 
     instr_num, note, volume = note_tuple
 
-    # Lancement de la note si pas en cours
-    if not gl.instruments_player[instr_num].thread_dict[note]:
-        # Lancement d'une note
-        gl.instruments_player[instr_num].thread_play_note(note, volume)
+    # Limitation à 10 canaux
+    if instr_num < 10:
+        # Lancement de la note si pas en cours
+        if not gl.instruments_player[instr_num].thread_dict[note]:
+            # Lancement d'une note
+            gl.instruments_player[instr_num].thread_play_note(note, volume)
 
 
 def stop_notes(last_notes):
@@ -554,10 +539,10 @@ def stop_notes(last_notes):
 def set_letter_position(letter_obj):
     """Réglage visuel"""
 
-    plagex = 4.6
+    plagex = 4.0
     u = numpy.random.uniform(-plagex, plagex)
 
-    plagey = 4.6
+    plagey = 4.0
     v = numpy.random.uniform(-plagey, plagey)
 
     un_peu_haut = 0
@@ -690,7 +675,6 @@ def set_letter_unvisible(lettre):
 
 def end():
     if gl.numero == gl.nombre_shot_total:
-        save_count()
         gl.endGame()
     elif gl.numero > gl.nombre_shot_total:
         gl.endGame()

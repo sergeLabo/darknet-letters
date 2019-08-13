@@ -78,6 +78,9 @@ class AnalyseMidi:
         self.instruments = []
         self.partitions = []
 
+        # Pour gérer les threads dans blender
+        self.end = 0
+        
     def get_instruments(self):
         """instruments =
         [Instrument(program=71, is_drum=False, name="Grand Piano"), ...]
@@ -225,7 +228,8 @@ class AnalyseMidi:
         return instrument_roll
 
     def save_midi_json(self):
-        """
+        """Commence par analyser le midi, puis enregistre.
+        
         partitions = liste des partitions = [partition_1, partition_2 ...]
         instruments = [Instrument(program=71, is_drum=False, name="mélodie"),
                         ...]
@@ -240,6 +244,10 @@ class AnalyseMidi:
         json dans /media/data/3D/projets/darknet-letters/letters/midi/json
         """
 
+        # Analyse du midi
+        self.get_partitions_and_instruments()
+
+        # Création du json
         json_data = {}
         json_data["partitions"] = self.partitions
         json_data["instruments"] = self.instruments
@@ -249,6 +257,9 @@ class AnalyseMidi:
         with open(json_name, 'w') as f_out:
             json.dump(json_data, f_out)
         print('\nEnregistrement de:', json_name)
+
+        # Pour Blender
+        self.end = 1
 
 
 class PlayMidi:
@@ -389,7 +400,7 @@ class OneInstrumentPlayer:
     une seule note par instrument à la fois.
     """
 
-    def __init__(self, fonts, channel, bank, bank_number):
+    def __init__(self, fonts, channel, bank, bank_number, verbose=0):
         """self.channel 1 to 16
         fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
         bank = 0, il y a d'autres bank dans FluidR3_GM.sf2
@@ -405,7 +416,8 @@ class OneInstrumentPlayer:
         self.fonts = fonts
         self.bank = bank
         self.bank_number = bank_number
-
+        self.verbose = verbose
+        
         self.set_audio()
 
         # Pour gérer les threads
@@ -441,9 +453,10 @@ class OneInstrumentPlayer:
         Se termine si self.thread_dict[note] = 0
         """
 
-        print("Lancement du thread: channel =", self.channel,
-                                    "note =", note,
-                                    "volume =", volume)
+        if self.verbose:
+            print("Lancement du thread: channel =", self.channel,
+                                        "note =", note,
+                                        "volume =", volume)
 
         # Excécution de la note
         self.fs.noteon(self.channel, note, volume)
@@ -453,9 +466,10 @@ class OneInstrumentPlayer:
             sleep(0.0001)
 
         # Sinon fin de la note
-        print("      Fin du thread: channel =", self.channel,
-                                      "note =", note,
-                                    "volume =", volume)
+        if self.verbose:
+            print("      Fin du thread: channel =", self.channel,
+                              "note =", note,
+                            "volume =", volume)
 
         self.fs.noteoff(self.channel, note)
 
@@ -674,7 +688,6 @@ def create_one_json(midi_file, FPS):
     """Création d'un json"""
 
     am = AnalyseMidi(midi_file, FPS)
-    am.get_partitions_and_instruments()
     am.save_midi_json()
 
 
