@@ -15,7 +15,7 @@ Le Blender Game engine ne permet d'enregistrer les shot qu'en png.
 Darknet n'accepte que des jpg.
 Bizarrement, darknet est plus efficace avec des images un peu floutées.
 Ce script floute et enregistre en jpg.
-Il faut définir le chemin de shot ligne 81.
+Il faut définir le chemin de shot ligne 24.
 """
 
 
