@@ -18,6 +18,7 @@ fonts_chooser/
 # darknet
 darknet53.conv.74
 libdarknet.so
+yolov3_letters*
 
 # Blender
 *.blend1
