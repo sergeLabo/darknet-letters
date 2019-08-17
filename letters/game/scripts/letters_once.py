@@ -63,7 +63,7 @@ def get_conf():
     gl.letters_dir = str(LETTERS_DIR.resolve())
     
     # Dossier *.ini
-    ini_file = gl.letters_dir + "/global.ini"
+    ini_file = gl.letters_dir + "/letters.ini"
     gl.ma_conf = MyConfig(ini_file)
     gl.conf = gl.ma_conf.conf
 
@@ -126,15 +126,26 @@ def set_variable():
     
     # Dimension des fenêtres
     gl.music_size = gl.conf["blend"]["music_size"]
-    gl.shot_size = gl.conf["darknet"]["shot_size"]
+    gl.shot_size = gl.conf["blend"]["shot_size"]
 
+    # Position et dimension des lettres
+    gl.plage_x = gl.conf["blend"]["plage_x"]
+    gl.plage_y = gl.conf["blend"]["plage_y"]
+    gl.size_min = gl.conf["blend"]["size_min"]
+    gl.size_max = gl.conf["blend"]["size_max"]
+    gl.scale = gl.conf["blend"]["letters_scale"]
+    
 
 def create_directories():
     """Création de 100 dossiers."""
 
     # Dossier d'enregistrement des images
-    gl.shot_directory = gl.conf['blend']["shot_dir"]
-    
+    gl.shot_directory = gl.conf['dirertories']["shot"]
+
+    # Si non défini, dans shot de letters
+    if gl.shot_directory == "":
+        gl.shot_directory = gl.letters_dir + "/shot"
+
     # Création du dossier si n'existe pas
     gl.tools.create_directory(gl.shot_directory)
     

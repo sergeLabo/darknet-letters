@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 
+import os, sys
 import numpy as np
 import cv2
 import re
@@ -10,10 +11,16 @@ from random import randint
 from pathlib import Path
 
 from pymultilame import MyTools
+sys.path.append("..")
+from letters_path import LettersPath
 
+lp = LettersPath()
+letters_dir = lp.letters_dir
+CONF = lp.conf
+shot_control_dir = lp.shot_control_dir
 
-# Définir ce chemin
-SHOT = "/media/data/3D/projets/darknet-letters/letters/shot_jpg"
+# Définir le chemin des shot à contrôler dans letters.ini
+shot_jpg_dir = lp.shot_jpg_dir
     
 tools = MyTools()
 
@@ -21,11 +28,14 @@ tools = MyTools()
 def cvDrawBoxes(img, coords):
     """Dessine le rectangle avec centre(cx, cy) et taille w et h"""
 
+    # taille des images
+    size = img.shape[0]
+    
     # Rectangle
-    cx = float(coords[1]) * 704
-    cy = float(coords[2]) * 704
-    w = float(coords[3]) * 704
-    h = float(coords[4]) * 704
+    cx = float(coords[1]) * size
+    cy = float(coords[2]) * size
+    w = float(coords[3]) * size
+    h = float(coords[4]) * size
 
     xmin = int(cx - w/2)
     ymin = int(cy - h/2)
@@ -38,8 +48,8 @@ def cvDrawBoxes(img, coords):
     cv2.rectangle(img, pt1, pt2, (0, 255, 0), 1)
 
     # Texte
-    text = coords[0]
-    put_text(img, text, (xmin, ymin-4), 0.4, 2)
+    # #text = coords[0]
+    # #put_text(img, text, (xmin, ymin-4), 0.4, 2)
     
     return img
 
@@ -70,15 +80,24 @@ def put_text(img, text, xy, size, thickness):
                 cv2.LINE_AA)
 
                 
-def verif(root, shot):
-    jpgs = tools.get_all_files_list(shot, ".jpg")
-    loop = 1
-    a = 0
+def save_control():
+    # Création du dossier control/shot_control
+    tools.create_directory(shot_control_dir)
+
+    # Contrôle possible des png et jpg
+    jpgs = tools.get_all_files_list(shot_jpg_dir, [".jpg", ".png"])
     print("Nombre de fichiers à contrôler:", len(jpgs))
+        
+    loop = 1
+    jpg = 0
     while loop:
-        img = cv2.imread(jpgs[a])
+        print("Image jpg ou png:", jpgs[jpg])
+        img = cv2.imread(jpgs[jpg])
+        
         # Toutes les lignes
-        lines = tools.read_file(jpgs[a][:-4] + ".txt")
+        print("Fichier txt:",jpgs[jpg][:-4] + ".txt")
+        lines = tools.read_file(jpgs[jpg][:-4] + ".txt")
+        
         # Les lignes en list
         lines = lines.splitlines()
 
@@ -87,22 +106,22 @@ def verif(root, shot):
             img = cvDrawBoxes(img, line)
 
         if lines:
-            # darknet-letters/letters/control/shot_rect/shot_1_rect.png
-            n = jpgs[a].split("/")
-            m = n[-1][:-4]
+            # darknet-letters/letters/control/shot_control/shot_1_control.jpg
+            parts = jpgs[jpg].split("/")
+            img_name = parts[-1]
             
-            # m = shot_1
-            shot_rect = root + "/shot_rect/"
-            name = shot_rect + m + "_rect.jpg"
-            print(name)
-            
-            cv2.imwrite(name, img)
+            name = shot_control_dir / img_name
+            print(":", str(name))
+
+            cv2.imwrite(str(name), img)
             time.sleep(0.01)
 
         # Stop à 200 maxi
-        if a == 200 or a == (len(jpgs)-1):
+        if jpg == 200:
             loop = 0
-        a += 1
+        if jpg == len(jpgs)-1:
+            loop = 0
+        jpg += 1
         # Echap, attente
         k = cv2.waitKey(1000)
         if k == 27:
@@ -111,28 +130,28 @@ def verif(root, shot):
     cv2.destroyAllWindows()
 
 
-def display(root):
-    shot_rect = root + "/shot_rect/"
-    jpgs = tools.get_all_files_list(shot_rect, "png")
+def display():
+    print("Dossier shot_control", shot_control_dir)
+    
+    jpgs = tools.get_all_files_list(shot_control_dir, [".jpg", ".png"])
+    print("Nombre de fichiers à contrôler:", len(jpgs))
+    
     loop = 1
-    a = 0
+    jpg = 0
     while loop:
-        img = cv2.imread(jpgs[a])
+        img = cv2.imread(jpgs[jpg])
+        img = cv2.resize(img, (1250, 1250), interpolation=cv2.INTER_AREA)
         cv2.imshow("Control", img)
-        a += 1
-        if a == len(jpgs):
+        if jpg == len(jpgs)-2:
             loop = 0
+        jpg += 1
          # Echap, attente
-        k = cv2.waitKey(300)
+        k = cv2.waitKey(2000)
         if k == 27:
             loop = 0
 
 
 if __name__ == '__main__':
 
-    root = str(Path.cwd().resolve())
-    print("Chemin du dossier courant de analyse_play_midi:", root)
-    
-    # root = .... /control
-    verif(root, SHOT)
-    display(root)
+    save_control()
+    display()

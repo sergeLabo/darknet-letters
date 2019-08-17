@@ -1,5 +1,0 @@
-classes = 400
-train = letters_0/train.txt
-valid = letters_0/test.txt
-names = letters_0/obj.names
-backup = letters_0/backup

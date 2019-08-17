@@ -57,14 +57,16 @@ from scripts.letters_once import convert_to_json_init
 
 
 HELP = """
-1 Affichage du logo\n
-2 Lancement de letters\n
+1 - Affichage du logo\n
+2 - Lancement de letters\n
     SPACE pour changer de musique\n
-3 Fabrication des shot pour l'IA\n
-4 Conversion en json\n
-H Help\n
-R Reset\n
-Echap Quitter
+3 - Fabrication des shot pour l'IA\n
+4 - Conversion en json\n
+5 - Flou et conversion en jpg\n
+6 - Création des train.txt et test.txt\n
+H - Help\n
+R - Reset\n\n
+Echap - Quitter
 """
 
         
@@ -78,6 +80,8 @@ def main():
     # Tous les update par frame
     gl.tempo.update()
     #print_frame_rate()
+
+    Cylinder_rotation()
 
     # Phase: intro, music and letters, get shot
     if gl.phase == "intro":
@@ -197,6 +201,10 @@ def thread_convert_to_json(midi_file):
     thread_convert.start()
 
 
+def Cylinder_rotation():
+    gl.all_obj["Cylinder"].applyRotation((0, 0, 0.002), False)
+
+
 def get_frame_notes():
     """
     gl.partitions  = [[partition_1, partition_2 ......],]
@@ -278,44 +286,97 @@ def get_sub_dir():
     return sub_dir
 
 
+def get_plane_vertices_position(obj):
+    """Retourne les coordonnées des vertices d'un plan
+    [[5.5, -4.125, 1.5], [5.5, -3.375, 1.5], [4.5, -3.375, 1.5],
+                                                    [4.5, -4.125, 1.5]]
+    """
+    verts = []
+    a = 0
+    for mesh in obj.meshes:
+        a += 1
+        for m_index in range(len(mesh.materials)):
+            for v_index in range(mesh.getVertexArrayLength(m_index)):
+                verts.append(mesh.getVertex(m_index, v_index))
+
+    vertices_list = []
+    for i in range(4):
+        vertices_list.append([verts[i].x, verts[i].y, verts[i].z])
+
+    return vertices_list
+
+
+def get_size(obj):
+    """[    [ 1.0, 0,  1.0],
+            [-1.0, 0,  1.0],
+            [-1.0, 0, -1.0],
+            [ 1.0, 0, -1.0]]
+    get_plane_vertices_position retourne la position des vertices de l'objet
+    à l'echelle 1 ! donc correction avec scale
+    """
+
+    # Valeur de scale appliquée à l'objet
+    scale = obj.worldScale
+    
+    vl = get_plane_vertices_position(obj)
+    sx = (vl[0][0] - vl[1][0])*scale[0]
+    sy = (vl[1][2] - vl[3][2])*scale[0]
+    return sx, sy
+
+    
 def get_objets_position_size():
-    """De tous les objets
-    Blender:
-        Dimension des lettres sans scale: 2,0,2
-        Centre: 0,0,0
+    """De toutes les lettres:
+    Tout ramené entre 0 et 1, soit 1 pour 10 réel, d'où relatif = 0.1
+        Dimension des lettres avec vertices équivalent à mode edit
+        Centre des lettres = Origin to Geometry
         Vue caméra: x = -5 à 5, y = 5 à -5
     Dans l'image:
         Origine en haut à gauche
     """
 
-    # absolu = 10 relatif = 1
     relatif = 0.1
 
     # Liste des lettres affichées
     datas = ""
     for ob in gl.obj_name_list_to_display:
         # ob = nom de l'objet
-        p = gl.all_obj[ob].worldPosition
-        s = gl.all_obj[ob].worldScale
-
+        pos = gl.all_obj[ob].worldPosition
+        sx, sy = get_size(gl.all_obj[ob])
+        
         # origine en 5, -5, le y est le z du centre
-        x = round((p[0] + 5) * relatif, 2)
-        # 3 +5 8 1-8
-        y = round(1 - ((p[2] + 5) * relatif), 2)
+        x = (pos[0] + 5) * relatif
+        y = 1 - ((pos[2] + 5) * relatif)
+        x = entre_zero_et_un(x)
+        y = entre_zero_et_un(y)
+        
         # Dimension
-        dim = round(s[0] * 2 * relatif, 2)
-
+        dim_x = abs(sx * relatif * gl.scale)
+        dim_y = abs(sy * relatif * gl.scale)
+        
+        dim_x = entre_zero_et_un(dim_x)
+        dim_y = entre_zero_et_un(dim_y)
+        
         data =  ob + " " \
-                + str(x) + " " \
-                + str(y) + " " \
-                + str(dim) + " " \
-                + str(dim) + " " \
+                + str(round(x, 4)) + " " \
+                + str(round(y, 4)) + " " \
+                + str(round(dim_x, 4)) + " " \
+                + str(round(dim_y, 4)) + " " \
                 + "\n"
         datas += data
-
     # Suppr du dernier fin de ligne
     datas = datas[:-2]
+    
     return datas
+
+
+def entre_zero_et_un(x):
+    if x < 0:
+        x = 0
+        print("x < 0")
+    if x > 1:
+        x = 1
+        print("x > 1")
+    return x
 
 
 def save_txt_file(datas, sub_dir):
@@ -539,17 +600,14 @@ def stop_notes(last_notes):
 def set_letter_position(letter_obj):
     """Réglage visuel"""
 
-    plagex = 4.0
-    u = numpy.random.uniform(-plagex, plagex)
+    u = numpy.random.uniform(-gl.plage_x, gl.plage_x)
 
-    plagey = 4.0
-    v = numpy.random.uniform(-plagey, plagey)
+    v = numpy.random.uniform(-gl.plage_y, gl.plage_y)
 
-    un_peu_haut = 0
-    letter_obj.worldPosition = u , 0, v - un_peu_haut
+    letter_obj.worldPosition = u , 0, v
 
-    size = numpy.random.uniform(0.4, 1.1)
-    letter_obj.worldScale = size, size, size
+    size = numpy.random.uniform(gl.size_min, gl.size_max)
+    letter_obj.localScale = size, size, size
     letter_obj.visible = True
 
 
