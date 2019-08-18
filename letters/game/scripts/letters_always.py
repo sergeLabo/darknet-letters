@@ -62,8 +62,6 @@ HELP = """
     SPACE pour changer de musique\n
 3 - Fabrication des shot pour l'IA\n
 4 - Conversion en json\n
-5 - Flou et conversion en jpg\n
-6 - Création des train.txt et test.txt\n
 H - Help\n
 R - Reset\n\n
 Echap - Quitter
@@ -449,7 +447,7 @@ def new_music():
     kill()
 
     if gl.phase == "music and letters":
-        print("Changement de musique")
+        print("Lancement d'une nouvelle musique")
         music_and_letters_init()
 
 
@@ -471,7 +469,7 @@ def kill():
                 gl.instruments_player[j].thread_dict[i] = 0
             except:
                 pass
-    sleep(0.1)
+    sleep(1)
     print("Fin de tous les threads")
 
     try:
@@ -482,6 +480,8 @@ def kill():
                 sleep(0.1)
     except:
         print("Erreur dans stop des fluidsynth.Synth()")
+    # Il faut laisser du temps au temps
+    sleep(1)
 
 
 def keyboard():
@@ -498,7 +498,7 @@ def keyboard():
     # Changement de music
     if gl.keyboard.events[events.SPACEKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         if gl.phase == "music and letters":
-            print("\n"*2, "Changemnt de musique")
+            print("\n"*10, "Changement de musique .............\n\n")
             new_music()
 
     # intro

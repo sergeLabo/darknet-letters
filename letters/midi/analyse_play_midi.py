@@ -668,11 +668,10 @@ def json_file_list_in_json_dir():
     return get_file_list(directory, extentions)
 
 
-def create_all_json(root, FPS):
+def create_all_json(directory, FPS):
     """Création des json des fichiers midi de file_list"""
 
     # Création des json
-    directory = root + "/music"
     extentions = [".midi", "mid", "kar", "Mid", "MID"]
     file_list = get_file_list(directory, extentions)
     print("Nombre de fichiers midi à analyser:", len(file_list))
@@ -687,10 +686,9 @@ def create_one_json(midi_file, FPS):
     am.save_midi_json()
 
 
-def play_all_json(root, FPS, fonts):
+def play_all_json(directory, FPS, fonts):
     """Joue tous les json du dossier json"""
 
-    directory = root + "/json"
     extentions = [".json"]
     file_list = get_file_list(directory, extentions)
     for i in range(1):  # len(file_list)):
@@ -706,10 +704,9 @@ def analyse_play_one_midi(midi_file, FPS, fonts):
     pm = PlayMidi(midi_file, FPS, fonts)
 
 
-def play_all_midi_files_in_music_directory(root, FPS, fonts):
-    # Analyse et play les midi de music
-    directory = root + "/music"
-    directory = root + "/music_guillaume"
+def play_all_midi_files_in_music_directory(directory, FPS, fonts):
+    """Analyse et play les midi de music"""
+
     extentions = [".mid", ".midi", "MID"]
     file_list = get_file_list(directory, extentions)
     for i in range(len(file_list)):
@@ -719,34 +716,25 @@ def play_all_midi_files_in_music_directory(root, FPS, fonts):
     
 if __name__ == '__main__':
 
-    # TODO faire menu terminal
-    
     # FPS de 10 (trop petit) à 100 (très bien), 60 dans Blender
     FPS = 60
 
-    # Il faut installer FluidR3_GM.sf2
-    fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
-
-    # Le dossier music doit exister avec des morceaux midi
-    # /media/data/3D/projets/darknet-letters/letters/midi"
-    root = str(Path.cwd().resolve())
-    print("Chemin du dossier courant de analyse_play_midi:", root)
+    # La font de Timidity
+    fonts = "./my_pretty_midi/TimGM6mb.sf2"
 
     # ## Analyse et play d'une music
-    # #r = "/media/data/3D/projets/darknet-letters/letters/midi/music/"
-    # #midi_file = r + "march-funebre.mid"
+    # #midi_file = "./music/bob_marley-no_woman_no_cry.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)
 
     # ## Play un midi
-    # #d = root + "/music_guillaume/"
-    # #midi_file = d + "michael_jackson-beatit.mid"
+    # #midi_file = "./music/pas_pour_github/michael_jackson-beatit.mid"
     # #PlayMidi(midi_file, FPS, fonts)
 
     # ## Analyse et play les midi de music
-    # #play_all_midi_files_in_music_directory(root, FPS, fonts)
+    # #play_all_midi_files_in_music_directory("./music/", FPS, fonts)
         
-    # Création des json
-    create_all_json(root, FPS)
+    # ## Création des json
+    # #create_all_json("./music/", FPS)
     
-    # ## Joue les json
-    # #play_all_json(root, FPS, fonts)
+    # Joue les json
+    play_all_json("./music/", FPS, fonts)

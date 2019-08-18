@@ -28,6 +28,8 @@ from pathlib import Path
 from pymultilame import MyTools
 
 # Import du dossier parent soit letters
+# Pas d'import possible direct du dossier parent
+# ValueError: attempted relative import beyond top-level package
 sys.path.append("..")
 from letters_path import LettersPath
 
