@@ -22,7 +22,6 @@ p = {
 import os, sys
 import json
 from pymultilame import MyTools
-from  analyse_play_midi import PlayJsonMidi
 from random import randint
 
 tools = MyTools()

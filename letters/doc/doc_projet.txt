@@ -1,0 +1,104 @@
+
+Documentation du projet
+    un canal = une police
+    une note =
+                note de 0 à 127
+                velocity = volume = 0 à 100
+        note = (102, 89)
+        note = (minuscule, majuscule)
+
+    unité
+    abcdefghij = 10 lettres
+    0123456789
+
+    dizaine
+    klmnopqrs = 9 lettres
+    123456789*10
+
+    centaine
+    t = 1 lettres
+    100
+
+    total de 20 lettres possibles de a à t
+
+    exemple:
+    lettres tlcDP de la police font_1
+    font_1 = police_1 = canal_1
+    note = t l c = 100 + 10 + 2 = 112
+    vol  = D P   = 3 + 60 = 63
+
+
+Ajoute obj à la place de Empty
+    position liste de 3
+    
+    addObject(object, reference, 0)
+    Adds an object to the scene like the Add Object Actuator would.
+    Parameters:	
+        object (KX_GameObject or string) – The (name of the) object to add.
+        reference (KX_GameObject or string) – The (name of the) object which
+        position, orientation, and scale to copy (optional), if the object
+        to add is a light and there is not reference the light’s layer will be
+        the same that the active layer in the blender scene.
+        time (integer) – The lifetime of the added object, in frames. A time
+        of 0 means the object will last forever (optional).
+
+    Returns: The newly added object.
+    Return type: KX_GameObject
+
+
+Division d'un plan texturé:
+    https://blender.stackexchange.com/questions/1437/subdivide-and-separate-face-into-different-meshes
+
+    In Edit mode -> Select the face
+    W -> Subdivde -> tool shelf T or F6 -> Number of Cuts (in your case 3)
+    With the subdivided faces selected -> Ctrl + E -> mark sharp
+    Add edge split modifier -> uncheck edge angle
+    In Object mode apply the edge split modifier
+    (optional) in Edit mode -> select the faces if not selected -> Ctrl + E -> clear sharp
+    In Edit mode -> P -> separate by loose parts (séparer par partie mal fixée, pas attachées)
+
+
+def apply_new_texture():
+    """Le changement de texture se afit sur tous les objets avec la texture,
+    donc sur les objets dupliqués
+    """
+    if gl.tempo["test"].tempo == 0:
+        n = random.randint(0, 9)
+        new_tex = "//textures/pngs/font_" + str(n) + "/A.png"
+        gl.tc.texture_new(new_tex)
+
+###############################################################################
+DARKNET YOLO V3 - Test 1
+
+Téléchargement du pre-trained weights
+    wget -c https://pjreddie.com/media/files/darknet53.conv.74
+
+For training for both small and large objects use modified models:
+    Full-model: 5 yolo layers: https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov3_5l.cfg
+
+Training Yolo v3:
+
+    change line batch to batch=64
+    change line subdivisions to subdivisions=8
+    change line max_batches to (classes*2000), soit 800 000
+    change line steps to 80% and 90% of max_batches, f.e. steps=640000,720000
+
+    change line classes=80 to your number of objects in each of 3 [yolo]-layers:
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L610
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L696
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L783
+        classes=400
+        
+    change [filters=255] to filters=(classes + 5)x3 in the 3 [convolutional] before each [yolo] layer
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L603
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L689
+        https://github.com/AlexeyAB/darknet/blob/0039fd26786ab5f71d5af725fc18b3f521e7acfd/cfg/yolov3.cfg#L776
+        filters = (classes + 5)x3 = (400 + 5) * 3 = 1215
+
+Distinction main gauche main droite
+ligne 17    flip = 0
+
+###############################################################################
+
+ligne 873 et 962
+classes=400

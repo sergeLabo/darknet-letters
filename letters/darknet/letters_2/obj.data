@@ -1,0 +1,5 @@
+classes = 400
+train = letters_2/train.txt
+valid = letters_2/test.txt
+names = letters_2/obj.names
+backup = letters_2/backup

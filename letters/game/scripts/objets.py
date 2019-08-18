@@ -40,7 +40,7 @@ def save_objects_in_obj_name():
 
     mt = MyTools()
 
-    f = "/media/data/3D/projets/darknet-letters/darknet/data/obj.names"
+    f = "/media/data/3D/projets/darknet-letters/letters/darknet/letters_0/obj.names"
 
     objects = get_objects()
 

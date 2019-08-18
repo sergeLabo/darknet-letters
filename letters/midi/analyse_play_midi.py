@@ -42,15 +42,11 @@ import threading
 import json
 from random import choice
 import numpy as np
-
-# Ajout du dossier courant dans lequel se trouve le dossier my_pretty_midi
 from pathlib import Path
-cur_dir = Path.cwd().resolve()
-print("Chemin du dossier courant", cur_dir)
-sys.path.append(str(cur_dir))
-import my_pretty_midi
-
 import fluidsynth
+
+# Le package (dossier) my_pretty_midi est dans le dossier de ce script
+import my_pretty_midi
 
 
 class AnalyseMidi:

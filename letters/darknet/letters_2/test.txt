@@ -1,0 +1,11 @@
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_33.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_18.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_51.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_16.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_67.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_90.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_71.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_4.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_61.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_58.jpg
+/media/data/3D/projets/darknet-letters/letters/shot_jpg/0/shot_60.jpg
