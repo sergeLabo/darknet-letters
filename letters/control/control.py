@@ -67,8 +67,8 @@ def cvDrawBoxes(img, coords):
     cv2.rectangle(img, pt1, pt2, (0, 255, 0), 1)
 
     # Texte
-    # #text = coords[0]
-    # #put_text(img, text, (xmin, ymin-4), 0.4, 2)
+    text = coords[0]
+    put_text(img, text, (xmin, ymin-4), 0.4, 2)
     
     return img
 

@@ -78,7 +78,7 @@ class BlurAndConvert:
 
     def blur(self, img):
         # Flou
-        blur = 3
+        blur = CONF["darknet"]["blur"]
         k = random.randint(0, blur)
         if k != 0:
             img = cv2.blur(img, (k, k))
@@ -89,6 +89,7 @@ class BlurAndConvert:
         for png in self.all_png_files:
             if n % 100 == 0:
                 print("png:", png)
+            n += 1
             
             # lecture
             img = cv2.imread(png)

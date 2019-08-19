@@ -150,10 +150,10 @@ class AnalyseMidi:
                  (0, 116),
                  (0, 117),
                  (0, 118),
-                 (0, 119),
-                 (8, 116),
-                 (8, 117),
-                 (8, 118)]
+                 (0, 119)]  #,
+                 # #(8, 116),
+                 # #(8, 117),
+                 # #(8, 118)]
 
         return choice(drums)
 
@@ -577,12 +577,12 @@ def get_json_name(midi_file):
         
 def get_channel(instruments):
     """16 channel maxi
-    channel 9 pour drums
+    channel 9 ou 10 pour drums ?
     Les channels sont attribués dans l'ordre des instruments de la liste
     """
 
     channels = []
-    channels_no_drum = [1,2,3,4,5,6,7,8,10,11,12,13,14,15,16]
+    channels_no_drum = [1,2,3,4,5,6,7,8,9,11,12,13,14,15,16]
     nbr = 0
     for instrument in instruments:
         if not instrument[1]:  # instrument[1] = boolean
@@ -590,7 +590,7 @@ def get_channel(instruments):
             channels.append(channels_no_drum[nbr])
             nbr += 1
         else:
-            channels.append(9)
+            channels.append(10)
     return channels
 
         
@@ -717,17 +717,29 @@ def play_all_midi_files_in_music_directory(directory, FPS, fonts):
 if __name__ == '__main__':
 
     # FPS de 10 (trop petit) à 100 (très bien), 60 dans Blender
-    FPS = 60
+    FPS = 10
 
     # La font de Timidity
-    fonts = "./my_pretty_midi/TimGM6mb.sf2"
-
+    #fonts = "./my_pretty_midi/TimGM6mb.sf2"
+    # ou
+    # #fonts = "./my_pretty_midi/merlin_vienna.sf2"
+    # Encore mieux
+    # #fonts = "./my_pretty_midi/MuseScore_General.sf3"
+    fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
+    
     # ## Analyse et play d'une music
     # #midi_file = "./music/bob_marley-no_woman_no_cry.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)
 
-    # ## Play un midi
-    # #midi_file = "./music/pas_pour_github/michael_jackson-beatit.mid"
+    # Play un midi
+    # #mf = michael_jackson-beatit.mid
+    # #mf = "boney_m-daddy_cool.mid"
+    # #mf = "pharrell_williams-happy.mid"
+    # #mf = "blur-girls_and_boys.mid"
+    # #mf = "bob_marley-i_shot_the_sheriff.mid"
+    # #mf = "b52s-rock_lobster.mid"
+    # #mf = "Fatboy Slim - Right Here, Right Now.mid"
+    # #midi_file = "./music/pas_pour_github/" + mf
     # #PlayMidi(midi_file, FPS, fonts)
 
     # ## Analyse et play les midi de music
@@ -736,5 +748,10 @@ if __name__ == '__main__':
     # ## Création des json
     # #create_all_json("./music/", FPS)
     
-    # Joue les json
-    play_all_json("./music/", FPS, fonts)
+    # ## Joue les json
+    # #play_all_json("./music/", FPS, fonts)
+
+    json_file = "./json/pas_pour_github/zulu_walking.json"
+    json_file = "./json/pas_pour_github/Capri.json"
+    pjm = PlayJsonMidi(json_file, FPS, fonts)
+    pjm.play()

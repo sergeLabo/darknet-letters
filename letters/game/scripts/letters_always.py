@@ -354,7 +354,7 @@ def get_objets_position_size():
         dim_x = entre_zero_et_un(dim_x)
         dim_y = entre_zero_et_un(dim_y)
         
-        data =  ob + " " \
+        data =  str(gl.letters_num[ob]) + " " \
                 + str(round(x, 4)) + " " \
                 + str(round(y, 4)) + " " \
                 + str(round(dim_x, 4)) + " " \

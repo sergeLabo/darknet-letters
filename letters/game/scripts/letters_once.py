@@ -252,7 +252,7 @@ def get_channel():
     """
     
     channels = []
-    channels_no_drum = [1,2,3,4,5,6,7,8,10,11,12,13,14,15,16]
+    channels_no_drum = [1,2,3,4,5,6,7,8,9,11,12,13,14,15,16]
     nbr = 0
     for instrument in gl.instruments:
         if not instrument[1]:  # instrument[1] = boolean
@@ -260,7 +260,7 @@ def get_channel():
             nbr += 1
             if nbr > 14: nbr = 0
         else:
-            channels.append(9)
+            channels.append(10)
             
     return channels
 
@@ -347,6 +347,19 @@ def convert_to_json_init():
     gl.convert_to_json_end = 1
     gl.conversion = None
 
+
+def get_obj_num():
+    """Dict de correspondance nom de l'objet:numéro"""
+
+    gl.letters_num = {}
+    
+    lines = gl.tools.read_file("./scripts/obj.names")
+    print(lines)
+    # Les lignes en list
+    lines = lines.splitlines()
+    for i in range(len(lines)):
+        gl.letters_num[lines[i]] = i
+
     
 def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""
@@ -359,8 +372,11 @@ def main():
     # Récupération de la configuration
     get_conf()
     set_variable()
-    set_tempo()        
+    set_tempo()
 
+    # Numéro de toutes les lettres entre 0 et 399   
+    get_obj_num()
+    
     # Carrés en dehors de la vue caméra
     set_all_letters_position()
 
