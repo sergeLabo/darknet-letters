@@ -5,7 +5,6 @@
 # divers
 old/
 .old/
-shot_control/
 
 # music
 music_guillaume_tout/
@@ -20,6 +19,9 @@ fonts_chooser/
 darknet53.conv.74
 libdarknet.so
 yolov3-tiny.weights
+shot/
+shot_jpg/
+shot_control/
 
 # Blender
 *.blend1
