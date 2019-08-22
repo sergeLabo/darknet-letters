@@ -87,6 +87,8 @@ class BlurAndConvert:
 
     def save_to_jpg(self):
         n = 0
+        size = CONF["darknet"]["shot_size"]
+        
         for png in self.all_png_files:
             if n % 100 == 0:
                 print("Nombre de fichiers convertis:", n, "sur", len(self.all_png_files))
@@ -98,7 +100,6 @@ class BlurAndConvert:
 
             # Les images de 704x704 occupent toute la mémoire de la GTX1060
             # de 6 Go !
-            size = CONF["darknet"]["shot_size"]
             img = cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
             
             # De ....  /shot/25/shot_4126.png
