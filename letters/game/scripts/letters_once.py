@@ -187,7 +187,7 @@ def get_get_shot_json():
     gl.partition_nbr = len(gl.partitions)
     
     print("Nombre d'instrument:", gl.partition_nbr)
-    print("Nombre de frame:", len(gl.partitions[0]))
+    print("Nombre de notes du morceau en frame:", len(gl.partitions[0]))
     
     
 def get_midi_json():

@@ -78,8 +78,9 @@ class BlurAndConvert:
 
     def blur(self, img):
         # Flou
-        blur = CONF["darknet"]["blur"]
-        k = random.randint(0, blur)
+        blur_mini = CONF["darknet"]["blur_mini"]
+        blur_maxi = CONF["darknet"]["blur_maxi"]
+        k = random.randint(blur_mini, blur_maxi)
         if k != 0:
             img = cv2.blur(img, (k, k))
         return img
@@ -88,7 +89,7 @@ class BlurAndConvert:
         n = 0
         for png in self.all_png_files:
             if n % 100 == 0:
-                print("png:", png)
+                print("Nombre de fichiers convertis:", n, "sur", len(self.all_png_files))
             n += 1
             
             # lecture
@@ -109,8 +110,7 @@ class BlurAndConvert:
             # print(nom)   # 46/shot_46'
             
             name = self.shot_jpg / nom
-            # ..... /letters/shot_jpg/..jpg
-            #print("jpg:", name)
+            #print("jpg:", name)  # ..... /letters/shot_jpg/..jpg
             
             # Copier coller du fichiers txt
             fin = part[1][:-4] + '.txt'
@@ -123,7 +123,7 @@ class BlurAndConvert:
             copyfile(txt, dst)
             
             # Ecriture
-            cv2.imwrite(str(name), img, [int(cv2.IMWRITE_JPEG_QUALITY), 98])
+            cv2.imwrite(str(name), img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
             sleep(0.01)
 
 
