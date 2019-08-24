@@ -22,6 +22,7 @@ yolov3-tiny.weights
 shot/
 shot_jpg/
 shot_control/
+video/
 
 # Blender
 *.blend1

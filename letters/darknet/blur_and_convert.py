@@ -58,7 +58,11 @@ class BlurAndConvert:
         self.create_shot_jpg()
         self.create_sub_directories()
         self.all_png_files = self.mt.get_all_files_list(self.shot, '.png')
-        print("Nombre d'images png:", len(self.all_png_files))
+        print("Nombre de fichiers à contrôler:", len(self.all_png_files))
+        if len(self.all_png_files) == 0:
+            print("\n\nPas d'images à contrôler")
+            print("Créer les images avant !")
+            os._exit(0)
 
         # Exécution du script flou puis save
         self.save_to_jpg()
@@ -90,7 +94,7 @@ class BlurAndConvert:
         size = CONF["darknet"]["shot_size"]
         
         for png in self.all_png_files:
-            if n % 100 == 0:
+            if n % 100 == 0 and n != 0:
                 print("Nombre de fichiers convertis:", n, "sur", len(self.all_png_files))
             n += 1
             
@@ -126,6 +130,7 @@ class BlurAndConvert:
             # Ecriture
             cv2.imwrite(str(name), img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
             sleep(0.01)
+        print("Nombre de fichiers convertis:", n)
 
 
 if __name__ == "__main__":

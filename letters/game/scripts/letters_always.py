@@ -131,6 +131,9 @@ def main_get_shot():
 
     # Aggrandissement de la fenêtre
     render.setWindowSize(gl.shot_size, gl.shot_size)
+
+    # Avance de la video
+    video_refresh()
     
     gl.all_obj["Cube"].visible = False
 
@@ -189,6 +192,12 @@ def main_convert_to_json():
 
     # La conversion en cours est-elle finie ?
     gl.convert_to_json_end = gl.conversion.end
+
+
+def video_refresh():
+    """call this function every frame to ensure update of the texture."""
+    # print("refresh")
+    gl.my_video.refresh(True)
 
     
 def thread_convert_to_json(midi_file):

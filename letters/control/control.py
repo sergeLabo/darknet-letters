@@ -106,6 +106,10 @@ def save_control():
     # Contrôle possible des png et jpg
     jpgs = tools.get_all_files_list(shot_jpg_dir, [".jpg", ".png"])
     print("Nombre de fichiers à contrôler:", len(jpgs))
+    if len(jpgs) == 0:
+        print("\n\nPas d'images à contrôler")
+        print("Il faut les convertir en jpg avant !")
+        os._exit(0)
         
     loop = 1
     jpg = 0

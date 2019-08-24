@@ -36,6 +36,7 @@ import random
 
 from bge import logic as gl
 from bge import render
+from bge import texture
 
 from pymultilame import MyConfig, MyTools, Tempo
 from pymultilame import TextureChange, get_all_objects
@@ -177,7 +178,7 @@ def get_file_list(directory, extentions):
 
 def get_get_shot_json():
 
-    gl.midi_json = "/media/data/3D/projets/darknet-letters/letters/midi/get_shot.json"
+    gl.midi_json = str(LETTERS_DIR) + "/midi/get_shot.json"
     
     with open(gl.midi_json) as f:
         data = json.load(f)
@@ -242,7 +243,6 @@ def fonts_shuffle():
     if n >= 10: n = 10
     for i in range(n):
         gl.fonts_dict[i] = L[i]
-    print("Dict des polices:", gl.fonts_dict)
 
 
 def get_channel():
@@ -354,11 +354,45 @@ def get_obj_num():
     gl.letters_num = {}
     
     lines = gl.tools.read_file("./scripts/obj.names")
-    print(lines)
     # Les lignes en list
     lines = lines.splitlines()
     for i in range(len(lines)):
         gl.letters_num[lines[i]] = i
+
+
+def set_video():
+    gl.plane = gl.all_obj["Plane.002"]
+    # identify a static texture by name
+    matID = texture.materialID(gl.plane, 'MAblack')
+    
+    # create a dynamic texture that will replace the static texture
+    gl.my_video = texture.Texture(gl.plane, matID)
+
+    # define a source of image for the texture, here a movie
+    try:
+        film = "Astrophotography-Stars-Sunsets-Sunrises-Storms.ogg"
+        movie = "./video/" + film
+        print('Movie =', movie)
+    except:
+        print("Une video valide doit être définie !")
+            
+    try:
+        s = os.path.getsize(movie)
+        print("Taille du film:", s)
+    except:
+        print("Problème avec la durée du film !")
+    
+    gl.my_video.source = texture.VideoFFmpeg(movie)
+    gl.my_video.source.scale = False
+
+    # Infinite loop
+    gl.my_video.source.repeat = -1
+
+    # Vitesse normale: < 1 ralenti, > 1 accélère
+    gl.my_video.source.framerate = 1.4
+    
+    # quick off the movie, but it wont play in the background
+    gl.my_video.source.play()
 
     
 def main():
@@ -381,6 +415,7 @@ def main():
     set_all_letters_position()
 
     intro_init()
+    set_video()
     
     # Pour les mondoshawan
     print("Initialisation du jeu terminée\n\n")

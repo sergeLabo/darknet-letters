@@ -1,3 +1,15 @@
+
+
+
+./darknet detector train data/obj.data data/yolov3.cfg darknet53.conv.74
+
+
+faux
+./darknet partial yolov3_5l/yolov3.cfg yolov3_5l/yolov3.weights yolov3_5l/yolov3.conv.81 81
+./darknet detector train yolov3_5l/obj.data yolov3_5lyolo-obj.cfg yolov3_5l/yolov3.conv.81 -map
+./darknet detector train datayolov3_5l/obj.data yolov3_5lyolo-obj.cfg darknet53.conv.74 -map
+
+
 "/usr/share/sounds/sf2/FluidR3_GM.sf2"
 
 
