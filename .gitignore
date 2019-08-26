@@ -17,11 +17,12 @@ pyfluidsynth_etude/
 ttfs/
 pngs/
 fonts_chooser/
+ttf_to_png/
 
 # darknet
 *.conv.*
 libdarknet.so
-yolov3-tiny.weights
+.weights
 shot/
 shot_jpg/
 shot_control/
