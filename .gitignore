@@ -9,6 +9,9 @@ old/
 # music
 music_guillaume_tout/
 pas_pour_github/
+*.sf2
+*.sf3
+pyfluidsynth_etude/
 
 # images
 ttfs/
@@ -16,7 +19,7 @@ pngs/
 fonts_chooser/
 
 # darknet
-darknet53.conv.74
+*.conv.*
 libdarknet.so
 yolov3-tiny.weights
 shot/

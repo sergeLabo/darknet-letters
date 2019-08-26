@@ -48,7 +48,7 @@ CHIFFRES = list(C)
 # https://www.imagemagick.org/script/color.php
 COLORS = [  "grey80",
             "purple1",
-            "OliveDrab1",
+            "OliveDrab3",
             "orange",
             "red",
             "yellow",

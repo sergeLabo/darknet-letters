@@ -457,6 +457,7 @@ def new_music():
 
     if gl.phase == "music and letters":
         print("Lancement d'une nouvelle musique")
+        sleep(1)
         music_and_letters_init()
 
 

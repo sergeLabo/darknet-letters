@@ -43,11 +43,11 @@ from pymultilame import TextureChange, get_all_objects
 
 # Ajout du dossier courant dans lequel se trouve le dossier my_pretty_midi
 CUR_DIR = Path.cwd()
-print("Chemin du dossier courant dans le BGE:", CUR_DIR.resolve())  # game
 
 # Chemin du dossier letters
 LETTERS_DIR = CUR_DIR.parent
 sys.path.append(str(LETTERS_DIR) + "/midi")
+
 
 # analyse_play_midi est dans /midi
 from analyse_play_midi import PlayJsonMidi, OneInstrumentPlayer
@@ -62,6 +62,7 @@ def get_conf():
     gl.tools =  MyTools()
 
     gl.letters_dir = str(LETTERS_DIR.resolve())
+    print("Chemin du dossier letters dans le BGE:", gl.letters_dir)
     
     # Dossier *.ini
     ini_file = gl.letters_dir + "/letters.ini"
@@ -69,7 +70,7 @@ def get_conf():
     gl.conf = gl.ma_conf.conf
 
     print("\nConfiguration du jeu Darknet Letters:")
-    print(gl.conf, "\n")
+    #print(gl.conf, "\n")
 
 
 def set_tempo():
@@ -211,8 +212,9 @@ def get_midi_json():
     gl.ma_conf.save_config("midi", "file_nbr", gl.nbr + 1)
 
     gl.midi_json = all_json[gl.nbr]
-    
-    print("Fichier midi en cours:", gl.midi_json)
+
+    name = gl.midi_json.split("/")[-1]
+    print("\nFichier midi en cours:", name, "\n\n")
 
     with open(gl.midi_json) as f:
         data = json.load(f)
@@ -225,8 +227,11 @@ def get_midi_json():
     fonts_shuffle()
     
     print("Nombre d'instrument:", len(gl.instruments))
-    
+    for instr in gl.instruments:
+        print('    Bank: {:>1} Number: {:>3} Drum: {:>1} Name: {:>16}'.format(instr[0][0], instr[0][1], instr[1], instr[2]))
+    print("\n\n")
 
+    
 def fonts_shuffle():
     """Le désordre des polices permet de rendre aléatoire
     le choix de la police pour chaque instrument.
@@ -300,8 +305,7 @@ def init_midi():
         chan = channels[i]
         is_drum = instrum[1]
         bank = instrum[0][0]
-        bank_number = instrum[0][1]
-        print("Instrument:", chan, bank, bank_number)  
+        bank_number = instrum[0][1]  
         gl.instruments_player[i] = OneInstrumentPlayer(fonts, chan, bank,
                                                        bank_number)
         
@@ -314,8 +318,9 @@ def intro_init():
 def music_and_letters_init():
     get_conf()
     get_midi_json()
-    sleep(0.1)
+    sleep(1)
     init_midi()
+    sleep(1)
     gl.phase = "music and letters"
 
         
