@@ -48,17 +48,19 @@ json_dict["instruments"].append(instr)
 # Définition des partitions
 # a et b compris entre 0 et 127
 
+# Drum note de 35 à 81
 
-# Minuscules
 part = []
-for j in range(10):
-    for i in range(30):
+
+for drum in range(35, 82, 1):
+    print(drum)
+    for i in range(60):
         part.append([])
-    for i in range(5):
+    for i in range(1):
         # note
-        a = 80
+        a = drum
         # volume
-        b = 99
+        b = 127
         part.append([[a, b]])
 
 json_dict["partitions"].append(part)

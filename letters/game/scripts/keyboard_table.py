@@ -52,7 +52,7 @@ CAPS_LOCK_KEYS = {  events.CAPSLOCK: "CAPSLOCK",
                     events.RIGHTSHIFT: "RIGHTSHIFT",
                     events.LEFTSHIFT: "LEFTSHIFT"}
 
-ARROW_KEYS = {  events.LEFTARROWKEY:"LEFT",
+ARROW_KEYS = {  events.LEFTARROW:"LEFT",
                 events.DOWNARROW: "DOWN",
                 events.RIGHTARROW: "RIGHT",
                 events.UPARROW: "UP"}

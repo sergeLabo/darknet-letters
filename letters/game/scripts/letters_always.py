@@ -456,7 +456,7 @@ def new_music():
     kill()
 
     if gl.phase == "music and letters":
-        print("Lancement d'une nouvelle musique")
+        print("\nLancement d'une nouvelle musique")
         sleep(1)
         music_and_letters_init()
 
@@ -490,7 +490,10 @@ def kill():
                 sleep(0.1)
     except:
         print("Erreur dans stop des fluidsynth.Synth()")
+
     # Il faut laisser du temps au temps
+    sleep(1)
+    del gl.instruments_player
     sleep(1)
 
 
@@ -505,14 +508,30 @@ def keyboard():
     H help
     """
 
+    # music and letters avance lent
+    if gl.keyboard.events[events.UPARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        gl.frame += 100
+        
+    # music and letters recul lent
+    elif gl.keyboard.events[events.DOWNARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        gl.frame -= 100
+        
+    # music and letters avance rapide
+    elif gl.keyboard.events[events.RIGHTARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        gl.frame += 1000
+        
+    # music and letters recul rapide
+    elif gl.keyboard.events[events.LEFTARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        gl.frame -= 1000
+        
     # Changement de music
-    if gl.keyboard.events[events.SPACEKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.SPACEKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         if gl.phase == "music and letters":
-            print("\n"*10, "Changement de musique .............\n\n")
+            print("\nChangement de musique .............\n\n")
             new_music()
 
     # intro
-    if gl.keyboard.events[events.PAD1] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.PAD1] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de logo")
         gl.phase = ""
         gl.info = "Début de logo"
@@ -521,7 +540,7 @@ def keyboard():
         intro_init()
         
     # music and letters
-    if gl.keyboard.events[events.PAD2] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.PAD2] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de music and letters")
         gl.phase = "music and letters"
         gl.info = "Début de music and letters"
@@ -529,7 +548,7 @@ def keyboard():
         music_and_letters_init()    
 
     # get shot
-    if gl.keyboard.events[events.PAD3] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.PAD3] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de get shot")
         gl.phase = "get shot"
         gl.info = "Début de get shot"
@@ -537,23 +556,26 @@ def keyboard():
         get_shot_init()
 
     # get json from midi file
-    if gl.keyboard.events[events.PAD4] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.PAD4] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de conversion des midi en json")
         gl.phase = "get json"
         kill()   
         convert_to_json_init()
         
     # Help
-    if gl.keyboard.events[events.HKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.HKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de help")
         gl.all_obj["Cube"].visible = False     
         gl.info = HELP
         gl.info_news = 1    
 
     # Reset
-    if gl.keyboard.events[events.RKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.RKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Reset ...............")
         gl.game.restart()
+
+    if gl.frame < 0: gl.frame = 0
+    # #if gl.frame > len(gl.partitions[0]) : gl.frame = len(gl.partitions[0])
 
         
 def display_info():

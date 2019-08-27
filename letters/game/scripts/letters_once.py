@@ -62,15 +62,12 @@ def get_conf():
     gl.tools =  MyTools()
 
     gl.letters_dir = str(LETTERS_DIR.resolve())
-    print("Chemin du dossier letters dans le BGE:", gl.letters_dir)
+    #print("Chemin du dossier letters dans le BGE:", gl.letters_dir)
     
     # Dossier *.ini
     ini_file = gl.letters_dir + "/letters.ini"
     gl.ma_conf = MyConfig(ini_file)
     gl.conf = gl.ma_conf.conf
-
-    print("\nConfiguration du jeu Darknet Letters:")
-    #print(gl.conf, "\n")
 
 
 def set_tempo():
@@ -214,7 +211,7 @@ def get_midi_json():
     gl.midi_json = all_json[gl.nbr]
 
     name = gl.midi_json.split("/")[-1]
-    print("\nFichier midi en cours:", name, "\n\n")
+    print("\nFichier midi en cours:", name[:-5], "\n\n")
 
     with open(gl.midi_json) as f:
         data = json.load(f)
@@ -284,15 +281,6 @@ def init_midi():
     
     fonts = gl.conf["midi"]["fonts"]
     channels = get_channel()
-
-    # TODO provoque erreur de segmentation
-    # ## Pour être sûr que les audio initiés soit bien stoppé
-    # #for i in range(10):
-        # #try:
-            # ## Stop des fluidsynth.Synth() initiés
-            # #gl.instruments_player[i].stop_audio()
-        # #except:
-            # #print("Erreur dans stop des fluidsynth.Synth()")
         
     # Création d'un dict des objets pour jouer chaque instrument
     gl.instruments_player = {}
@@ -317,6 +305,8 @@ def intro_init():
 
 def music_and_letters_init():
     get_conf()
+    set_variable()
+    set_tempo()
     get_midi_json()
     sleep(1)
     init_midi()

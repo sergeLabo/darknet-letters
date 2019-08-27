@@ -18,7 +18,8 @@
 
 
 """
-Utilise FluidR3_GM.sf2 uniquement.
+Table des instruments MIDI
+    https://www.zikinf.com/articles/mao/tablemidi.php
 
 Installation:
     numpy
@@ -143,7 +144,9 @@ class AnalyseMidi:
                 8 118 808 Tom
         """
 
-        drums = [(0, 114),
+        drums = [(0, 112)
+                 (0, 113)
+                 (0, 114),
                  (0, 115),
                  (0, 116),
                  (0, 117),
@@ -717,17 +720,13 @@ if __name__ == '__main__':
     # FPS de 10 (trop petit) à 100 (très bien), 60 dans Blender
     FPS = 60
     
-    # La font de Timidity
-    # #fonts = "./my_pretty_midi/TimGM6mb.sf2"
-
-    # #fonts = "./my_pretty_midi/merlin_vienna.sf2"
-    
-    # #fonts = "./my_pretty_midi/MuseScore_General.sf3"
-    fonts = "./my_pretty_midi/MuseScore_General_Full.sf2"
-
-    # General midi
-    # #fonts = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
-    
+    # #fonts = "./soundfont/TimGM6mb.sf2"
+    # #fonts = "./soundfont/merlin_vienna.sf2"
+    # #fonts = "./soundfont/MuseScore_General.sf3"
+    # #fonts = "./soundfont/MuseScore_General_Full.sf2"
+    fonts = "./soundfont/FluidR3_GM.sf2"
+    # #fonts = "./soundfont/FluidR3_GS.sf2"
+    fonts = "./soundfont/percussion/142-Cymbal Roll.sf2"
     # ## Analyse et play d'une music
     # #midi_file = "./music/pas_pour_github/Capri.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)
@@ -740,8 +739,14 @@ if __name__ == '__main__':
     # ## Play de tous les midi
     # #play_all_midi_files(FPS, fonts)
         
-    # Création des json
-    create_all_json("./music/", FPS)
+    # ## Création des json
+    # #create_all_json("./music/", FPS)
     
-    # Joue les json
-    play_all_json("./json/pas_pour_github", FPS, fonts)
+    # ## Joue les json
+    # #play_all_json("./json/pas_pour_github", FPS, fonts)
+
+    # Play un json
+    json_file = "./drum_test.json"
+    pjm = PlayJsonMidi(json_file, FPS, fonts)
+    pjm.play()
+    del pjm
