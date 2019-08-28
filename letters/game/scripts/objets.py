@@ -14,8 +14,8 @@ lettres de a à t et A à T
 from pymultilame import MyTools
 
 
-m = "abcdefghijklmnopqrst"
-M = "ABCDEFGHIJKLMNOPQRST"
+m = "bcdefghijklmnopqrst"
+M = "BCDEFGHIJKLMNOPQRST"
 MINUS = list(m)
 MAJUS = list(M)
 
@@ -40,7 +40,7 @@ def save_objects_in_obj_name():
 
     mt = MyTools()
 
-    f = "/media/data/3D/projets/darknet-letters/letters/darknet/letters_0/obj.names"
+    f = "./obj.names"
 
     objects = get_objects()
 
@@ -52,4 +52,4 @@ def save_objects_in_obj_name():
 
     
 if __name__ == '__main__':
-    #save_objects_in_obj_name()
+    save_objects_in_obj_name()

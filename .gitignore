@@ -10,7 +10,9 @@ old/
 music_guillaume_tout/
 pas_pour_github/
 *.sf2
+*.SF2
 *.sf3
+*.SF3
 pyfluidsynth_etude/
 
 # images

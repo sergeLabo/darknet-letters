@@ -74,7 +74,6 @@ def set_tempo():
 
     # Création des objects
     tempo_liste = [ ("seconde", 60),
-                    ("frame", 999999999),
                     ("shot", int(gl.conf['blend']['shot_every'])),
                     ("info", 180)]
                     

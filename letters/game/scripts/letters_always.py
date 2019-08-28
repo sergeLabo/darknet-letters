@@ -103,7 +103,8 @@ def main_intro():
 
 def main_music_and_letters():
     # Aggrandissement de la fenêtre
-    render.setWindowSize(gl.music_size, gl.music_size)
+    #render.setWindowSize(gl.music_size, gl.music_size)
+    render.setFullScreen(True)
     
     gl.all_obj["Cube"].visible = False
 
@@ -574,8 +575,8 @@ def keyboard():
         print("Reset ...............")
         gl.game.restart()
 
-    if gl.frame < 0: gl.frame = 0
     # #if gl.frame > len(gl.partitions[0]) : gl.frame = len(gl.partitions[0])
+    if gl.frame < 0: gl.frame = 0
 
         
 def display_info():
