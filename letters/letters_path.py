@@ -85,6 +85,10 @@ class LettersPath(LettersConfig):
     def get_letters_path(self):
         return self.letters_dir
 
-
+    def get_midi_directory(self):
+        return str(self.letters_dir / 'midi')
+        
 if __name__ == "__main__":
     lp = LettersPath()
+    print("\nChemin du dossier midi:", lp.get_midi_directory())
+    print(type(lp.get_midi_directory()))

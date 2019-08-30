@@ -13,6 +13,7 @@ pas_pour_github/
 *.SF2
 *.sf3
 *.SF3
+!TimGM6mb.sf2
 pyfluidsynth_etude/
 
 # images

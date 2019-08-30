@@ -494,7 +494,8 @@ def kill():
 
     # Il faut laisser du temps au temps
     sleep(1)
-    del gl.instruments_player
+    if gl.phase != "get shot":
+        del gl.instruments_player
     sleep(1)
 
 
@@ -686,7 +687,7 @@ def get_pos_nums(num):
 def conversion(note, casse):
     """note = 35 = l e, 30 = l et pas d'unité avec casse = min
     valable aussi pour volume à la place de note avec casse=maj
-    Les a et A ne sonjt pas utilisés, donc 380 objets différents.
+    Les a et A ne sont pas utilisés, donc 380 objets différents.
     """
 
     # Table de conversion
