@@ -13,7 +13,10 @@ pas_pour_github/
 *.SF2
 *.sf3
 *.SF3
+
+# Exception pour le fichier
 !TimGM6mb.sf2
+
 pyfluidsynth_etude/
 
 # images
@@ -25,11 +28,12 @@ ttf_to_png/
 # darknet
 *.conv.*
 libdarknet.so
-.weights
+*.weights
 shot/
 shot_jpg/
 shot_control/
 video/
+json_to_image/
 
 # Blender
 *.blend1

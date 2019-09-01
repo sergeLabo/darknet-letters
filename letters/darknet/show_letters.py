@@ -20,6 +20,7 @@ import textwrap
 import cv2
 import numpy as np
 import darknet
+from random import randint
 
 # Import du dossier parent soit letters
 # Pas d'import possible direct du dossier parent
@@ -36,10 +37,31 @@ shot_control_dir = lp.shot_control_dir
 sys.path.append(lp.get_midi_directory())
 from analyse_play_midi import OneInstrumentPlayer
 
-# Définir le chemin des shot dans letters.ini
-shot_jpg_dir = lp.shot_jpg_dir
-
 from pymultilame import MyConfig, MyTools
+
+
+SHOT_JPG = "../json_to_image"
+
+# Pour test
+LETTERS = [ ['font_5_t', 'font_8_c', 'font_5_b', 'font_0_k', 'font_6_o', 'font_0_f', 'font_8_m', 'font_3_f', 'font_1_g', 'font_9_s', 'font_7_q', 'font_2_c', 'font_1_p', 'font_6_h', 'font_4_j', 'font_7_g', 'font_4_l', 'font_4_J', 'font_2_l', 'font_5_k', 'font_3_r'],
+            ['font_7_S', 'font_2_R', 'font_7_B', 'font_6_L', 'font_4_I', 'font_8_T', 'font_8_C', 'font_5_O', 'font_6_H', 'font_2_C', 'font_9_R', 'font_2_c', 'font_1_B'],
+            ['font_2_t', 'font_1_t', 'font_3_t', 'font_8_m', 'font_6_q', 'font_5_p', 'font_6_e', 'font_3_f', 'font_8_d', 'font_4_b', 'font_2_c', 'font_9_l', 'font_0_o', 'font_7_f', 'font_5_f', 'font_3_k', 'font_9_d', 'font_0_d', 'font_1_k'],
+            ['font_6_Q', 'font_9_R', 'font_4_T', 'font_0_H', 'font_2_E', 'font_1_N', 'font_8_F', 'font_2_S', 'font_7_L', 'font_1_B', 'font_7_G', 'font_3_O', 'font_9_E', 'font_0_T', 'font_7_T', 'font_8_R', 'font_4_j', 'font_8_e', 'font_4_J'],
+            ['font_9_t', 'font_5_n', 'font_3_o', 'font_3_f', 'font_1_e', 'font_7_n', 'font_2_d', 'font_6_o', 'font_8_t', 'font_8_g', 'font_0_k', 'font_7_e', 'font_1_n', 'font_9_l', 'font_4_g', 'font_9_h', 'font_2_n', 'font_6_g'],
+            ['font_9_Q', 'font_6_L', 'font_7_T', 'font_5_K', 'font_4_B', 'font_8_T', 'font_8_G', 'font_1_I', 'font_9_I', 'font_7_K', 'font_3_H', 'font_4_R', 'font_5_I', 'font_0_L', 'font_3_O', 'font_6_I', 'font_1_s'],
+            ['font_4_e', 'font_9_q', 'font_6_b', 'font_1_e', 'font_3_i', 'font_8_d', 'font_7_t', 'font_5_i', 'font_5_q', 'font_2_f', 'font_0_c', 'font_4_k', 'font_8_r', 'font_7_h', 'font_9_b', 'font_0_t', 'font_6_r'],
+            ['font_5_G', 'font_3_D', 'font_6_D', 'font_0_D', 'font_7_J', 'font_5_R', 'font_8_Q', 'font_1_D', 'font_8_E', 'font_7_Q', 'font_2_P', 'font_6_S', 'font_4_E', 'font_3_O', 'font_4_P'],
+            ['font_7_m', 'font_5_i', 'font_5_n', 'font_7_b', 'font_6_t', 'font_6_k', 'font_4_t', 'font_1_q', 'font_1_g', 'font_3_r', 'font_9_p', 'font_9_d', 'font_4_k', 'font_8_k', 'font_3_d', 'font_0_b', 'font_6_f', 'font_8_j', 'font_4_K'],
+            ['font_3_J', 'font_1_R', 'font_2_L', 'font_2_J', 'font_7_S', 'font_3_Q', 'font_7_H', 'font_1_E', 'font_0_L', 'font_5_F', 'font_6_T', 'font_8_R', 'font_9_H', 'font_9_N', 'font_5_Q', 'font_0_T', 'font_0_c'],
+            ['font_4_o', 'font_1_h', 'font_3_d', 'font_9_q', 'font_7_s', 'font_1_k', 'font_6_f', 'font_5_k', 'font_1_t', 'font_8_h', 'font_7_c', 'font_3_n', 'font_6_r', 'font_8_k', 'font_4_f', 'font_0_c', 'font_9_h', 'font_0_t', 'font_5_c'],
+            ['font_9_N', 'font_8_B', 'font_2_K', 'font_3_I', 'font_5_K', 'font_3_P', 'font_4_Q', 'font_5_E', 'font_9_F', 'font_6_G', 'font_2_F', 'font_8_K', 'font_7_T', 'font_7_H', 'font_6_P', 'font_1_D', 'font_8_k']]
+NOTES = [   [(45, 80, 2), (80, 80, 5)],
+            [(45, 80, 2), (80, 80, 5)],
+            [(45, 80, 2), (80, 80, 5)],
+            [(40, 80, 4), (60, 80, 3)],
+            [(40, 80, 4), (60, 80, 3)],
+            [(40, 80, 4), (60, 80, 3)],
+            [(40, 80, 4), (60, 80, 3)] ]
 
 
 class YOLO:
@@ -98,15 +120,30 @@ class YOLO:
         for i in range(10):
             channel = i
             bank = 0
-            bank_number = 10*i
+            bank_number = 1  # randint(0, 127)
             self.player[i] = OneInstrumentPlayer(fonts, channel, bank, bank_number)
 
     def play_notes(self, notes):
-        """[(note, volume, police), ...] = [(45,124, 2), ... ]"""
+        """[(note, volume, police), ...] = [(45, 124, 2), ... ]"""
 
         print("Notes dans l'image:", notes)
+
+        notes_en_cours = []
         for note in notes:
-            self.player[note[2]].thread_play_note(note[0], 90)  #note[1])
+            notes_en_cours.append([note[0], note[2]])
+        # Stop des notes en cours et absentes de notes
+        for i in range(10):
+            for key, val in self.player[i].thread_dict.items():
+                if (key, i) not in notes_en_cours:
+                    self.player[i].thread_dict[key] = 0
+                    
+        # play des nouvelles notes
+        for note in notes:
+            if 0 < note[0] < 127:
+                if not self.player[note[2]].thread_dict[note[0]]:
+                    vol = note[1]
+                    if vol < 50: vol = 100
+                    self.player[note[2]].thread_play_note(note[0], vol)
             
     def create_trackbar(self):
         """
@@ -153,7 +190,7 @@ class YOLO:
         lp.save_config(section, key, value)
 
     def detect(self):
-        fl = self.mt.get_all_files_list("../shot_jpg", ".jpg")
+        fl = self.mt.get_all_files_list(SHOT_JPG, ".jpg")
         i = 0
         while self.loop:
             name = fl[i]
@@ -188,7 +225,16 @@ class YOLO:
             # Conversion des letrres en notes
             # notes = [(note, volume, police), ...] = [(45,124, 2), ... ]
             # police = instrument
+            # #if i % 2 == 0:
+                # #letters = LETTERS[i]
+            # #else:
+                # #letters = []
+                
             notes = letters_to_notes(letters)
+            # #if i % 2 == 0:
+                # #notes = NOTES[i]
+            # #else:
+                # #notes = []
             self.play_notes(notes)
             
             image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
@@ -198,7 +244,9 @@ class YOLO:
             cv2.imshow('Reglage', self.reglage_img)
 
             # Attente
-            k = cv2.waitKey(100)
+            k = cv2.waitKey(1)
+            if i == fl :
+                self.loop = 0
             # Echap pour quitter
             if k == 27:
                 self.loop = 0
@@ -355,6 +403,7 @@ def letters_to_notes(letters):
                 if l.islower():
                     notes_d[i][0] += x
                 else:
+                    print("Ajout à volume de:", x)
                     notes_d[i][1] += x
                     
     for k, v in notes_d.items():

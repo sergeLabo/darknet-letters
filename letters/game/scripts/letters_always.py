@@ -30,6 +30,7 @@ import json
 from pathlib import Path
 import textwrap
 import threading
+import cv2
 
 from pymultilame import MyTools
 from pymultilame import get_all_objects, get_scene_with_name
@@ -54,17 +55,18 @@ from scripts.letters_once import get_shot_init
 from scripts.letters_once import music_and_letters_init
 from scripts.letters_once import intro_init
 from scripts.letters_once import convert_to_json_init
-
+from scripts.letters_once import json_to_image_init
 
 HELP = """
-1 - Affichage du logo\n
-2 - Lancement de letters\n
-    SPACE pour changer de musique\n
-3 - Fabrication des shot pour l'IA\n
-4 - Conversion en json\n
-H - Help\n
-R - Reset\n\n
-Echap - Quitter
+ 1 - Retour au logo\n
+ 2 - Lancement de letters\n
+     SPACE pour changer de musique\n
+ 3 - Fabrication des shot pour l'IA\n
+ 4 - Conversion en json\n
+ 5 - Conversion d'une musique en image\n
+ H - Help\n
+ R - Reset\n\n
+ Echap - Quitter
 """
 
         
@@ -90,7 +92,8 @@ def main():
         main_get_shot()
     if gl.phase == "get json":
         main_convert_to_json()
-
+    if gl.phase == "json vers image":
+        main_json_to_image()
 
 def main_intro():
     # Aggrandissement de la fenêtre
@@ -195,6 +198,43 @@ def main_convert_to_json():
     gl.convert_to_json_end = gl.conversion.end
 
 
+def main_json_to_image():
+    """Idem music_and_letters mais sans music et
+    idem get_shot mais sans le json get shot
+    """
+
+    # Aggrandissement de la fenêtre
+    render.setWindowSize(gl.shot_size, gl.shot_size)
+    
+    gl.all_obj["Cube"].visible = False
+
+    if gl.tempo['shot'].tempo == 5:
+        # Reset de la liste des noms d'objets blender à afficher
+        gl.obj_name_list_to_display = []
+
+        # Affiche les notes de la frame
+        frame_notes = get_frame_notes()
+        notes = get_notes(frame_notes)
+        display_frame_notes(notes)
+
+        # Décalage des lettres non jouées
+        hide_unplayed_letters()
+
+    # Save position des lettres frame avant d'enreg
+    if gl.tempo['shot'].tempo == 10:
+        gl.previous_datas = get_objets_position_size()
+
+    # Enregistre les shots
+    if gl.tempo['shot'].tempo == 15:
+        if gl.previous_datas:
+            save_json_to_image_shot()
+            sleep(0.01)
+            gl.numero += 1
+
+    # Fin du jeu
+    end()
+    
+
 def video_refresh():
     """call this function every frame to ensure update of the texture."""
     # print("refresh")
@@ -260,7 +300,6 @@ def get_notes(frame_notes):
     """
 
     notes = []
-
     if frame_notes:
         for i in range(len(frame_notes)):
             # intrument dans l'ordre
@@ -402,8 +441,30 @@ def save_shot(sub_dir):
     print(gl.frame, "Shot n°", gl.numero, "dans", name_file_shot)
 
 
-def get_name_file_shot(sub_dir):
+def save_json_to_image_shot():
+    """Les jpg et les png sont mélangés"""
+    
+    name_file_shot = get_name_json_to_image_shot()
+    render.makeScreenshot(name_file_shot)
+    print("Shot n°", gl.numero, "dans", name_file_shot)
+    
+    sleep(0.05)
+    png = name_file_shot
+    img = cv2.imread(png)
+    jpg = name_file_shot[:-4] + ".jpg"
+    cv2.imwrite(jpg, img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+    print("        Conversion:", jpg)
+    sleep(0.05)
+    
+
+def get_name_json_to_image_shot():
     """./shot/5/shot_41254.png"""
+
+    return os.path.join(gl.json_to_image_directory, 's_j_to_i_' + str(gl.numero) + '.png')
+
+
+def get_name_file_shot(sub_dir):
+    """gl.json_to_image_directory = letters/json_to_image"""
 
     return os.path.join(gl.shot_directory,
                             str(sub_dir),
@@ -494,7 +555,7 @@ def kill():
 
     # Il faut laisser du temps au temps
     sleep(1)
-    if gl.phase != "get shot":
+    if gl.phase != "get shot" and gl.phase != "json vers image":
         del gl.instruments_player
     sleep(1)
 
@@ -563,6 +624,13 @@ def keyboard():
         gl.phase = "get json"
         kill()   
         convert_to_json_init()
+
+    # conversion d'un json en image
+    elif gl.keyboard.events[events.PAD5] == gl.KX_INPUT_JUST_ACTIVATED:
+        print("Conversion d'un json en image")
+        gl.phase = "json vers image"
+        kill()   
+        json_to_image_init()
         
     # Help
     elif gl.keyboard.events[events.HKEY] == gl.KX_INPUT_JUST_ACTIVATED:

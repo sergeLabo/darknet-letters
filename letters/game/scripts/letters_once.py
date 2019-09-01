@@ -149,13 +149,22 @@ def create_directories():
     
     print("Dossier des shots:", gl.shot_directory)
 
-    # Si le dossier n'existe pas, je le crée
-    gl.tools.create_directory(gl.shot_directory)
-
     # Un dossier réparti dans 100 sous dossiers
     for l in range(100):
         directory = os.path.join(gl.shot_directory, str(l))
         gl.tools.create_directory(directory)
+
+
+def create_json_to_image_directory():
+    """Un seul dossier json_to_image dans letters"""
+
+
+    gl.json_to_image_directory = gl.letters_dir + "/json_to_image"
+
+    # Création du dossier si n'existe pas
+    gl.tools.create_directory(gl.json_to_image_directory)
+    
+    print("Dossier:", gl.json_to_image_directory)
 
 
 def get_file_list(directory, extentions):
@@ -219,7 +228,7 @@ def get_midi_json():
     gl.instruments = data["instruments"]  # [instrument_1.program, ...
     gl.partition_nbr = len(gl.partitions)
     
-    # Pour choix 2 et 3
+    # Pour choix 2 et 3 et 5
     fonts_shuffle()
     
     print("Nombre d'instrument:", len(gl.instruments))
@@ -320,6 +329,7 @@ def get_shot_init():
     gl.fonts_dict = {}
     for i in range(10):
         gl.fonts_dict[i] = i
+    set_video()
     gl.phase = "get shot"
 
     
@@ -341,6 +351,18 @@ def convert_to_json_init():
     gl.convert_to_json_end = 1
     gl.conversion = None
 
+
+def json_to_image_init():
+    """Idem get_shot mais avec un json de la liste"""
+
+    # Dossier des images
+    create_json_to_image_directory()
+
+    # Récup du json en cours
+    get_midi_json()
+            
+    gl.phase = "json vers image"
+    
 
 def get_obj_num():
     """Dict de correspondance nom de l'objet:numéro"""
@@ -409,7 +431,6 @@ def main():
     set_all_letters_position()
 
     intro_init()
-    set_video()
     
     # Pour les mondoshawan
     print("Initialisation du jeu terminée\n\n")
