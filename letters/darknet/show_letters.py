@@ -9,7 +9,13 @@ La lib
         libdarknet.so
 doit être dans le dossier darknet de letters,
 elle est créée à la compilation des sources de darknet
-et se trouve dans ce dossier. 
+et se trouve dans ce dossier.
+
+Les fichiers:
+    - yolov3.cfg
+    - yolov3_best.weights
+    - obj.data
+sont à définir dans letters.ini
 """
 
 
@@ -40,7 +46,7 @@ from analyse_play_midi import OneInstrumentPlayer
 from pymultilame import MyConfig, MyTools
 
 
-SHOT_JPG = "../json_to_image"
+JSON_TO_IMAGE = "../json_to_image"
 
 # Pour test
 LETTERS = [ ['font_5_t', 'font_8_c', 'font_5_b', 'font_0_k', 'font_6_o', 'font_0_f', 'font_8_m', 'font_3_f', 'font_1_g', 'font_9_s', 'font_7_q', 'font_2_c', 'font_1_p', 'font_6_h', 'font_4_j', 'font_7_g', 'font_4_l', 'font_4_J', 'font_2_l', 'font_5_k', 'font_3_r'],
@@ -68,13 +74,13 @@ class YOLO:
 
     def __init__(self):
         self.mt = MyTools()
-                
+
         self.loop = 1
 
-        configPath = "./data/yolov3.cfg"
-        weightPath = "./data/backup/yolov3_best.weights"
-        metaPath   = "./data/obj.data"
-            
+        configPath = CONF['darknet']['configPath']
+        weightPath = CONF['darknet']['weightPath']
+        metaPath = CONF['darknet']['metaPath']
+
         self.netMain = darknet.load_net_custom(configPath.encode("ascii"),
                                                 weightPath.encode("ascii"),
                                                 0,
@@ -103,7 +109,7 @@ class YOLO:
         self.hier_thresh = int(CONF['darknet']['hier_thresh'])
         self.nms = int(CONF['darknet']['nms'])
         print("pb conf", self.thresh, self.hier_thresh, self.nms)
-    
+
         # Trackbars
         self.create_trackbar()
         self.set_init_tackbar_position()
@@ -117,16 +123,35 @@ class YOLO:
         # Midi
         fonts = CONF['midi']['fonts']
         self.player = {}
-        for i in range(10):
-            channel = i
-            bank = 0
-            bank_number = 1  # randint(0, 127)
-            self.player[i] = OneInstrumentPlayer(fonts, channel, bank, bank_number)
+
+        # #for i in range(10):
+            # #channel = i
+            # #bank = 0
+            # #bank_number = 1  # randint(0, 127)
+            # #self.player[i] = OneInstrumentPlayer(fonts, channel, bank, bank_number)
+
+        # Spécifique à /pas_pour_github/black_eyed_peas-my_humps
+        canaux = [  (1 , 0 ,  56),
+                    (2 , 0 ,  39),
+                    (3 , 0 ,  62),
+                    (4 , 0 ,   0),
+                    (5 , 0 ,  48),
+                    (6 , 0 , 121),
+                    (7 , 0 ,  81),
+                    (8 , 0 ,  80 ),
+                    (10 , 8 , 118)]
+        i = 0
+        for c in canaux:
+            channel = c[0]
+            bank = c[1]
+            bank_number = c[2]
+            self.player[i] = OneInstrumentPlayer(fonts,
+                                                 channel,
+                                                 bank,
+                                                 bank_number)
 
     def play_notes(self, notes):
         """[(note, volume, police), ...] = [(45, 124, 2), ... ]"""
-
-        print("Notes dans l'image:", notes)
 
         notes_en_cours = []
         for note in notes:
@@ -136,7 +161,7 @@ class YOLO:
             for key, val in self.player[i].thread_dict.items():
                 if (key, i) not in notes_en_cours:
                     self.player[i].thread_dict[key] = 0
-                    
+
         # play des nouvelles notes
         for note in notes:
             if 0 < note[0] < 127:
@@ -144,7 +169,7 @@ class YOLO:
                     vol = note[1]
                     if vol < 50: vol = 100
                     self.player[note[2]].thread_play_note(note[0], vol)
-            
+
     def create_trackbar(self):
         """
         thresh            min 0 max 1
@@ -189,31 +214,42 @@ class YOLO:
     def save_change(self, section, key, value):
         lp.save_config(section, key, value)
 
+    def get_sorted_files(self):
+
+        fli = self.mt.get_all_files_list(JSON_TO_IMAGE, ".jpg")
+
+        files_list = [0]*len(fli)
+        for image in fli:
+            # ../json_to_image/s_j_to_i_2677.jpg s_j_to_i_2677.jpg
+            nbr = image.split("/")[-1].split("_")[-1][:-4]  # 2677
+            files_list[int(nbr)] = image
+
+        return files_list
+
     def detect(self):
-        fl = self.mt.get_all_files_list(SHOT_JPG, ".jpg")
+        fl = self.get_sorted_files()
         i = 0
+        print("Nomnbre d'images:", len(fl))
+
         while self.loop:
             name = fl[i]
             i += 1
-            
+
             # Capture des positions des sliders
             self.thresh = cv2.getTrackbarPos('threshold','Reglage')
             self.hier_thresh = cv2.getTrackbarPos('hier_thresh','Reglage')
             self.nms = cv2.getTrackbarPos('nms','Reglage')
-            
+
             img = cv2.imread(name)
-            print(name, "img.shape", img.shape)
-            #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             img_resized = cv2.resize(img, (darknet.network_width(self.netMain),
                                            darknet.network_height(self.netMain)),
                                            interpolation=cv2.INTER_LINEAR)
 
             darknet.copy_image_from_bytes(self.darknet_image, img_resized.tobytes())
-            
-            # detect_image(net, meta, im, thresh=0.5, hier_thresh=0.5, nms=0.45, debug=False)
-            detections_l = darknet.detect_image(self.netMain, 
-                                                self.metaMain, 
+
+            detections_l = darknet.detect_image(self.netMain,
+                                                self.metaMain,
                                                 self.darknet_image,
                                                 self.thresh/100,
                                                 self.hier_thresh/100,
@@ -229,14 +265,15 @@ class YOLO:
                 # #letters = LETTERS[i]
             # #else:
                 # #letters = []
-                
+
             notes = letters_to_notes(letters)
+            print("Name:", name, "Notes:", notes)
             # #if i % 2 == 0:
                 # #notes = NOTES[i]
             # #else:
                 # #notes = []
             self.play_notes(notes)
-            
+
             image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
             # Affichage du Semaphore
             cv2.imshow('Letters', image)
@@ -376,7 +413,7 @@ def conversion(note, casse):
 
     return c, d, u
 
-    
+
 def letters_to_notes(letters):
     """
     letters:
@@ -384,14 +421,15 @@ def letters_to_notes(letters):
 
     Retourne les notes en clair:
         notes = [(note, volume, police), ...] = [(45,124, 2), ... ]
-    
+
     notes_d[police] = [ 10+5, 100+20+4]
-    
+
     """
 
     notes = []
-    # Parcours des 10 polices possibles
     notes_d = {}
+
+    # Parcours des 10 polices possibles
     for i in range(10):
         notes_d[i] = [0, 0]
         for letter in letters:
@@ -399,17 +437,15 @@ def letters_to_notes(letters):
             if police == i:
                 l = letter[7]
                 x = CONVERSION[l]
-                #print(l, x)
                 if l.islower():
                     notes_d[i][0] += x
                 else:
-                    print("Ajout à volume de:", x)
                     notes_d[i][1] += x
-                    
+
     for k, v in notes_d.items():
         if v[0] != 0:
             notes.append([v[0], v[1], k])
-        
+
     return notes
 
 
@@ -443,7 +479,7 @@ def convertBack(x, y, w, h):
     """
     Permet d'avoir le rectangle dans l'image affichée.
     """
-    
+
     xmin = int(round(x - (w / 2)))
     xmax = int(round(x + (w / 2)))
     ymin = int(round(y - (h / 2)))
@@ -452,32 +488,32 @@ def convertBack(x, y, w, h):
 
 
 def cvDrawBoxes(detections, img):
-    """
-    Cobnstruit le rectangle autour d'une détection
-    """
-    
+    """Construit le rectangle autour d'une détection"""
+
     letters = []
     for detection in detections:
         # La lettre détectée
-        lettre = detection[0].decode()
-        # Ajout à la liste des letrres
-        letters.append(lettre)
-        
-        x, y, w, h = detection[2][0],\
-            detection[2][1],\
-            detection[2][2],\
-            detection[2][3]
-        xmin, ymin, xmax, ymax = convertBack(float(x), float(y),
-                                             float(w), float(h))
-        pt1 = (xmin, ymin)
-        pt2 = (xmax, ymax)
-        cv2.rectangle(img, pt1, pt2, (0, 255, 0), 1)
-        cv2.putText(img,
-                    lettre +
-                    " [" + str(round(detection[1] * 100, 2)) + "]",
-                    (pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.1,
-                    [0, 255, 0], 2)
-                    
+        lettre = detection[0].decode("utf-8")
+
+        if "font_" in lettre:
+            # Ajout à la liste des lettres
+            letters.append(lettre)
+
+            x, y, w, h = detection[2][0],\
+                detection[2][1],\
+                detection[2][2],\
+                detection[2][3]
+            xmin, ymin, xmax, ymax = convertBack(float(x), float(y),
+                                                 float(w), float(h))
+            pt1 = (xmin, ymin)
+            pt2 = (xmax, ymax)
+            cv2.rectangle(img, pt1, pt2, (0, 255, 0), 1)
+            cv2.putText(img,
+                        lettre +
+                        " [" + str(round(detection[1] * 100, 2)) + "]",
+                        (pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.1,
+                        [0, 255, 0], 2)
+
     return img, letters
 
 
@@ -512,9 +548,9 @@ if __name__ == "__main__":
             # #a = "font_" + f + "_" + l
             # #print(a)
             # #letters.append(a)
-            
+
     # #print("letters", letters)
     # #letters_to_notes(letters)
-    
+
     yolo = YOLO()
     yolo.detect()

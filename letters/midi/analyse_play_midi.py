@@ -96,12 +96,6 @@ class AnalyseMidi:
         # Correction des intruments pour avoir le program des drums
         self.get_instruments_with_drums()
 
-        # #print("\nListe des instruments:")
-        # #for i in range(len(self.instruments_without_drums)):
-            # #ins = self.instruments[i]
-            # #print("   ", ins, "soit numéro:", i)
-        # #print("\n")
-
         return self.instruments
 
     def get_instruments_with_drums(self):
@@ -144,8 +138,8 @@ class AnalyseMidi:
                 8 118 808 Tom
         """
 
-        drums = [(0, 112)
-                 (0, 113)
+        drums = [(0, 112),
+                 (0, 113),
                  (0, 114),
                  (0, 115),
                  (0, 116),
@@ -490,7 +484,7 @@ class OneInstrumentPlayer:
             thread_note.start()
 
 
-class PlayJsonMidi:
+class PlayJsonFile:
 
     def __init__(self, midi_json, FPS, fonts):
         """midi_json créé avec AnalyseMidi"""
@@ -568,13 +562,13 @@ def get_json_name(midi_file):
     ./midi/json/pas_pour_github/
     """
 
-    # Remplacement de music par json
-    with_json_dir = midi_file.replace("music/", "json/")
-    # Suppression de l'extension ./midi/json/pas_pour_github/toto.MID
-    # TODO moche !
-    without_extension = with_json_dir.split(".")[:-1]
-    json_name = "./" + without_extension[0] + ".json"
+    # Remplacement de l'extension .midi en .json
+    filename, file_extension = os.path.splitext(midi_file)
+    filename = filename + ".json"
 
+    # Remplacement de music par json
+    json_name = filename.replace("music/", "json/")
+    
     return json_name
 
         
@@ -698,7 +692,7 @@ def play_all_json(directory, FPS, fonts):
     print("Nombre de fichiers json:", len(file_list))
     for i in range(len(file_list)):
         json_file = file_list[i]
-        pjm = PlayJsonMidi(json_file, FPS, fonts)
+        pjm = PlayJsonFile(json_file, FPS, fonts)
         pjm.play()
         del pjm
 
@@ -723,10 +717,10 @@ if __name__ == '__main__':
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
     # #fonts = "./soundfont/MuseScore_General.sf3"
-    # #fonts = "./soundfont/MuseScore_General_Full.sf2"
-    fonts = "./soundfont/FluidR3_GM.sf2"
+    fonts = "./soundfont/MuseScore_General_Full.sf2"
+    # #fonts = "./soundfont/FluidR3_GM.sf2"
     # #fonts = "./soundfont/FluidR3_GS.sf2"
-    fonts = "./soundfont/percussion/142-Cymbal Roll.sf2"
+    # #fonts = "./soundfont/percussion/142-Cymbal Roll.sf2"
     # ## Analyse et play d'une music
     # #midi_file = "./music/pas_pour_github/Capri.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)
@@ -745,8 +739,13 @@ if __name__ == '__main__':
     # ## Joue les json
     # #play_all_json("./json/pas_pour_github", FPS, fonts)
 
+    # Création d'un json pour to_image
+    f = "./music/pas_pour_github/black_eyed_peas-my_humps.mid"
+    am = AnalyseMidi(f, 17)
+    am.save_midi_json()
+    
     # Play un json
-    json_file = "./drum_test.json"
-    pjm = PlayJsonMidi(json_file, FPS, fonts)
+    json_file = "./json/pas_pour_github/black_eyed_peas-my_humps.json"
+    pjm = PlayJsonFile(json_file, 17, fonts)
     pjm.play()
     del pjm

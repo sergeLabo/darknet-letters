@@ -55,17 +55,17 @@ for i in range(10):
 
 # Définition des partitions
 # a et b compris entre 0 et 127
-
-# Minuscules
 for partition in range(10):
     part = []
     for i in range(loop):
         for j in range(loop):
+            # Minuscules
             if j % 2 == 0:
                 # note
                 a = randint(0, 127)
                 # volume
                 b = 0
+            # Majuscules
             else:
                 # note
                 a = 0

@@ -81,7 +81,7 @@ def main():
     gl.tempo.update()
     #print_frame_rate()
 
-    Cylinder_rotation()
+    cylinder_rotation()
 
     # Phase: intro, music and letters, get shot
     if gl.phase == "intro":
@@ -94,6 +94,7 @@ def main():
         main_convert_to_json()
     if gl.phase == "json vers image":
         main_json_to_image()
+
 
 def main_intro():
     # Aggrandissement de la fenêtre
@@ -159,13 +160,13 @@ def main_get_shot():
 
     # Enregistre les shots
     if gl.tempo['shot'].tempo == 15:
-        if gl.previous_datas:
-            sub_dir = get_sub_dir()
-            save_txt_file(gl.previous_datas, sub_dir)
-            sleep(0.01)
-            save_shot(sub_dir)
-            sleep(0.01)
-            gl.numero += 1
+        #if gl.previous_datas: non, c'est toujours !
+        sub_dir = get_sub_dir()
+        save_txt_file(gl.previous_datas, sub_dir)
+        sleep(0.01)
+        save_shot(sub_dir)
+        sleep(0.01)
+        gl.numero += 1
 
     # Fin du jeu
     end()
@@ -226,10 +227,9 @@ def main_json_to_image():
 
     # Enregistre les shots
     if gl.tempo['shot'].tempo == 15:
-        if gl.previous_datas:
-            save_json_to_image_shot()
-            sleep(0.01)
-            gl.numero += 1
+        save_json_to_image_shot()
+        sleep(0.01)
+        gl.numero += 1
 
     # Fin du jeu
     end()
@@ -249,7 +249,7 @@ def thread_convert_to_json(midi_file):
     thread_convert.start()
 
 
-def Cylinder_rotation():
+def cylinder_rotation():
     gl.all_obj["Cylinder"].applyRotation((0, 0, 0.002), False)
 
 
@@ -274,19 +274,24 @@ def get_frame_notes():
 
     # Si le morceau n'est pas fini
     if gl.frame < len(gl.partitions[0]):
-        # Je passe les frames sans notes
-        while not frame_notes:
-            # si gl.partitions à 6 listes soit 6 partitions
-            for partition in gl.partitions:
-                frame_notes.append(partition[gl.frame])
-            gl.frame += 1
+        for partition in gl.partitions:
+            frame_notes.append(partition[gl.frame])
+        # Création d'image sans objet 1 fois sur 100, 22000->220
+        if gl.phase == "get shot":
+            if gl.frame % 100 == 0:
+                print("Frame sans lettre !")
+                frame_notes = []
+                
+        gl.frame += 1
+        
+    # Le morceaux est fini
     else:
         if gl.phase == "get shot":
             # Relance de get_shot.json à une frame au hazard
             gl.frame = randint(500, 2000)
             frame_notes = []
         if gl.phase == "music and letters":    
-            # Kill de tous les threads et restart
+            # Kill de tous les threads et restart sur nouvelle musique
             new_music()
 
     return frame_notes
@@ -300,6 +305,7 @@ def get_notes(frame_notes):
     """
 
     notes = []
+
     if frame_notes:
         for i in range(len(frame_notes)):
             # intrument dans l'ordre
@@ -312,8 +318,11 @@ def get_notes(frame_notes):
                 volume = frame_notes[i][0][1]
                 notes.append((instrum, note, volume))
             except:
+                #print("Pas de note, volume")
                 pass
-
+    else:
+        print("Pas de notes")
+            
     return notes
 
 
@@ -397,6 +406,7 @@ def get_objets_position_size():
         y = entre_zero_et_un(y)
         
         # Dimension
+        # gl.scale comprend le scale du rectangle englobant
         dim_x = abs(sx * relatif * gl.scale)
         dim_y = abs(sy * relatif * gl.scale)
         
@@ -555,7 +565,9 @@ def kill():
 
     # Il faut laisser du temps au temps
     sleep(1)
-    if gl.phase != "get shot" and gl.phase != "json vers image":
+    if gl.phase != "get shot" \
+    and gl.phase != "json vers image"\
+    and gl.phase != "get json":
         del gl.instruments_player
     sleep(1)
 

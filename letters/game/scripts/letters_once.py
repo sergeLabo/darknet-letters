@@ -50,7 +50,7 @@ sys.path.append(str(LETTERS_DIR) + "/midi")
 
 
 # analyse_play_midi est dans /midi
-from analyse_play_midi import PlayJsonMidi, OneInstrumentPlayer
+from analyse_play_midi import PlayJsonFile, OneInstrumentPlayer
 
 
 # Pour retrouver le début du jeu dans le terminal
@@ -352,6 +352,30 @@ def convert_to_json_init():
     gl.conversion = None
 
 
+def get_json_for_image():
+    """Charge le json à transformer en image"""
+    
+    gl.midi_json = gl.conf["midi"]["json_to_image"]
+    
+    name = gl.midi_json.split("/")[-1]
+    print("\nFichier midi en cours:", name[:-5], "\n\n")
+
+    with open(gl.midi_json) as f:
+        data = json.load(f)
+
+    gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
+    gl.instruments = data["instruments"]  # [instrument_1.program, ...
+    gl.partition_nbr = len(gl.partitions)
+    
+    # Pour choix 2 et 3 et 5
+    fonts_shuffle()
+    
+    print("Nombre d'instrument:", len(gl.instruments))
+    for instr in gl.instruments:
+        print('    Bank: {:>1} Number: {:>3} Drum: {:>1} Name: {:>16}'.format(instr[0][0], instr[0][1], instr[1], instr[2]))
+    print("\n\n")
+
+    
 def json_to_image_init():
     """Idem get_shot mais avec un json de la liste"""
 
@@ -359,7 +383,7 @@ def json_to_image_init():
     create_json_to_image_directory()
 
     # Récup du json en cours
-    get_midi_json()
+    get_json_for_image()
             
     gl.phase = "json vers image"
     

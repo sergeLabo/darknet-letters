@@ -98,11 +98,23 @@ def put_text(img, text, xy, size, thickness):
                 thickness,
                 cv2.LINE_AA)
 
-                
+
+def get_sorted_files(fli):
+
+    files_list = [0]*len(fli)
+    for image in fli:
+        # ../json_to_image/s_j_to_i_2677.jpg s_j_to_i_2677.jpg
+        nbr = image.split("/")[-1].split("_")[-1][:-4]  # 2677
+        files_list[int(nbr)] = image
+        
+    return files_list
+
+        
 def save_control():
     # Création du dossier control/shot_control
     tools.create_directory(shot_control_dir)
 
+    shot_jpg_dir = "/media/serge/BACKUP/shot_jpg/0"
     # Contrôle possible des png et jpg
     jpgs = tools.get_all_files_list(shot_jpg_dir, [".jpg", ".png"])
     print("Nombre de fichiers à contrôler:", len(jpgs))
@@ -110,7 +122,10 @@ def save_control():
         print("\n\nPas d'images à contrôler")
         print("Il faut les convertir en jpg avant !")
         os._exit(0)
-        
+
+    # Tri par numéro
+    #jpgs = get_sorted_files(jpgs_list)
+    
     loop = 1
     jpg = 0
     while loop:
@@ -128,16 +143,15 @@ def save_control():
             line = line.split(" ")
             img = cvDrawBoxes(img, line)
 
-        if lines:
-            # darknet-letters/letters/control/shot_control/shot_1_control.jpg
-            parts = jpgs[jpg].split("/")
-            img_name = parts[-1]
-            
-            name = shot_control_dir / img_name
-            print(":", str(name))
+        # darknet-letters/letters/control/shot_control/shot_1.jpg
+        parts = jpgs[jpg].split("/")
+        img_name = parts[-1]
+        
+        name = shot_control_dir / img_name
+        print("Save to:", str(name))
 
-            cv2.imwrite(str(name), img)
-            time.sleep(0.01)
+        cv2.imwrite(str(name), img)
+        time.sleep(0.01)
 
         # Stop à 200 maxi
         if jpg == 200:
