@@ -48,38 +48,35 @@ from pymultilame import MyConfig, MyTools
 
 JSON_TO_IMAGE = "../json_to_image"
 
-# Pour test
-LETTERS = [ ['font_5_t', 'font_8_c', 'font_5_b', 'font_0_k', 'font_6_o', 'font_0_f', 'font_8_m', 'font_3_f', 'font_1_g', 'font_9_s', 'font_7_q', 'font_2_c', 'font_1_p', 'font_6_h', 'font_4_j', 'font_7_g', 'font_4_l', 'font_4_J', 'font_2_l', 'font_5_k', 'font_3_r'],
-            ['font_7_S', 'font_2_R', 'font_7_B', 'font_6_L', 'font_4_I', 'font_8_T', 'font_8_C', 'font_5_O', 'font_6_H', 'font_2_C', 'font_9_R', 'font_2_c', 'font_1_B'],
-            ['font_2_t', 'font_1_t', 'font_3_t', 'font_8_m', 'font_6_q', 'font_5_p', 'font_6_e', 'font_3_f', 'font_8_d', 'font_4_b', 'font_2_c', 'font_9_l', 'font_0_o', 'font_7_f', 'font_5_f', 'font_3_k', 'font_9_d', 'font_0_d', 'font_1_k'],
-            ['font_6_Q', 'font_9_R', 'font_4_T', 'font_0_H', 'font_2_E', 'font_1_N', 'font_8_F', 'font_2_S', 'font_7_L', 'font_1_B', 'font_7_G', 'font_3_O', 'font_9_E', 'font_0_T', 'font_7_T', 'font_8_R', 'font_4_j', 'font_8_e', 'font_4_J'],
-            ['font_9_t', 'font_5_n', 'font_3_o', 'font_3_f', 'font_1_e', 'font_7_n', 'font_2_d', 'font_6_o', 'font_8_t', 'font_8_g', 'font_0_k', 'font_7_e', 'font_1_n', 'font_9_l', 'font_4_g', 'font_9_h', 'font_2_n', 'font_6_g'],
-            ['font_9_Q', 'font_6_L', 'font_7_T', 'font_5_K', 'font_4_B', 'font_8_T', 'font_8_G', 'font_1_I', 'font_9_I', 'font_7_K', 'font_3_H', 'font_4_R', 'font_5_I', 'font_0_L', 'font_3_O', 'font_6_I', 'font_1_s'],
-            ['font_4_e', 'font_9_q', 'font_6_b', 'font_1_e', 'font_3_i', 'font_8_d', 'font_7_t', 'font_5_i', 'font_5_q', 'font_2_f', 'font_0_c', 'font_4_k', 'font_8_r', 'font_7_h', 'font_9_b', 'font_0_t', 'font_6_r'],
-            ['font_5_G', 'font_3_D', 'font_6_D', 'font_0_D', 'font_7_J', 'font_5_R', 'font_8_Q', 'font_1_D', 'font_8_E', 'font_7_Q', 'font_2_P', 'font_6_S', 'font_4_E', 'font_3_O', 'font_4_P'],
-            ['font_7_m', 'font_5_i', 'font_5_n', 'font_7_b', 'font_6_t', 'font_6_k', 'font_4_t', 'font_1_q', 'font_1_g', 'font_3_r', 'font_9_p', 'font_9_d', 'font_4_k', 'font_8_k', 'font_3_d', 'font_0_b', 'font_6_f', 'font_8_j', 'font_4_K'],
-            ['font_3_J', 'font_1_R', 'font_2_L', 'font_2_J', 'font_7_S', 'font_3_Q', 'font_7_H', 'font_1_E', 'font_0_L', 'font_5_F', 'font_6_T', 'font_8_R', 'font_9_H', 'font_9_N', 'font_5_Q', 'font_0_T', 'font_0_c'],
-            ['font_4_o', 'font_1_h', 'font_3_d', 'font_9_q', 'font_7_s', 'font_1_k', 'font_6_f', 'font_5_k', 'font_1_t', 'font_8_h', 'font_7_c', 'font_3_n', 'font_6_r', 'font_8_k', 'font_4_f', 'font_0_c', 'font_9_h', 'font_0_t', 'font_5_c'],
-            ['font_9_N', 'font_8_B', 'font_2_K', 'font_3_I', 'font_5_K', 'font_3_P', 'font_4_Q', 'font_5_E', 'font_9_F', 'font_6_G', 'font_2_F', 'font_8_K', 'font_7_T', 'font_7_H', 'font_6_P', 'font_1_D', 'font_8_k']]
-NOTES = [   [(45, 80, 2), (80, 80, 5)],
-            [(45, 80, 2), (80, 80, 5)],
-            [(45, 80, 2), (80, 80, 5)],
-            [(40, 80, 4), (60, 80, 3)],
-            [(40, 80, 4), (60, 80, 3)],
-            [(40, 80, 4), (60, 80, 3)],
-            [(40, 80, 4), (60, 80, 3)] ]
-
 
 class YOLO:
 
     def __init__(self):
         self.mt = MyTools()
-
         self.loop = 1
 
-        configPath = CONF['darknet']['configPath']
-        weightPath = CONF['darknet']['weightPath']
-        metaPath = CONF['darknet']['metaPath']
+        # Initialisation de la détection
+        self.set_darknet()
+
+        # Paramètres de détections
+        self.thresh = int(CONF['darknet']['thresh'])
+        self.hier_thresh = int(CONF['darknet']['hier_thresh'])
+        self.nms = int(CONF['darknet']['nms'])
+
+        # Trackbars
+        self.create_trackbar()
+        self.set_init_tackbar_position()
+
+        # Midi
+        self.fonts = CONF['midi']['fonts']
+        self.set_canaux()
+        self.player = {}
+        self.set_players()
+
+    def set_darknet(self):
+        configPath = CONF['darknet']['configpath']
+        weightPath = CONF['darknet']['weightpath']
+        metaPath = CONF['darknet']['metapath']
 
         self.netMain = darknet.load_net_custom(configPath.encode("ascii"),
                                                 weightPath.encode("ascii"),
@@ -102,50 +99,38 @@ class YOLO:
                         self.altNames = [x.strip() for x in namesList]
             except TypeError:
                 print("Erreur self.altNames")
-
-        # Paramètres de detections
-        print(CONF['darknet'])
-        self.thresh = int(CONF['darknet']['thresh'])
-        self.hier_thresh = int(CONF['darknet']['hier_thresh'])
-        self.nms = int(CONF['darknet']['nms'])
-        print("pb conf", self.thresh, self.hier_thresh, self.nms)
-
-        # Trackbars
-        self.create_trackbar()
-        self.set_init_tackbar_position()
-
+                
         # Create an image we reuse for each detect
-        self.darknet_image = darknet.make_image(darknet.network_width(self.netMain),
-                                                darknet.network_height(self.netMain),
-                                                3)
-        self.msg = ""
+        self.darknet_image = darknet.make_image(\
+                                        darknet.network_width(self.netMain),
+                                        darknet.network_height(self.netMain),
+                                        3)
 
-        # Midi
-        fonts = CONF['midi']['fonts']
-        self.player = {}
+    def set_canaux(self):
+        """Définit les canaux avec le fichier texte
+        0 39
+        0 62
+        ...
+        """
+        self.canaux = []
 
-        # #for i in range(10):
-            # #channel = i
-            # #bank = 0
-            # #bank_number = 1  # randint(0, 127)
-            # #self.player[i] = OneInstrumentPlayer(fonts, channel, bank, bank_number)
-
-        # Spécifique à /pas_pour_github/black_eyed_peas-my_humps
-        canaux = [  (1 , 0 ,  56),
-                    (2 , 0 ,  39),
-                    (3 , 0 ,  62),
-                    (4 , 0 ,   0),
-                    (5 , 0 ,  48),
-                    (6 , 0 , 121),
-                    (7 , 0 ,  81),
-                    (8 , 0 ,  80 ),
-                    (10 , 8 , 118)]
-        i = 0
-        for c in canaux:
-            channel = c[0]
-            bank = c[1]
-            bank_number = c[2]
-            self.player[i] = OneInstrumentPlayer(fonts,
+        file_name = JSON_TO_IMAGE + "/instruments.txt"
+        data = self.mt.read_file(file_name)
+        lines = data.splitlines()
+        for line in lines:
+            line_list = line.split(" ")
+            self.canaux.append(line_list)
+                    
+    def set_players(self):
+        """Crée les players pour chaque canal"""
+        
+        for i in range(len(self.canaux)):
+            # Les drums ne sont pas sur le channel,
+            # complique et sert à rien
+            channel = i
+            bank = int(self.canaux[i][0])
+            bank_number = int(self.canaux[i][1])
+            self.player[i] = OneInstrumentPlayer(self.fonts,
                                                  channel,
                                                  bank,
                                                  bank_number)
@@ -155,9 +140,11 @@ class YOLO:
 
         notes_en_cours = []
         for note in notes:
+            #if note[2] < 9:
             notes_en_cours.append([note[0], note[2]])
+
         # Stop des notes en cours et absentes de notes
-        for i in range(10):
+        for i in range(len(self.player)):
             for key, val in self.player[i].thread_dict.items():
                 if (key, i) not in notes_en_cours:
                     self.player[i].thread_dict[key] = 0
@@ -214,26 +201,36 @@ class YOLO:
     def save_change(self, section, key, value):
         lp.save_config(section, key, value)
 
-    def get_sorted_files(self):
+    def get_sorted_shot_list(self):
 
         fli = self.mt.get_all_files_list(JSON_TO_IMAGE, ".jpg")
 
-        files_list = [0]*len(fli)
+        shot_list = [0]*len(fli)
         for image in fli:
             # ../json_to_image/s_j_to_i_2677.jpg s_j_to_i_2677.jpg
             nbr = image.split("/")[-1].split("_")[-1][:-4]  # 2677
-            files_list[int(nbr)] = image
+            shot_list[int(nbr)-60] = image
 
-        return files_list
+        return shot_list
 
     def detect(self):
-        fl = self.get_sorted_files()
+        """FPS = 162 sur MSI sans détection: lecture + affichage = 6 ms"""
+
+        shot_list = self.get_sorted_shot_list()
         i = 0
-        print("Nomnbre d'images:", len(fl))
+        fps = 0
+        print("Nombre d'images:", len(shot_list))
+        t_init = time.time()
 
         while self.loop:
-            name = fl[i]
+            name = shot_list[i]
             i += 1
+            fps += 1
+            ta = time.time()
+            if ta > t_init + 1:
+                print("FPS =", fps)
+                t_init = time.time()
+                fps = 0
 
             # Capture des positions des sliders
             self.thresh = cv2.getTrackbarPos('threshold','Reglage')
@@ -258,20 +255,7 @@ class YOLO:
             # Application des détections dan sl'image
             image, letters = cvDrawBoxes(detections_l, img_resized)
 
-            # Conversion des letrres en notes
-            # notes = [(note, volume, police), ...] = [(45,124, 2), ... ]
-            # police = instrument
-            # #if i % 2 == 0:
-                # #letters = LETTERS[i]
-            # #else:
-                # #letters = []
-
             notes = letters_to_notes(letters)
-            print("Name:", name, "Notes:", notes)
-            # #if i % 2 == 0:
-                # #notes = NOTES[i]
-            # #else:
-                # #notes = []
             self.play_notes(notes)
 
             image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
@@ -282,11 +266,13 @@ class YOLO:
 
             # Attente
             k = cv2.waitKey(1)
-            if i == fl :
+            if i == len(shot_list) :
                 self.loop = 0
             # Echap pour quitter
             if k == 27:
                 self.loop = 0
+
+        cv2.destroyAllWindows()
 
 
 CONVERSION = {  "b": 1,
@@ -450,19 +436,8 @@ def letters_to_notes(letters):
 
 
 def put_text(img, text, xy, size, thickness):
-    """
-    Adding Text to Images:
-        Text data that you want to write
-        Position coordinates of where you want put it (i.e. bottom-left corner
-        where data starts).
-        Font type (Check cv.putText() docs for supported fonts)
-        Font Scale (specifies the size of font)
-        regular things like color, thickness, lineType etc. For better look,
-        lineType = cv.LINE_AA is recommended.
-
-    We will write OpenCV on our image in white color.
-    font = cv.FONT_HERSHEY_SIMPLEX
-    cv.putText(img, 'OpenCV', (10, 500), font, 4, (255,255,255), 2, cv.LINE_AA)
+    """img=cv.putText(img, text, org, fontFace, fontScale,
+                      color[, thickness[, lineType[, bottomLeftOrigin]]])
     """
 
     cv2.putText(img,
@@ -508,11 +483,17 @@ def cvDrawBoxes(detections, img):
             pt1 = (xmin, ymin)
             pt2 = (xmax, ymax)
             cv2.rectangle(img, pt1, pt2, (0, 255, 0), 1)
+            # + " [" + str(round(detection[1] * 100, 2)) + "]"
+            t = lettre[5:]
+            # img=cv.putText(img, text, org, fontFace, fontScale,
+            #                color[, thickness[, lineType[, bottomLeftOrigin]]])
             cv2.putText(img,
-                        lettre +
-                        " [" + str(round(detection[1] * 100, 2)) + "]",
-                        (pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.1,
-                        [0, 255, 0], 2)
+                        t,
+                        (pt1[0], pt1[1] - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        [0, 255, 0],
+                        1)
 
     return img, letters
 

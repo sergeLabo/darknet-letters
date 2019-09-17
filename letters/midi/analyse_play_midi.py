@@ -165,8 +165,12 @@ class AnalyseMidi:
             self.instruments_without_drums = []
 
         for instrument in self.instruments_without_drums:
-            print("    Analyse de l'instrument: {:>2} Drum: {:>1} Name: {:>24}".\
-            format(instrument.program, instrument.is_drum, instrument.name))
+            if instrument.is_drum:
+                drum = "Drum"
+            else:
+                drum = ""
+            print("    Analyse de l'instrument: {:>2} {:>6} Name: {:>24}".\
+            format(instrument.program, drum, instrument.name))
 
             # Array de 128 x nombre de frames
             instrument_roll = self.get_instrument_roll(instrument)
@@ -740,12 +744,12 @@ if __name__ == '__main__':
     # #play_all_json("./json/pas_pour_github", FPS, fonts)
 
     # Création d'un json pour to_image
-    f = "./music/pas_pour_github/black_eyed_peas-my_humps.mid"
+    f = "./music/pas_pour_github/axel_f-crazy_frog.mid"
     am = AnalyseMidi(f, 17)
     am.save_midi_json()
     
     # Play un json
-    json_file = "./json/pas_pour_github/black_eyed_peas-my_humps.json"
+    json_file = "./json/pas_pour_github/axel_f-crazy_frog.json"
     pjm = PlayJsonFile(json_file, 17, fonts)
     pjm.play()
     del pjm

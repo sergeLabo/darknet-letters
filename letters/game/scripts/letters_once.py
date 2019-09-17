@@ -160,7 +160,8 @@ def create_json_to_image_directory():
 
 
     gl.json_to_image_directory = gl.letters_dir + "/json_to_image"
-
+    gl.json_to_image_directory_jpg = gl.json_to_image_directory + "/jpg"
+    
     # Création du dossier si n'existe pas
     gl.tools.create_directory(gl.json_to_image_directory)
     
@@ -230,10 +231,14 @@ def get_midi_json():
     
     # Pour choix 2 et 3 et 5
     fonts_shuffle()
-    
+
     print("Nombre d'instrument:", len(gl.instruments))
     for instr in gl.instruments:
-        print('    Bank: {:>1} Number: {:>3} Drum: {:>1} Name: {:>16}'.format(instr[0][0], instr[0][1], instr[1], instr[2]))
+        if instr[1]:
+            drum = "Drum"
+        else:
+            drum = ""
+        print('    Bank: {:>1} Number: {:>3} {:>6} Name: {:>16}'.format(instr[0][0], instr[0][1], drum, instr[2]))
     print("\n\n")
 
     
@@ -358,7 +363,8 @@ def get_json_for_image():
     gl.midi_json = gl.conf["midi"]["json_to_image"]
     
     name = gl.midi_json.split("/")[-1]
-    print("\nFichier midi en cours:", name[:-5], "\n\n")
+    filename, file_extension = os.path.splitext(name)
+    print("\nFichier midi en cours:", filename, "\n\n")
 
     with open(gl.midi_json) as f:
         data = json.load(f)
@@ -375,6 +381,34 @@ def get_json_for_image():
         print('    Bank: {:>1} Number: {:>3} Drum: {:>1} Name: {:>16}'.format(instr[0][0], instr[0][1], instr[1], instr[2]))
     print("\n\n")
 
+
+def write_instruments_text():
+    """gl.instruments = [[[0, 39], false, ''],
+                        [[0, 62], false, ''],
+                        [[0, 74], false, ''],
+                        [[0, 82], false, ''],
+                        [[0, 32], false, ''],
+                        [[0, 63], false, ''],
+                        [[8, 117], true, ''],
+                        [[0, 87], false, ''],
+                        [[0, 53], false, ''],
+                        [[0, 34], false, '']]
+        à traduire dans
+            gl.midi_json.txt
+        data = "0 39\n0 62\n....."
+        """
+
+    data = ""
+    for instr in gl.instruments:
+        # [[0, 39], false, '']
+        data += str(instr[0][0]) + " " + str(instr[0][1]) + "\n"
+        
+    fichier = gl.json_to_image_directory + "/instruments.txt"
+
+    # Ecriture
+    gl.tools.write_data_in_file(data, fichier, "w")
+    print("Fichier créé:", fichier)
+
     
 def json_to_image_init():
     """Idem get_shot mais avec un json de la liste"""
@@ -384,6 +418,9 @@ def json_to_image_init():
 
     # Récup du json en cours
     get_json_for_image()
+
+    # Fichier text
+    write_instruments_text()
             
     gl.phase = "json vers image"
     

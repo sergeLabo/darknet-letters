@@ -102,6 +102,7 @@ def main_intro():
         
     if gl.info == "":
         gl.all_obj["Cube"].visible = True
+        gl.all_obj["Cylinder"].visible = False
         gl.info = "H = Help"  
 
 
@@ -111,7 +112,7 @@ def main_music_and_letters():
     render.setFullScreen(True)
     
     gl.all_obj["Cube"].visible = False
-
+    gl.all_obj["Cylinder"].visible = False
     # Reset de la liste des noms d'objet blender à afficher
     gl.obj_name_list_to_display = []
 
@@ -141,7 +142,8 @@ def main_get_shot():
     video_refresh()
     
     gl.all_obj["Cube"].visible = False
-
+    gl.all_obj["Cylinder"].visible = False
+    
     if gl.tempo['shot'].tempo == 5:
         # Reset de la liste des noms d'objets blender à afficher
         gl.obj_name_list_to_display = []
@@ -179,6 +181,8 @@ def main_convert_to_json():
     Il faut un truc dans AnalyseMidi qui informe de la fin d'une conversion. 
     """
 
+    gl.all_obj["Cylinder"].visible = False
+    
     # Si plus de midi
     if gl.json_file_nbr > len(gl.all_midi_files):
         gl.phase = "intro"
@@ -207,9 +211,12 @@ def main_json_to_image():
     # Aggrandissement de la fenêtre
     render.setWindowSize(gl.shot_size, gl.shot_size)
     
-    gl.all_obj["Cube"].visible = False
+    gl.all_obj['Cube'].visible = False
+    gl.all_obj["Cylinder"].visible = True
+    
+    tempo = gl.tempo['shot'].tempo
 
-    if gl.tempo['shot'].tempo == 5:
+    if gl.tempo['shot'].tempo == int(tempo/5):  # 10 sur 50
         # Reset de la liste des noms d'objets blender à afficher
         gl.obj_name_list_to_display = []
 
@@ -222,14 +229,18 @@ def main_json_to_image():
         hide_unplayed_letters()
 
     # Save position des lettres frame avant d'enreg
-    if gl.tempo['shot'].tempo == 10:
+    if gl.tempo['shot'].tempo == int(2*tempo/5):  # 20 sur 50
         gl.previous_datas = get_objets_position_size()
 
     # Enregistre les shots
-    if gl.tempo['shot'].tempo == 15:
-        save_json_to_image_shot()
+    if gl.tempo['shot'].tempo == int(3*tempo/5):  # 30 sur 50
+        gl.png = save_json_to_image_shot()
         sleep(0.01)
         gl.numero += 1
+
+    # Effacement du png
+    if gl.tempo['shot'].tempo == int(4*tempo/5):  # 40 sur 50
+        convert_to_jpg_and_delete_png(gl.png)
 
     # Fin du jeu
     end()
@@ -446,26 +457,40 @@ def save_txt_file(datas, sub_dir):
 
 
 def save_shot(sub_dir):
-    name_file_shot = get_name_file_shot(sub_dir)
-    render.makeScreenshot(name_file_shot)
-    print(gl.frame, "Shot n°", gl.numero, "dans", name_file_shot)
+    png = get_png(sub_dir)
+    render.makeScreenshot(png)
+    print(gl.frame, "Shot n°", gl.numero, "dans", png)
 
 
 def save_json_to_image_shot():
-    """Les jpg et les png sont mélangés"""
+    """Les jpg et les png sont mélangés,
+    le png est detruit après conversion.
+    """
     
-    name_file_shot = get_name_json_to_image_shot()
-    render.makeScreenshot(name_file_shot)
-    print("Shot n°", gl.numero, "dans", name_file_shot)
+    png = get_name_json_to_image_shot()
+    render.makeScreenshot(png)
+    print("Shot n°", gl.numero, "dans", png)
     
+    return png
+
+
+def convert_to_jpg_and_delete_png(png):
+
     sleep(0.05)
-    png = name_file_shot
     img = cv2.imread(png)
-    jpg = name_file_shot[:-4] + ".jpg"
+
+    # Remplacement de l'extension .midi en .json
+    filename, file_extension = os.path.splitext(png)
+    jpg = filename + ".jpg"
+    
     cv2.imwrite(jpg, img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
     print("        Conversion:", jpg)
     sleep(0.05)
-    
+
+    # Effacement du png
+    os.remove(png)
+    sleep(0.05)
+
 
 def get_name_json_to_image_shot():
     """./shot/5/shot_41254.png"""
@@ -585,19 +610,20 @@ def keyboard():
 
     # music and letters avance lent
     if gl.keyboard.events[events.UPARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        gl.frame += 100
+        gl.frame += 1000
+        print("Avance rapide")
         
     # music and letters recul lent
     elif gl.keyboard.events[events.DOWNARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        gl.frame -= 100
+        gl.frame -= 1000
         
     # music and letters avance rapide
     elif gl.keyboard.events[events.RIGHTARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        gl.frame += 1000
+        gl.frame += 100
         
     # music and letters recul rapide
     elif gl.keyboard.events[events.LEFTARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        gl.frame -= 1000
+        gl.frame -= 100
         
     # Changement de music
     elif gl.keyboard.events[events.SPACEKEY] == gl.KX_INPUT_JUST_ACTIVATED:
@@ -846,7 +872,7 @@ def set_letter_unvisible(lettre):
 
 
 def end():
-    if gl.numero == gl.nombre_shot_total:
+    if gl.numero >= gl.nombre_shot_total:
         gl.endGame()
-    elif gl.numero > gl.nombre_shot_total:
+    if gl.numero >= len(gl.partitions[0]):
         gl.endGame()
