@@ -45,9 +45,9 @@ print("Nombre de fichiers", nb)
 
 if nb == 0:
     print("\n\nErreur:")
-    print("Définir les chemins de shot et shot_jpg dans letters.ini\n\n")
+    print("Définir les chemins de shot_jpg dans letters.ini\n\n")
     os._exit(0)
-    
+
 train_num = int(0.9*nb)
 
 counter = 0

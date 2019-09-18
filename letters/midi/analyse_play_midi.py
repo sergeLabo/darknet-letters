@@ -567,10 +567,12 @@ def get_json_name(midi_file):
     """
 
     # Remplacement de l'extension .midi en .json
+    # TODO utiliser Path.with_suffix
     filename, file_extension = os.path.splitext(midi_file)
     filename = filename + ".json"
 
     # Remplacement de music par json
+    # TODO possible avec Path ?
     json_name = filename.replace("music/", "json/")
     
     return json_name

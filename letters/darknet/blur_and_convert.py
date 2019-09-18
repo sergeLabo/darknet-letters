@@ -52,11 +52,13 @@ class BlurAndConvert:
     def __init__(self):
         self.mt = MyTools()
 
-        # Chemin de shot
+        # Dossiers
         self.shot = shot_dir
-        
+        print("Dossier shot:", self.shot)
         self.create_shot_jpg()
         self.create_sub_directories()
+
+        # Images png
         self.all_png_files = self.mt.get_all_files_list(self.shot, '.png')
         print("Nombre de fichiers à contrôler:", len(self.all_png_files))
         if len(self.all_png_files) == 0:
@@ -66,12 +68,13 @@ class BlurAndConvert:
 
         # Exécution du script flou puis save
         self.save_to_jpg()
-                
+
     def create_shot_jpg(self):
         self.shot_jpg = shot_jpg
+        print("Dossier shot_jpg:", self.shot_jpg)
         # Si le dossier n'existe pas, je le crée
         self.mt.create_directory(self.shot_jpg)
-        
+
     def create_sub_directories(self):
         """Création de 100 dossiers."""
 
@@ -92,47 +95,65 @@ class BlurAndConvert:
     def save_to_jpg(self):
         n = 0
         size = CONF["darknet"]["shot_size"]
-        
+
         for png in self.all_png_files:
             if n % 100 == 0 and n != 0:
-                print("Nombre de fichiers convertis:", n, "sur", len(self.all_png_files))
+                a = len(self.all_png_files)
+                print("Nombre de fichiers convertis:", n, "sur", a)
             n += 1
-            
-            # lecture
+
+            # Lecture de png
             img = cv2.imread(png)
+
+            # Flou
             img = self.blur(img)
 
-            # Les images de 704x704 occupent toute la mémoire de la GTX1060
-            # de 6 Go !
+            # Retaillage avec size de letters.ini
             img = cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
+
+            # On travaille avec Path
+            png_path = Path(png)
+            jpg_path = self.get_jpg_name(png_path)  # PosixPath
             
-            # De ....  /shot/25/shot_4126.png
-            # vers ..  /shot_jpg/25/shot_4126.jpg
-            part = png.split("/shot/")
-            # print(part)  # ['...', '0/shot_25.png']
+            # Ecriture de l'image jpg
+            cv2.imwrite(str(jpg_path), img,
+                                       [int(cv2.IMWRITE_JPEG_QUALITY),
+                                       100])
             
-            nom = part[1][:-4] + '.jpg'
-            # print(nom)   # 46/shot_46'
-            
-            name = self.shot_jpg / nom
-            #print("jpg:", name)  # ..... /letters/shot_jpg/..jpg
-            
-            # Copier coller du fichiers txt
-            fin = part[1][:-4] + '.txt'
-            txt = self.shot / fin
-            #print("txt de png:", txt)
-            
-            dst = self.shot_jpg / fin
-            #print("txt de jpg:", dst)
-            
+            # Copie du fichier txt de png dans jpg
+            txt, dst = self.get_txt_dst(png_path, jpg_path)
             copyfile(txt, dst)
-            
-            # Ecriture
-            cv2.imwrite(str(name), img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+
+            # On prend son temps
             sleep(0.01)
+            
         print("Nombre de fichiers convertis:", n)
 
+    def get_jpg_name(self, png_path):
+        """ png = str
+        png = str(self.shot)     + /25/shot_4126.png = str
+        jpg = str(self.shot_jpg) + /25/shot_4126.jpg = str
+        
+        self.shot = PosixPath
+        ('/', 'media', 'data', '3D', 'projets', 'darknet-letters', 'letters',
+        'shot', '0', 'shot_8.png')
+        """
+        
+        # Ajout du sous dossier et du nom
+        jpg_path = Path(self.shot_jpg, png_path.parts[-2], png_path.parts[-1])
+        # Changement de l'extension
+        jpg_path = jpg_path.with_suffix(".jpg")
 
+        return jpg_path
+            
+    def get_txt_dst(self, png_path, jpg_path):
+        
+        txt_path = png_path.with_suffix(".txt")
+        dst_path = jpg_path.with_suffix(".txt")
+
+        return txt_path, dst_path
+
+            
 if __name__ == "__main__":
-    
+
     BlurAndConvert()
