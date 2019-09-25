@@ -115,7 +115,7 @@ class BlurAndConvert:
             png_path = Path(png)
             jpg_path = self.get_jpg_name(png_path)  # PosixPath
             
-            # Ecriture de l'image jpg
+            # Ecriture de l'image jpg, cv2 prend seulement path en str
             cv2.imwrite(str(jpg_path), img,
                                        [int(cv2.IMWRITE_JPEG_QUALITY),
                                        100])
@@ -133,16 +133,15 @@ class BlurAndConvert:
         """ png = str
         png = str(self.shot)     + /25/shot_4126.png = str
         jpg = str(self.shot_jpg) + /25/shot_4126.jpg = str
-        
-        self.shot = PosixPath
-        ('/', 'media', 'data', '3D', 'projets', 'darknet-letters', 'letters',
-        'shot', '0', 'shot_8.png')
         """
-        
-        # Ajout du sous dossier et du nom
-        jpg_path = Path(self.shot_jpg, png_path.parts[-2], png_path.parts[-1])
+
+        # Soustraction du chemin de shot_dir
+        a = str(png_path).replace(str(shot_dir), "")
+        # Ajout du chemin de jpg_dir
+        b = Path(str(shot_jpg) + a)
+
         # Changement de l'extension
-        jpg_path = jpg_path.with_suffix(".jpg")
+        jpg_path = b.with_suffix(".jpg")
 
         return jpg_path
             

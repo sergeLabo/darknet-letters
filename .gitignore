@@ -34,6 +34,7 @@ shot_jpg/
 shot_control/
 video/
 json_to_image/
+get_shot.json
 
 # Blender
 *.blend1

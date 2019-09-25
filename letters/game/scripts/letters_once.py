@@ -56,7 +56,7 @@ from analyse_play_midi import PlayJsonFile, OneInstrumentPlayer
 # Pour retrouver le début du jeu dans le terminal
 print("\n"*20)
 
-
+                
 def get_conf():
     """Récupère la configuration depuis le fichier *.ini."""
     gl.tools =  MyTools()
@@ -132,7 +132,9 @@ def set_variable():
     gl.size_min = gl.conf["blend"]["size_min"]
     gl.size_max = gl.conf["blend"]["size_max"]
     gl.scale = gl.conf["blend"]["letters_scale"]
-    
+
+    # Eclairage
+    gl.sun = gl.all_obj["Sun"]
 
 def create_directories():
     """Création de 100 dossiers."""
@@ -159,13 +161,10 @@ def create_json_to_image_directory():
     """Un seul dossier json_to_image dans letters"""
 
 
-    gl.json_to_image_directory = gl.letters_dir + "/json_to_image"
-    gl.json_to_image_directory_jpg = gl.json_to_image_directory + "/jpg"
+    gl.json_to_image_directory = gl.conf["json_to_image"]["json_to_image_dir"]
     
     # Création du dossier si n'existe pas
     gl.tools.create_directory(gl.json_to_image_directory)
-    
-    print("Dossier:", gl.json_to_image_directory)
 
 
 def get_file_list(directory, extentions):
@@ -336,7 +335,15 @@ def get_shot_init():
         gl.fonts_dict[i] = i
     set_video()
     gl.phase = "get shot"
-
+    gl.comptage = {}
+    l = "abcdefghijklmnopqrstABCDEFGHIJKLMNOPQRST"
+    letters = list(l)
+    for i in range(10):
+        gl.comptage[i] = {}
+        for l in letters:
+            gl.comptage[i][l] = 0
+    gl.tempo['shot'].reset()
+    print("\n\nInitialisation de get_shot\n")
     
 def convert_to_json_init():
     """Pour créer les json, 
@@ -359,13 +366,18 @@ def convert_to_json_init():
 
 def get_json_for_image():
     """Charge le json à transformer en image"""
-    
-    gl.midi_json = gl.conf["midi"]["json_to_image"]
-    
-    name = gl.midi_json.split("/")[-1]
-    filename, file_extension = os.path.splitext(name)
+
+    a = gl.conf["json_to_image"]["json_file_nbr"]
+    gl.midi_json = gl.conf["json_to_image"]["json_file"][a]
+
+    # Suppression de l'extension
+    filename = Path(gl.midi_json).with_suffix('').name
     print("\nFichier midi en cours:", filename, "\n\n")
 
+    # Création du sous dossier
+    gl.json_to_image_sub_directory = gl.json_to_image_directory + "/" + str(filename)
+    gl.tools.create_directory(gl.json_to_image_sub_directory)
+    
     with open(gl.midi_json) as f:
         data = json.load(f)
 
@@ -403,7 +415,7 @@ def write_instruments_text():
         # [[0, 39], false, '']
         data += str(instr[0][0]) + " " + str(instr[0][1]) + "\n"
         
-    fichier = gl.json_to_image_directory + "/instruments.txt"
+    fichier = gl.json_to_image_sub_directory + "/instruments.txt"
 
     # Ecriture
     gl.tools.write_data_in_file(data, fichier, "w")
@@ -422,7 +434,7 @@ def json_to_image_init():
     # Fichier text
     write_instruments_text()
             
-    gl.phase = "json vers image"
+    gl.phase = "json to image"
     
 
 def get_obj_num():

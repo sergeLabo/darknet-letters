@@ -71,6 +71,7 @@ HELP = """
 
         
 def main():
+
     # Saisie clavier
     keyboard()
 
@@ -92,7 +93,7 @@ def main():
         main_get_shot()
     if gl.phase == "get json":
         main_convert_to_json()
-    if gl.phase == "json vers image":
+    if gl.phase == "json to image":
         main_json_to_image()
 
 
@@ -109,8 +110,11 @@ def main_intro():
 def main_music_and_letters():
     # Aggrandissement de la fenêtre
     #render.setWindowSize(gl.music_size, gl.music_size)
-    render.setFullScreen(True)
-    
+    if gl.conf["blend"]["fullscreen"] == 1:
+        render.setFullScreen(True)
+    else:
+        render.setWindowSize(gl.music_size, gl.music_size)
+        
     gl.all_obj["Cube"].visible = False
     gl.all_obj["Cylinder"].visible = False
     # Reset de la liste des noms d'objet blender à afficher
@@ -143,7 +147,8 @@ def main_get_shot():
     
     gl.all_obj["Cube"].visible = False
     gl.all_obj["Cylinder"].visible = False
-    
+    gl.plane.visible = False
+
     if gl.tempo['shot'].tempo == 5:
         # Reset de la liste des noms d'objets blender à afficher
         gl.obj_name_list_to_display = []
@@ -153,23 +158,26 @@ def main_get_shot():
         notes = get_notes(frame_notes)
         display_frame_notes(notes)
 
+        # Eclairage
+        set_sun_color_energy()
+
         # Décalage des lettres non jouées
         hide_unplayed_letters()
-
+    
     # Save position des lettres frame avant d'enreg
     if gl.tempo['shot'].tempo == 10:
         gl.previous_datas = get_objets_position_size()
 
     # Enregistre les shots
     if gl.tempo['shot'].tempo == 15:
-        #if gl.previous_datas: non, c'est toujours !
         sub_dir = get_sub_dir()
         save_txt_file(gl.previous_datas, sub_dir)
         sleep(0.01)
         save_shot(sub_dir)
         sleep(0.01)
         gl.numero += 1
-
+        print(gl.comptage[0])
+        
     # Fin du jeu
     end()
 
@@ -227,7 +235,7 @@ def main_json_to_image():
 
         # Décalage des lettres non jouées
         hide_unplayed_letters()
-
+    
     # Save position des lettres frame avant d'enreg
     if gl.tempo['shot'].tempo == int(2*tempo/5):  # 20 sur 50
         gl.previous_datas = get_objets_position_size()
@@ -238,7 +246,7 @@ def main_json_to_image():
         sleep(0.01)
         gl.numero += 1
 
-    # Effacement du png
+    # Conversion en jpg et effacement du png
     if gl.tempo['shot'].tempo == int(4*tempo/5):  # 40 sur 50
         convert_to_jpg_and_delete_png(gl.png)
 
@@ -248,7 +256,6 @@ def main_json_to_image():
 
 def video_refresh():
     """call this function every frame to ensure update of the texture."""
-    # print("refresh")
     gl.my_video.refresh(True)
 
     
@@ -287,9 +294,10 @@ def get_frame_notes():
     if gl.frame < len(gl.partitions[0]):
         for partition in gl.partitions:
             frame_notes.append(partition[gl.frame])
+            
         # Création d'image sans objet 1 fois sur 100, 22000->220
         if gl.phase == "get shot":
-            if gl.frame % 100 == 0:
+            if gl.frame % 100 == 10:
                 print("Frame sans lettre !")
                 frame_notes = []
                 
@@ -299,7 +307,8 @@ def get_frame_notes():
     else:
         if gl.phase == "get shot":
             # Relance de get_shot.json à une frame au hazard
-            gl.frame = randint(500, 2000)
+            gl.frame = randint(0, 200)
+            print("Relance à:", gl.frame)
             frame_notes = []
         if gl.phase == "music and letters":    
             # Kill de tous les threads et restart sur nouvelle musique
@@ -324,17 +333,44 @@ def get_notes(frame_notes):
             # la liste est dans une liste qui pourrait avoir plusieurs notes
             # soit un accord, je ne garde que la première note
             # frame_notes[i] = [[81, 44], [69, 24]]
-            try:
+            if frame_notes[i]:
                 note = frame_notes[i][0][0]
                 volume = frame_notes[i][0][1]
                 notes.append((instrum, note, volume))
-            except:
-                #print("Pas de note, volume")
-                pass
     else:
         print("Pas de notes")
-            
     return notes
+
+
+def display_frame_notes(notes):
+    """Affichage"""
+
+    for note_tuple in notes:
+        instrum, note, volume = note_tuple[0], note_tuple[1], note_tuple[2]
+        if instrum < 10:
+            display(instrum, note, volume)
+
+
+def display(instrum, note, volume):
+    """Affiche ou cache les lettres"""
+
+    # Lettres correspondantes
+    cn, dn, un = conversion(note, "min")
+    cv, dv, uv = conversion(volume, "maj")
+
+    # Liste des lettres à afficher
+    to_display = [un, dn, cn, uv, dv, cv]
+
+    # Affichage des lettres
+    for letter in to_display:
+        if letter:
+            # Polices shuffle
+            font = gl.fonts_dict[instrum]
+            ob = "font_" + str(font) + "_" + letter
+            gl.obj_name_list_to_display.append(ob)
+            letter_obj = gl.all_obj[ob]
+            set_letter_position(letter_obj)
+            gl.comptage[instrum][letter] += 1
 
 
 def get_sub_dir():
@@ -457,17 +493,18 @@ def save_txt_file(datas, sub_dir):
 
 
 def save_shot(sub_dir):
-    png = get_png(sub_dir)
+    png = get_name_file_shot(sub_dir)
     render.makeScreenshot(png)
-    print(gl.frame, "Shot n°", gl.numero, "dans", png)
+    print(gl.frame-1, "Shot n°", gl.numero, "dans", png)
 
 
 def save_json_to_image_shot():
     """Les jpg et les png sont mélangés,
     le png est detruit après conversion.
     """
-    
-    png = get_name_json_to_image_shot()
+
+    # ./shot/5/shot_41254.png"""
+    png = os.path.join(gl.json_to_image_sub_directory, 's_j_to_i_' + str(gl.numero) + '.png')
     render.makeScreenshot(png)
     print("Shot n°", gl.numero, "dans", png)
     
@@ -479,9 +516,8 @@ def convert_to_jpg_and_delete_png(png):
     sleep(0.05)
     img = cv2.imread(png)
 
-    # Remplacement de l'extension .midi en .json
-    filename, file_extension = os.path.splitext(png)
-    jpg = filename + ".jpg"
+    # Remplacement de l'extension png en jpg
+    jpg = str(Path(png).with_suffix('.jpg'))
     
     cv2.imwrite(jpg, img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
     print("        Conversion:", jpg)
@@ -492,14 +528,8 @@ def convert_to_jpg_and_delete_png(png):
     sleep(0.05)
 
 
-def get_name_json_to_image_shot():
-    """./shot/5/shot_41254.png"""
-
-    return os.path.join(gl.json_to_image_directory, 's_j_to_i_' + str(gl.numero) + '.png')
-
-
 def get_name_file_shot(sub_dir):
-    """gl.json_to_image_directory = letters/json_to_image"""
+    """gl.json_to_image_sub_directory = letters/json_to_image"""
 
     return os.path.join(gl.shot_directory,
                             str(sub_dir),
@@ -516,36 +546,6 @@ def play_frame_notes(notes):
 
     # Arrêt des notes si plus dans la liste
     stop_notes(last_notes)
-
-
-def display_frame_notes(notes):
-    """Affichage"""
-
-    for note_tuple in notes:
-        instrum, note, volume = note_tuple[0], note_tuple[1], note_tuple[2]
-        if instrum < 10:
-            display(instrum, note, volume)
-
-
-def display(instrum, note, volume):
-    """Affiche ou cache les lettres"""
-
-    # Lettres correspondantes
-    cn, dn, un = conversion(note, "min")
-    cv, dv, uv = conversion(volume, "maj")
-
-    # Liste des lettres à afficher
-    to_display = [un, dn, cn, uv, dv, cv]
-
-    # Affichage des lettres
-    for letter in to_display:
-        if letter:
-            # Polices shuffle
-            font = gl.fonts_dict[instrum]
-            ob = "font_" + str(font) + "_" + letter
-            gl.obj_name_list_to_display.append(ob)
-            letter_obj = gl.all_obj[ob]
-            set_letter_position(letter_obj)
 
 
 def new_music():
@@ -591,7 +591,7 @@ def kill():
     # Il faut laisser du temps au temps
     sleep(1)
     if gl.phase != "get shot" \
-    and gl.phase != "json vers image"\
+    and gl.phase != "json to image"\
     and gl.phase != "get json":
         del gl.instruments_player
     sleep(1)
@@ -666,7 +666,7 @@ def keyboard():
     # conversion d'un json en image
     elif gl.keyboard.events[events.PAD5] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Conversion d'un json en image")
-        gl.phase = "json vers image"
+        gl.phase = "json to image"
         kill()   
         json_to_image_init()
         
@@ -762,7 +762,9 @@ def hide_unplayed_letters():
 
 
 def hide_letter(lettre):
-    """lettre = font_1_q, récup du 1 et du q"""
+    """lettre = font_1_q, récup du 1 et du q
+    les lettres sont dispersées
+    """
 
     l = "abcdefghijklmnopqrstABCDEFGHIJKLMNOPQRST"
     letters = list(l)
@@ -871,8 +873,29 @@ def set_letter_unvisible(lettre):
     lettre.visible = False
 
 
+def set_sun_color_energy():
+
+    gl.sun.energy = uniform(1, 4)
+    
+    color = uniform(0.5, 1.0), uniform(0.5, 1.0), uniform(0.5, 1.0)
+    # #print("sun", round(gl.sun.energy, 2),
+                 # #round(color[0], 2),
+                 # #round(color[1], 2),
+                 # #round(color[2], 2))
+    gl.sun.color = color
+
+                 
 def end():
+
+    # Limite par nombre_shot_total dans ini
     if gl.numero >= gl.nombre_shot_total:
         gl.endGame()
+
+    # Fin de la partition
     if gl.numero >= len(gl.partitions[0]):
         gl.endGame()
+
+    # Limitation du nombre d'image
+    if gl.phase == "json to image":
+        if gl.numero >= 2000:
+            gl.endGame()

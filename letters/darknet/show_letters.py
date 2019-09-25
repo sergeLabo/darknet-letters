@@ -46,7 +46,7 @@ from analyse_play_midi import OneInstrumentPlayer
 from pymultilame import MyConfig, MyTools
 
 
-JSON_TO_IMAGE = "../json_to_image"
+JSON_TO_IMAGE = "../json_to_image/cougourdoun-nicola"
 
 
 class YOLO:
@@ -134,7 +134,8 @@ class YOLO:
                                                  channel,
                                                  bank,
                                                  bank_number)
-
+        print("Nombre de player:", len(self.player))
+            
     def play_notes(self, notes):
         """[(note, volume, police), ...] = [(45, 124, 2), ... ]"""
 
@@ -152,10 +153,12 @@ class YOLO:
         # play des nouvelles notes
         for note in notes:
             if 0 < note[0] < 127:
-                if not self.player[note[2]].thread_dict[note[0]]:
-                    vol = note[1]
-                    if vol < 50: vol = 100
-                    self.player[note[2]].thread_play_note(note[0], vol)
+                if 0 < note[2] < len(self.canaux):
+                    print(note[2], note[0])
+                    if not self.player[note[2]].thread_dict[note[0]]:
+                        vol = note[1]
+                        if vol < 50: vol = 100
+                        self.player[note[2]].thread_play_note(note[0], vol)
 
     def create_trackbar(self):
         """
@@ -463,10 +466,13 @@ def convertBack(x, y, w, h):
 
 
 def cvDrawBoxes(detections, img):
-    """Construit le rectangle autour d'une détection"""
-
+    """Construit le rectangle autour des détections
+    Une détection
+        b'font_9_K', 0.995, (74.0, 245.0, 40.6, 39.6))
+    """
     letters = []
     for detection in detections:
+        print(detection)
         # La lettre détectée
         lettre = detection[0].decode("utf-8")
 

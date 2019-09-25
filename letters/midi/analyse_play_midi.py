@@ -567,9 +567,8 @@ def get_json_name(midi_file):
     """
 
     # Remplacement de l'extension .midi en .json
-    # TODO utiliser Path.with_suffix
-    filename, file_extension = os.path.splitext(midi_file)
-    filename = filename + ".json"
+    filename = Path(midi_file).with_suffix(".json")
+    filename = str(filename)
 
     # Remplacement de music par json
     # TODO possible avec Path ?
@@ -745,13 +744,13 @@ if __name__ == '__main__':
     # ## Joue les json
     # #play_all_json("./json/pas_pour_github", FPS, fonts)
 
-    # Création d'un json pour to_image
-    f = "./music/pas_pour_github/axel_f-crazy_frog.mid"
-    am = AnalyseMidi(f, 17)
-    am.save_midi_json()
+    # ## Création d'un json pour to_image
+    # #f = "./music/pas_pour_github/axel_f-crazy_frog.mid"
+    # #am = AnalyseMidi(f, 17)
+    # #am.save_midi_json()
     
-    # Play un json
-    json_file = "./json/pas_pour_github/axel_f-crazy_frog.json"
-    pjm = PlayJsonFile(json_file, 17, fonts)
-    pjm.play()
-    del pjm
+    # ## Play un json
+    # #json_file = "./json/pas_pour_github/axel_f-crazy_frog.json"
+    # #pjm = PlayJsonFile(json_file, 17, fonts)
+    # #pjm.play()
+    # #del pjm

@@ -114,7 +114,6 @@ def save_control():
     # Création du dossier control/shot_control
     tools.create_directory(shot_control_dir)
 
-    shot_jpg_dir = "/media/serge/BACKUP/shot_jpg/0"
     # Contrôle possible des png et jpg
     jpgs = tools.get_all_files_list(shot_jpg_dir, [".jpg", ".png"])
     print("Nombre de fichiers à contrôler:", len(jpgs))
