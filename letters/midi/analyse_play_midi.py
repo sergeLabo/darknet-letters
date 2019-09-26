@@ -169,7 +169,7 @@ class AnalyseMidi:
                 drum = "Drum"
             else:
                 drum = ""
-            print("    Analyse de l'instrument: {:>2} {:>6} Name: {:>24}".\
+            print("    Analyse de l'instrument: {:>2} {:>6}   Name: {:>24}".\
             format(instrument.program, drum, instrument.name))
 
             # Array de 128 x nombre de frames
@@ -250,7 +250,7 @@ class AnalyseMidi:
 
         with open(json_name, 'w') as f_out:
             json.dump(json_data, f_out)
-        print('\nEnregistrement de:', json_name)
+        print('Enregistrement de:', json_name)
 
         # Pour Blender
         self.end = 1
@@ -299,8 +299,12 @@ class PlayMidi:
             bank = instrument[0][0]
             bank_number = instrument[0][1]
 
-            print('    Channel: {:>2} Bank: {:>1} Number: {:>3} Drum: {:>1}'.\
-            format(chan, bank, bank_number, is_drum))
+            if is_drum:
+                dr = "Drum"
+            else:
+                dr = ""
+            print('    Channel: {:>2} Bank: {:>1} Number: {:>3} {}'.\
+            format(chan, bank, bank_number, dr))
             
             instruments_player[i] = PlayOneMidiPartition(self.partitions[i],
                                                               fonts,
@@ -724,16 +728,15 @@ if __name__ == '__main__':
     # #fonts = "./soundfont/MuseScore_General.sf3"
     fonts = "./soundfont/MuseScore_General_Full.sf2"
     # #fonts = "./soundfont/FluidR3_GM.sf2"
-    # #fonts = "./soundfont/FluidR3_GS.sf2"
     # #fonts = "./soundfont/percussion/142-Cymbal Roll.sf2"
     # ## Analyse et play d'une music
     # #midi_file = "./music/pas_pour_github/Capri.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)
 
-    # Play un midi
-    # #mf = "Fatboy Slim - Right Here, Right Now.mid"
-    # #midi_file = "./music/pas_pour_github/" + mf
-    # #PlayMidi(midi_file, FPS, fonts)
+    # ## Play un midi
+    mf = "axel_f-crazy_frog.mid"
+    midi_file = "./music/pas_pour_github/" + mf
+    PlayMidi(midi_file, FPS, fonts)
 
     # ## Play de tous les midi
     # #play_all_midi_files(FPS, fonts)

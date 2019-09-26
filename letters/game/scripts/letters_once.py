@@ -115,7 +115,7 @@ def set_variable():
     # nombre de shot total
     gl.nombre_shot_total = gl.conf['blend']['total']
     gl.previous_datas = ""
-
+    
     # Numero conservé au changement de morceau
     gl.numero = gl.conf['blend']['numero']
     gl.total = gl.conf['blend']['total']
@@ -209,6 +209,11 @@ def get_midi_json():
     js = gl.letters_dir + "/midi/json"
     all_json = gl.tools.get_all_files_list(js, ".json")
 
+    # Tri des json alpha
+    all_json = sorted(all_json)
+    # #for f in all_json:
+        # #print(f)
+        
     # Reset de gl.nbr si fini
     if gl.nbr >= len(all_json):
         gl.nbr = 0
@@ -237,7 +242,7 @@ def get_midi_json():
             drum = "Drum"
         else:
             drum = ""
-        print('    Bank: {:>1} Number: {:>3} {:>6} Name: {:>16}'.format(instr[0][0], instr[0][1], drum, instr[2]))
+        print('    Bank: {:>1} Number: {:>3} {:>6}  Name: {:>16}'.format(instr[0][0], instr[0][1], drum, instr[2]))
     print("\n\n")
 
     
@@ -335,7 +340,10 @@ def get_shot_init():
         gl.fonts_dict[i] = i
     set_video()
     gl.phase = "get shot"
+    
+    # Pour occurence avec get shot
     gl.comptage = {}
+    
     l = "abcdefghijklmnopqrstABCDEFGHIJKLMNOPQRST"
     letters = list(l)
     for i in range(10):
@@ -346,8 +354,8 @@ def get_shot_init():
     print("\n\nInitialisation de get_shot\n")
     
 def convert_to_json_init():
-    """Pour créer les json, 
-    """
+    """Pour créer les json"""
+    
     gl.FPS = gl.conf["midi"]["fps"]
     gl.json_file_nbr = 0
 
@@ -355,9 +363,6 @@ def convert_to_json_init():
     extentions = [".midi", "mid", "kar", "Mid", "MID"]
     gl.all_midi_files = get_file_list(midi, extentions)
     print("Nombre de fichiers à convertir:", len(gl.all_midi_files))
-    
-    # #print("Liste des fichiers midi:")
-    # #print("    ", gl.all_midi_files)
     
     # Pour la fin de la conversion
     gl.convert_to_json_end = 1

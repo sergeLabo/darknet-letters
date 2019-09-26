@@ -65,7 +65,6 @@ HELP = """
  4 - Conversion en json\n
  5 - Conversion d'une musique en image\n
  H - Help\n
- R - Reset\n\n
  Echap - Quitter
 """
 
@@ -261,7 +260,7 @@ def video_refresh():
     
 def thread_convert_to_json(midi_file):
 
-    print("Conversion de:", midi_file)
+    print("\n\nConversion de:", midi_file)
     gl.conversion = AnalyseMidi(midi_file, gl.FPS)
     thread_convert = threading.Thread(target=gl.conversion.save_midi_json)
     thread_convert.start()
@@ -370,7 +369,8 @@ def display(instrum, note, volume):
             gl.obj_name_list_to_display.append(ob)
             letter_obj = gl.all_obj[ob]
             set_letter_position(letter_obj)
-            gl.comptage[instrum][letter] += 1
+            if gl.phase == "get shot":
+                gl.comptage[instrum][letter] += 1
 
 
 def get_sub_dir():
@@ -677,10 +677,10 @@ def keyboard():
         gl.info = HELP
         gl.info_news = 1    
 
-    # Reset
-    elif gl.keyboard.events[events.RKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        print("Reset ...............")
-        gl.game.restart()
+    # ## Reset marche pas bug
+    # #elif gl.keyboard.events[events.RKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        # #print("Reset ...............")
+        # #gl.restartGame()
 
     # #if gl.frame > len(gl.partitions[0]) : gl.frame = len(gl.partitions[0])
     if gl.frame < 0: gl.frame = 0

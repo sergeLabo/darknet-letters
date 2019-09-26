@@ -36,6 +36,7 @@ video/
 json_to_image/
 get_shot.json
 
+
 # Blender
 *.blend1
 *.blend2
