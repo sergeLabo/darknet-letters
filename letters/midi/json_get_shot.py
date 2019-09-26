@@ -94,6 +94,8 @@ for i in range(10):
 
 # Json
 data = json.dumps(json_dict)
+# Fin de ligne à la fin pour github
+data += "\n"
 
 f = "get_shot.json"
 mode = "w"
