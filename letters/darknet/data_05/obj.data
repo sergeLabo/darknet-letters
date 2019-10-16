@@ -1,0 +1,5 @@
+classes = 380
+train = data_05/train.txt
+valid = data_05/test.txt
+names = data_05/obj.names
+backup = data_05/backup

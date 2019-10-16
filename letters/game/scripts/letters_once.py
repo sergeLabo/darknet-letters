@@ -24,7 +24,7 @@ Seuls les attributs de logic sont stockés en permanence.
 
 Il est relancé par main de letters_always à la fin du morceau.
 
-suspendDynamics(False) 
+suspendDynamics(False)
 """
 
 
@@ -56,14 +56,14 @@ from analyse_play_midi import PlayJsonFile, OneInstrumentPlayer
 # Pour retrouver le début du jeu dans le terminal
 print("\n"*20)
 
-                
+
 def get_conf():
     """Récupère la configuration depuis le fichier *.ini."""
     gl.tools =  MyTools()
 
     gl.letters_dir = str(LETTERS_DIR.resolve())
     #print("Chemin du dossier letters dans le BGE:", gl.letters_dir)
-    
+
     # Dossier *.ini
     ini_file = gl.letters_dir + "/letters.ini"
     gl.ma_conf = MyConfig(ini_file)
@@ -76,7 +76,7 @@ def set_tempo():
     tempo_liste = [ ("seconde", 60),
                     ("shot", int(gl.conf['blend']['shot_every'])),
                     ("info", 180)]
-                    
+
     gl.tempo = Tempo(tempo_liste)
     gl.frame_rate = 0
     gl.time = 0
@@ -84,18 +84,18 @@ def set_tempo():
 
 def set_all_letters_position():
     """Etalement des lettres name = k"""
-    
+
     l = "abcdefghijklmnopqrstABCDEFGHIJKLMNOPQRST"
     letters = list(l)
-    
+
     for k, v in gl.all_obj.items():
         if "font" in k:
             # font_0_a
             x = 25 + int(k[5])
             # index ok
-            y = letters.index(k[7]) 
+            y = letters.index(k[7])
             v.position = x, y, 0
-    
+
 
 def set_variable():
 
@@ -105,7 +105,7 @@ def set_variable():
     gl.obj_name_list_to_display = []
     gl.partitions = []
     gl.instruments = []
-    
+
     # Tous les objets
     gl.all_obj = get_all_objects()
     gl.info = ""
@@ -115,13 +115,13 @@ def set_variable():
     # nombre de shot total
     gl.nombre_shot_total = gl.conf['blend']['total']
     gl.previous_datas = ""
-    
+
     # Numero conservé au changement de morceau
     gl.numero = gl.conf['blend']['numero']
     gl.total = gl.conf['blend']['total']
     if gl.numero >= gl.total:
         gl.numero = gl.total
-    
+
     # Dimension des fenêtres
     gl.music_size = gl.conf["blend"]["music_size"]
     gl.shot_size = gl.conf["blend"]["shot_size"]
@@ -136,8 +136,12 @@ def set_variable():
     # Eclairage
     gl.sun = gl.all_obj["Sun"]
 
+    # Fond de l'image pour get shot
+    gl.fond = gl.conf["blend"]["fond"]
+
+
 def create_directories():
-    """Création de 100 dossiers."""
+    """Création de 100 dossiers pour letters."""
 
     # Dossier d'enregistrement des images
     gl.shot_directory = gl.conf['dirertories']["shot"]
@@ -148,23 +152,13 @@ def create_directories():
 
     # Création du dossier si n'existe pas
     gl.tools.create_directory(gl.shot_directory)
-    
+
     print("Dossier des shots:", gl.shot_directory)
 
     # Un dossier réparti dans 100 sous dossiers
     for l in range(100):
         directory = os.path.join(gl.shot_directory, str(l))
         gl.tools.create_directory(directory)
-
-
-def create_json_to_image_directory():
-    """Un seul dossier json_to_image dans letters"""
-
-
-    gl.json_to_image_directory = gl.conf["json_to_image"]["json_to_image_dir"]
-    
-    # Création du dossier si n'existe pas
-    gl.tools.create_directory(gl.json_to_image_directory)
 
 
 def get_file_list(directory, extentions):
@@ -185,41 +179,48 @@ def get_file_list(directory, extentions):
 def get_get_shot_json():
 
     gl.midi_json = str(LETTERS_DIR) + "/midi/get_shot.json"
-    
+
     with open(gl.midi_json) as f:
         data = json.load(f)
 
     gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
     gl.instruments = data["instruments"]  # [instrument_1.program, ...
     gl.partition_nbr = len(gl.partitions)
-    
+
     print("Nombre d'instrument:", gl.partition_nbr)
     print("Nombre de notes du morceau en frame:", len(gl.partitions[0]))
-    
-    
+
+
 def get_midi_json():
     """
     json_data = {"partitions":  [partition_1, partition_2 ......],
                  "instruments": [instrument_1.program,
                                  instrument_2.program, ...]
     """
-                  
-    
-    gl.nbr = gl.conf["midi"]["file_nbr"]
-    js = gl.letters_dir + "/midi/json"
+
+    if gl.phase == "music and letters":
+        gl.nbr = gl.conf["midi"]["file_nbr"]
+        js = gl.conf["midi"]["json_files"]
+
+    if gl.phase == "json to image":
+        gl.nbr = gl.conf["json_to_image"]["file_nbr"]
+        js = gl.conf["json_to_image"]["json_files"]
+        
     all_json = gl.tools.get_all_files_list(js, ".json")
 
     # Tri des json alpha
     all_json = sorted(all_json)
-    # #for f in all_json:
-        # #print(f)
-        
+
     # Reset de gl.nbr si fini
     if gl.nbr >= len(all_json):
         gl.nbr = 0
 
     # Enregistrement du numéro du prochain fichier à lire
-    gl.ma_conf.save_config("midi", "file_nbr", gl.nbr + 1)
+    if gl.phase == "music and letters":
+        section = "midi"
+    if gl.phase == "music and letters":
+        section = "json_to_image"
+    gl.ma_conf.save_config(section, "file_nbr", gl.nbr + 1)
 
     gl.midi_json = all_json[gl.nbr]
 
@@ -232,7 +233,7 @@ def get_midi_json():
     gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
     gl.instruments = data["instruments"]  # [instrument_1.program, ...
     gl.partition_nbr = len(gl.partitions)
-    
+
     # Pour choix 2 et 3 et 5
     fonts_shuffle()
 
@@ -245,7 +246,7 @@ def get_midi_json():
         print('    Bank: {:>1} Number: {:>3} {:>6}  Name: {:>16}'.format(instr[0][0], instr[0][1], drum, instr[2]))
     print("\n\n")
 
-    
+
 def fonts_shuffle():
     """Le désordre des polices permet de rendre aléatoire
     le choix de la police pour chaque instrument.
@@ -269,7 +270,7 @@ def get_channel():
     channel 9 pour drums
     Les channels sont attribués dans l'ordre des instruments de la liste
     """
-    
+
     channels = []
     channels_no_drum = [1,2,3,4,5,6,7,8,9,11,12,13,14,15,16]
     nbr = 0
@@ -280,12 +281,14 @@ def get_channel():
             if nbr > 14: nbr = 0
         else:
             channels.append(10)
-            
+
     return channels
 
-                    
+
 def init_midi():
-    """bank = 0
+    """Pour jouer les json en midi
+
+    bank = 0
     bank_number = instrument[]
     Dans PlayOneMidiPartition, une note est jouée avec:
         .thread_play_note(note, volume)
@@ -295,10 +298,10 @@ def init_midi():
     gl.instruments = [[[0, 25], false, "Bass"], [[0, 116], true, "Drums2"]]
         instrum = [[0, 25], false, "Bass"]
     """
-    
+
     fonts = gl.conf["midi"]["fonts"]
     channels = get_channel()
-        
+
     # Création d'un dict des objets pour jouer chaque instrument
     gl.instruments_player = {}
 
@@ -310,10 +313,10 @@ def init_midi():
         chan = channels[i]
         is_drum = instrum[1]
         bank = instrum[0][0]
-        bank_number = instrum[0][1]  
+        bank_number = instrum[0][1]
         gl.instruments_player[i] = OneInstrumentPlayer(fonts, chan, bank,
                                                        bank_number)
-        
+
 
 def intro_init():
     # Phases du jeu "intro" "music and letters" "get shot"
@@ -330,7 +333,7 @@ def music_and_letters_init():
     sleep(1)
     gl.phase = "music and letters"
 
-        
+
 def get_shot_init():
     create_directories()
     get_get_shot_json()
@@ -340,10 +343,10 @@ def get_shot_init():
         gl.fonts_dict[i] = i
     set_video()
     gl.phase = "get shot"
-    
+
     # Pour occurence avec get shot
     gl.comptage = {}
-    
+
     l = "abcdefghijklmnopqrstABCDEFGHIJKLMNOPQRST"
     letters = list(l)
     for i in range(10):
@@ -352,50 +355,74 @@ def get_shot_init():
             gl.comptage[i][l] = 0
     gl.tempo['shot'].reset()
     print("\n\nInitialisation de get_shot\n")
-    
-def convert_to_json_init():
-    """Pour créer les json"""
-    
-    gl.FPS = gl.conf["midi"]["fps"]
-    gl.json_file_nbr = 0
 
+
+def convert_to_json_init():
+    """Valable pour les FPS letters et IA
+    letters va dans json_fps_60
+    IA      va dans json_fps_17"""
+    
     midi = gl.letters_dir + "/midi/music"
     extentions = [".midi", "mid", "kar", "Mid", "MID"]
     gl.all_midi_files = get_file_list(midi, extentions)
     print("Nombre de fichiers à convertir:", len(gl.all_midi_files))
+    
+    if gl.phase == "get json letters":
+        gl.FPS = gl.conf["midi"]["fps"]
+
+    if gl.phase == "get json IA":
+        gl.FPS = gl.conf["json_to_image"]["fps"]
+
+    # Numéro du fichier en cours
+    gl.json_file_nbr = 0
     
     # Pour la fin de la conversion
     gl.convert_to_json_end = 1
     gl.conversion = None
 
 
-def get_json_for_image():
-    """Charge le json à transformer en image"""
+def create_json_to_image_directory():
+    """Un dossier json_to_image dans letters
+    et un sous dossiers par morceau.
+    """
 
-    a = gl.conf["json_to_image"]["json_file_nbr"]
-    gl.midi_json = gl.conf["json_to_image"]["json_file"][a]
+    # Création du dossier si n'existe pas
+    gl.tools.create_directory(gl.json_to_image_directory)
+
+    # Sous dossiers
+    for f in gl.json_list:
+        gl.json_to_image_directory + 1
+
+
+def set_variable_from_json_for_conversion_to_image():
+    """Récup des infos des json à convertir en image"""
+
+
+    gl.midi_json = ""
 
     # Suppression de l'extension
     filename = Path(gl.midi_json).with_suffix('').name
     print("\nFichier midi en cours:", filename, "\n\n")
 
     # Création du sous dossier
-    gl.json_to_image_sub_directory = gl.json_to_image_directory + "/" + str(filename)
+    gl.json_to_image_sub_directory = gl.json_to_image_directory +\
+                                     "/" + str(filename)
     gl.tools.create_directory(gl.json_to_image_sub_directory)
-    
+
     with open(gl.midi_json) as f:
         data = json.load(f)
 
     gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
     gl.instruments = data["instruments"]  # [instrument_1.program, ...
     gl.partition_nbr = len(gl.partitions)
-    
+
     # Pour choix 2 et 3 et 5
     fonts_shuffle()
-    
+
     print("Nombre d'instrument:", len(gl.instruments))
     for instr in gl.instruments:
-        print('    Bank: {:>1} Number: {:>3} Drum: {:>1} Name: {:>16}'.format(instr[0][0], instr[0][1], instr[1], instr[2]))
+        print('    Bank: {:>1} Number: {:>3} Drum: {:>1} Name: {:>16}'.\
+              format(instr[0][0], instr[0][1], instr[1], instr[2]))
     print("\n\n")
 
 
@@ -419,34 +446,42 @@ def write_instruments_text():
     for instr in gl.instruments:
         # [[0, 39], false, '']
         data += str(instr[0][0]) + " " + str(instr[0][1]) + "\n"
-        
+
     fichier = gl.json_to_image_sub_directory + "/instruments.txt"
 
     # Ecriture
     gl.tools.write_data_in_file(data, fichier, "w")
     print("Fichier créé:", fichier)
 
-    
-def json_to_image_init():
-    """Idem get_shot mais avec un json de la liste"""
 
-    # Dossier des images
+def json_to_image_init():
+    """"""
+
+    # Main directory with images
+    gl.json_to_image_directory = "../json_to_image_shot"
+
+    # Récup de la liste des json à convertir en image
+    json_list = get_file_list(gl.json_to_image_directory, [".json"])
+
+    # Dossiers des images
     create_json_to_image_directory()
 
-    # Récup du json en cours
-    get_json_for_image()
+    for json_file in json_list:
+        get_json_for_conversion_to_image()
 
-    # Fichier text
-    write_instruments_text()
-            
+        # Fichier text
+        write_instruments_text()
+
+    set_variable_from_json_for_conversion_to_image()
+
     gl.phase = "json to image"
-    
+
 
 def get_obj_num():
     """Dict de correspondance nom de l'objet:numéro"""
 
     gl.letters_num = {}
-    
+
     lines = gl.tools.read_file("./scripts/obj.names")
     # Les lignes en list
     lines = lines.splitlines()
@@ -455,10 +490,10 @@ def get_obj_num():
 
 
 def set_video():
-    gl.plane = gl.all_obj["Plane.002"]
+    gl.plane = gl.all_obj["Video"]
     # identify a static texture by name
     matID = texture.materialID(gl.plane, 'MAblack')
-    
+
     # create a dynamic texture that will replace the static texture
     gl.my_video = texture.Texture(gl.plane, matID)
 
@@ -469,13 +504,13 @@ def set_video():
         print('Movie =', movie)
     except:
         print("Une video valide doit être définie !")
-            
+
     try:
         s = os.path.getsize(movie)
         print("Taille du film:", s)
     except:
         print("Problème avec la durée du film !")
-    
+
     gl.my_video.source = texture.VideoFFmpeg(movie)
     gl.my_video.source.scale = False
 
@@ -484,11 +519,11 @@ def set_video():
 
     # Vitesse normale: < 1 ralenti, > 1 accélère
     gl.my_video.source.framerate = 1.4
-    
+
     # quick off the movie, but it wont play in the background
     gl.my_video.source.play()
 
-    
+
 def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""
 
@@ -496,19 +531,19 @@ def main():
 
     # Le couteau suisse
     gl.tools = MyTools()
-    
+
     # Récupération de la configuration
     get_conf()
     set_variable()
     set_tempo()
 
-    # Numéro de toutes les lettres entre 0 et 399   
+    # Numéro de toutes les lettres entre 0 et 399
     get_obj_num()
-    
+
     # Carrés en dehors de la vue caméra
     set_all_letters_position()
 
     intro_init()
-    
+
     # Pour les mondoshawan
     print("Initialisation du jeu terminée\n\n")

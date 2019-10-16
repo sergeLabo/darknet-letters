@@ -60,9 +60,9 @@ class BlurAndConvert:
 
         # Images png
         self.all_png_files = self.mt.get_all_files_list(self.shot, '.png')
-        print("Nombre de fichiers à contrôler:", len(self.all_png_files))
+        print("Nombre de fichiers à convertir:", len(self.all_png_files))
         if len(self.all_png_files) == 0:
-            print("\n\nPas d'images à contrôler")
+            print("\n\nPas d'images à convertir")
             print("Créer les images avant !")
             os._exit(0)
 

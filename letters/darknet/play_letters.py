@@ -46,12 +46,13 @@ from analyse_play_midi import OneInstrumentPlayer
 from pymultilame import MyConfig, MyTools
 
 
-JSON_TO_IMAGE = "../json_to_image/cougourdoun-nicola"
-
-
 class YOLO:
 
     def __init__(self):
+        """Les images à convertir en musique"""
+        
+        JSON_TO_IMAGE = CONF(["json_to_image"]["json_files")
+        
         self.mt = MyTools()
         self.loop = 1
 

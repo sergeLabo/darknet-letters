@@ -49,6 +49,9 @@ import fluidsynth
 # Le package (dossier) my_pretty_midi est dans le dossier de ce script
 import my_pretty_midi
 
+# Mon package perso
+from pymultilame import MyTools
+
 
 class AnalyseMidi:
     """Analyse le fichier midi,
@@ -58,6 +61,10 @@ class AnalyseMidi:
 
     partitions = liste des partitions
     instruments = liste des instruments soit objet avec .program et .name
+
+    L'enregistrement des json avec chemins absolus ne marche que pour letters
+
+    Sous répertoires et sous sous répertoires possible dans /music
     """
 
     def __init__(self, midi_file, FPS):
@@ -74,6 +81,7 @@ class AnalyseMidi:
         self.instruments = None
         self.instruments = []
         self.partitions = []
+        self.mytools = MyTools()
 
         # Pour gérer les threads dans blender
         self.end = 0
@@ -235,7 +243,8 @@ class AnalyseMidi:
 
         midi dans /media/data/3D/projets/darknet-letters/letters/midi/music
                      sous dossiers possible
-        json dans /media/data/3D/projets/darknet-letters/letters/midi/json
+        json dans /media/data/3D/projets/darknet-letters/letters/midi/json_fps
+        et sous dossiers
         """
 
         # Analyse du midi
@@ -245,17 +254,82 @@ class AnalyseMidi:
         json_data = {}
         json_data["partitions"] = self.partitions
         json_data["instruments"] = self.instruments
-
-        json_name = get_json_name(self.midi_file)
-
+        
+        # Save du json
+        json_name = self.get_json_name()
         with open(json_name, 'w') as f_out:
             json.dump(json_data, f_out)
         print('Enregistrement de:', json_name)
 
         # Pour Blender
         self.end = 1
+    
+    def get_json_name(self):
+        """Le fichier midi_file est le chemin relatif du fichier dans :
+        ./midi/music/
+             ou 
+        ./midi/music/non_git/
 
+        Le json sera dans le dossier 
+        ./midi/json_60/
+        ou
+        ./midi/json_60/non_git/
+        """
 
+        # Remplacement de l'extension .midi en .json
+        filename = Path(self.midi_file).with_suffix(".json")
+        filename = str(filename)
+        
+        # Remplacement de music par json
+        json_name = filename.replace("music/",
+                                     "json_fps_" + str(self.FPS) + "/")
+
+        print("Nom du fichier json", json_name)
+        
+        # Crée les dossiers et sous dossiers
+        self.create_directories(json_name)
+        
+        return json_name
+
+    def create_directories(self, json_name):
+        """
+        json_name converti en absolu pour valable ici ou dans blender
+
+        json_name = /med/da/3D/pr/dark/let/midi/json_fps_17/toto.json
+                                        5
+        json_fps =  /med/da/3D/pr/dark/let/midi/json_fps_17/oui/toto.json
+                                                    7
+        """
+
+        json_name_abs = Path(json_name).absolute()
+        print("json_name en abs parts", json_name_abs.parts)
+        
+        # json_17 doit toujours exister, si existe on passe
+        index_midi = json_name_abs.parts.index("midi")
+
+        # Bidouille pour agréger les parts
+        a = Path(json_name_abs.parts[0])
+        b = json_name_abs.parts[1:index_midi + 2]
+        json_fps = a.joinpath(*b)
+        
+        # json_fps = Chemin absolu de json_fps
+        self.mytools.create_directory(json_fps)
+
+        # Sous répertoires
+        if len(json_name_abs.parts) - index_midi == 4:
+            sd_fin = json_name_abs.parts[1:index_midi + 3]
+            sd = a.joinpath(*sd_fin)
+            print("Sous dossier", sd)
+            self.mytools.create_directory(sd)
+            
+        # Sous sous répertoires
+        if len(json_name_abs.parts) - index_midi == 5:
+            ssd_fin = json_name_abs.parts[1:index_midi + 4]
+            ssd = a.joinpath(*ssd_fin)
+            print("Sous sous dossier", ssd)
+            self.mytools.create_directory(ssd)
+
+            
 class PlayMidi:
     """oip = OneInstrumentPlayer(fonts, channel, bank, bank_number)
     oip.play_note(note, volume)
@@ -557,29 +631,6 @@ class PlayJsonFile:
         
         print("\nFin du morceau:", self.midi_json.split("/")[-1])
 
-
-def get_json_name(midi_file):
-    """Le fichier midi_file est le chemin relatif du fichier dans :
-    ./midi/music/
-         ou 
-    ./midi/music/pas_pour_github/
-
-    Le json sera dans le dossier 
-    ./midi/json/
-    ou
-    ./midi/json/pas_pour_github/
-    """
-
-    # Remplacement de l'extension .midi en .json
-    filename = Path(midi_file).with_suffix(".json")
-    filename = str(filename)
-
-    # Remplacement de music par json
-    # TODO possible avec Path ?
-    json_name = filename.replace("music/", "json/")
-    
-    return json_name
-
         
 def get_channel(instruments):
     """16 channel maxi
@@ -720,8 +771,11 @@ def play_all_midi_files(FPS, fonts):
         
 if __name__ == '__main__':
 
-    # FPS de 10 (trop petit) à 100 (très bien), 60 dans Blender
-    FPS = 60
+    # FPS de 17 pour IA, 60 pour letters
+    FPS = 17
+
+    # Création des json
+    create_all_json("./music/", FPS)
     
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
@@ -733,17 +787,14 @@ if __name__ == '__main__':
     # #midi_file = "./music/pas_pour_github/Capri.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)
 
-    # ## Play un midi
-    mf = "axel_f-crazy_frog.mid"
-    midi_file = "./music/pas_pour_github/" + mf
-    PlayMidi(midi_file, FPS, fonts)
+    # Play un midi
+    # #mf = "axel_f-crazy_frog.mid"
+    # #midi_file = "./music/pas_pour_github/" + mf
+    # #PlayMidi(midi_file, FPS, fonts)
 
     # ## Play de tous les midi
     # #play_all_midi_files(FPS, fonts)
-        
-    # ## Création des json
-    # #create_all_json("./music/", FPS)
-    
+            
     # ## Joue les json
     # #play_all_json("./json/pas_pour_github", FPS, fonts)
 
@@ -757,3 +808,25 @@ if __name__ == '__main__':
     # #pjm = PlayJsonFile(json_file, 17, fonts)
     # #pjm.play()
     # #del pjm
+
+
+        # #json_name_rel_parts = json_name_abs.parts[ind + 1:]
+        # #print("json_name en rel parts", json_name_rel_parts)
+        
+        # ## json_17 doit toujours exister, si existe on passe
+        # #print("Création du répertoire", json_name_rel_parts[0])
+        # #self.mytools.create_directory(json_name_rel_parts[0])
+
+        # ## Sous répertoires
+        # #if len(json_name_rel_parts) == 3:
+            # #print("sous dossier")
+            # #a = json_name_rel_parts[0] + "/" + json_name_rel_parts[1]
+            # #self.mytools.create_directory(a)
+            
+        # ## Sous sous répertoires
+        # #if len(json_name_rel_parts) == 4:
+            # #print("sous sous dossier")
+            # #a = json_name_rel_parts[0] + "/" \
+                # #+ json_name_rel_parts[1] + "/" \
+                # #+ json_name_rel_parts[2] 
+            # #self.mytools.create_directory(a)
