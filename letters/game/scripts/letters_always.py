@@ -261,7 +261,6 @@ def main_json_to_image():
         frame_notes = get_frame_notes()
         notes = get_notes(frame_notes)
         display_frame_notes(notes)
-        print("notes :", notes)
 
         # Décalage des lettres non jouées
         hide_unplayed_letters()
@@ -280,18 +279,10 @@ def main_json_to_image():
     if gl.tempo['shot'].tempo == int(4*tempo/5):  # 40 sur 50
         convert_to_jpg_and_delete_png(gl.png)
 
-    # Fin du jeu
+    # Fin du json
     end()
 
     
-def new_json():
-    """Bascule sur le fichier json à convertir en images suivant."""
-
-    if gl.phase == "":
-        print("\nJson suivant à convertir")
-        json_to_image_init()()
-
-        
 def video_refresh():
     """call this function every frame to ensure update of the texture."""
     gl.my_video.refresh(True)
@@ -628,7 +619,7 @@ def kill():
                 gl.instruments_player[i].stop_audio()
                 sleep(0.1)
     except:
-        print("Erreur dans stop des fluidsynth.Synth()")
+        print("Pas de player audio à arrêter\n")
 
     # Il faut laisser du temps au temps
     sleep(1)
@@ -721,11 +712,9 @@ def keyboard():
         
     # conversion d'un json en image
     elif gl.keyboard.events[events.PAD5] == gl.KX_INPUT_JUST_ACTIVATED:
-        print("Conversion d'un json en image")
-        gl.phase = "json to image"
-        kill()   
+        print("Conversion d'un json en image") 
         json_to_image_init()
-        
+         
     # Help
     elif gl.keyboard.events[events.HKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de help")
@@ -940,10 +929,12 @@ def end():
         gl.endGame()
 
     # Fin de la partition
-    if gl.numero >= len(gl.partitions[0]):
-        gl.endGame()
-
-    # Limitation du nombre d'image
-    if gl.phase == "json to image":
-        if gl.numero >= 2000:
+    if gl.partitions:  # bug
+        if gl.numero >= len(gl.partitions[0]):
             gl.endGame()
+
+    # Limitation du nombre d'images pour test
+    if gl.phase == "json to image":
+        if gl.numero >= gl.conf["json_to_image"]["images_nbr"]:
+            print("Fin de la conversion du json en images")
+            json_to_image_init()

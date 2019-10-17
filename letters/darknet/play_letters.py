@@ -48,10 +48,9 @@ from pymultilame import MyConfig, MyTools
 
 class YOLO:
 
-    def __init__(self):
-        """Les images à convertir en musique"""
+    def __init__(self, images_directory):
         
-        JSON_TO_IMAGE = CONF(["json_to_image"]["json_files")
+        self.images_directory = images_directory
         
         self.mt = MyTools()
         self.loop = 1
@@ -115,7 +114,7 @@ class YOLO:
         """
         self.canaux = []
 
-        file_name = JSON_TO_IMAGE + "/instruments.txt"
+        file_name = self.images_directory + "/instruments.txt"
         data = self.mt.read_file(file_name)
         lines = data.splitlines()
         for line in lines:
@@ -126,15 +125,16 @@ class YOLO:
         """Crée les players pour chaque canal"""
         
         for i in range(len(self.canaux)):
-            # Les drums ne sont pas sur le channel,
-            # complique et sert à rien
-            channel = i
-            bank = int(self.canaux[i][0])
-            bank_number = int(self.canaux[i][1])
-            self.player[i] = OneInstrumentPlayer(self.fonts,
-                                                 channel,
-                                                 bank,
-                                                 bank_number)
+            if i < 10:
+                # Les drums ne sont pas sur le channel,
+                # complique et sert à rien
+                channel = i
+                bank = int(self.canaux[i][0])
+                bank_number = int(self.canaux[i][1])
+                self.player[i] = OneInstrumentPlayer(self.fonts,
+                                                     channel,
+                                                     bank,
+                                                     bank_number)
         print("Nombre de player:", len(self.player))
             
     def play_notes(self, notes):
@@ -153,13 +153,19 @@ class YOLO:
 
         # play des nouvelles notes
         for note in notes:
-            if 0 < note[0] < 127:
-                if 0 < note[2] < len(self.canaux):
-                    print(note[2], note[0])
-                    if not self.player[note[2]].thread_dict[note[0]]:
-                        vol = note[1]
-                        if vol < 50: vol = 100
-                        self.player[note[2]].thread_play_note(note[0], vol)
+            
+            player = note[2]
+            la_note = note[0]
+            vol = note[1]
+            
+            if 0 < la_note < 127:
+                if 0 < player < len(self.canaux):
+                    if not self.player[player].thread_dict[la_note]:
+                        # #if vol < 50:
+                            # #vol = 100
+                        print("Player: {:>2} note: {:>3} volume: {:>3}"\
+                                .format(player, la_note, vol))
+                        self.player[player].thread_play_note(la_note, vol)
 
     def create_trackbar(self):
         """
@@ -170,14 +176,17 @@ class YOLO:
         cv2.namedWindow('Reglage')
         self.reglage_img = np.zeros((10, 1000, 3), np.uint8)
 
-        cv2.createTrackbar('threshold', 'Reglage', 0, 100, self.onChange_thresh)
-        cv2.createTrackbar('hier_thresh', 'Reglage', 0, 100, self.onChange_hier_thresh)
-        cv2.createTrackbar('nms', 'Reglage', 0, 100, self.onChange_nms)
+        cv2.createTrackbar('threshold__', 'Reglage', 0, 100,
+                                            self.onChange_thresh)
+        cv2.createTrackbar('hier_thresh', 'Reglage', 0, 100,
+                                            self.onChange_hier_thresh)
+        cv2.createTrackbar('nms', 'Reglage', 0, 100,
+                                            self.onChange_nms)
 
     def set_init_tackbar_position(self):
         """setTrackbarPos(trackbarname, winname, pos) -> None"""
 
-        cv2.setTrackbarPos('threshold', 'Reglage', self.thresh)
+        cv2.setTrackbarPos('threshold__', 'Reglage', self.thresh)
         cv2.setTrackbarPos('hier_thresh', 'Reglage', self.hier_thresh)
         cv2.setTrackbarPos('nms', 'Reglage', self.nms)
 
@@ -207,13 +216,14 @@ class YOLO:
 
     def get_sorted_shot_list(self):
 
-        fli = self.mt.get_all_files_list(JSON_TO_IMAGE, ".jpg")
+        fli = self.mt.get_all_files_list(self.images_directory, ".jpg")
 
         shot_list = [0]*len(fli)
         for image in fli:
-            # ../json_to_image/s_j_to_i_2677.jpg s_j_to_i_2677.jpg
+            # ../json_to_image/s_j_to_i_2677.jpg devient s_j_to_i_2677.jpg
             nbr = image.split("/")[-1].split("_")[-1][:-4]  # 2677
-            shot_list[int(nbr)-60] = image
+            # TODO Bug si images supprimées dans le dossier
+            shot_list[int(nbr)] = image
 
         return shot_list
 
@@ -221,11 +231,13 @@ class YOLO:
         """FPS = 162 sur MSI sans détection: lecture + affichage = 6 ms"""
 
         shot_list = self.get_sorted_shot_list()
-        i = 0
+        i = 200
         fps = 0
         print("Nombre d'images:", len(shot_list))
         t_init = time.time()
 
+        print("Dossier:", self.images_directory)
+        
         while self.loop:
             name = shot_list[i]
             i += 1
@@ -237,7 +249,7 @@ class YOLO:
                 fps = 0
 
             # Capture des positions des sliders
-            self.thresh = cv2.getTrackbarPos('threshold','Reglage')
+            self.thresh = cv2.getTrackbarPos('threshold__','Reglage')
             self.hier_thresh = cv2.getTrackbarPos('hier_thresh','Reglage')
             self.nms = cv2.getTrackbarPos('nms','Reglage')
 
@@ -473,7 +485,7 @@ def cvDrawBoxes(detections, img):
     """
     letters = []
     for detection in detections:
-        print(detection)
+        # print(detection)
         # La lettre détectée
         lettre = detection[0].decode("utf-8")
 
@@ -493,7 +505,7 @@ def cvDrawBoxes(detections, img):
             # + " [" + str(round(detection[1] * 100, 2)) + "]"
             t = lettre[5:]
             # img=cv.putText(img, text, org, fontFace, fontScale,
-            #                color[, thickness[, lineType[, bottomLeftOrigin]]])
+            #              color[, thickness[, lineType[, bottomLeftOrigin]]])
             cv2.putText(img,
                         t,
                         (pt1[0], pt1[1] - 5),
@@ -524,21 +536,13 @@ def crop(img):
 
 if __name__ == "__main__":
 
-    # #note = 123
-    # #casse = "min"
-    # #c, d, u = conversion(note, casse)
-    # #print(c, d, u)
-    # #f = "5"
-
-    # #letters = []
-    # #for l in [c, d, u]:
-        # #if l:
-            # #a = "font_" + f + "_" + l
-            # #print(a)
-            # #letters.append(a)
-
-    # #print("letters", letters)
-    # #letters_to_notes(letters)
-
-    yolo = YOLO()
-    yolo.detect()
+    # Dossier des dossiers des images à convertir en musique
+    dossier = CONF["play_letters"]["dossier"]
+    
+    sd_list = [x[0] for x in os.walk(dossier)]
+    print("Liste des sous dossiers:", sd_list)
+    for sd in sd_list:
+        if sd != "../json_to_image_shot":
+            print("Répertoire:", sd)
+            yolo = YOLO(sd)
+            yolo.detect()

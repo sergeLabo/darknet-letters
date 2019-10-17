@@ -25,6 +25,7 @@ ttfs/
 pngs/
 fonts_chooser/
 ttf_to_png/
+json_to_image_shot/
 
 # darknet
 *.conv.*
