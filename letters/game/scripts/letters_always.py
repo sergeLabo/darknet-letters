@@ -915,10 +915,6 @@ def set_sun_color_energy():
     gl.sun.energy = uniform(1, 4)
     
     color = uniform(0.5, 1.0), uniform(0.5, 1.0), uniform(0.5, 1.0)
-    # #print("sun", round(gl.sun.energy, 2),
-                 # #round(color[0], 2),
-                 # #round(color[1], 2),
-                 # #round(color[2], 2))
     gl.sun.color = color
 
                  

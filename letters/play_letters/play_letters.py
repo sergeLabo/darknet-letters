@@ -174,7 +174,7 @@ class YOLO:
         nms               min 0 max 1
         """
         cv2.namedWindow('Reglage')
-        self.reglage_img = np.zeros((10, 1000, 3), np.uint8)
+        self.reglage_img = np.zeros((10, 600, 3), np.uint8)
 
         cv2.createTrackbar('threshold__', 'Reglage', 0, 100,
                                             self.onChange_thresh)
@@ -243,8 +243,8 @@ class YOLO:
             i += 1
             fps += 1
             ta = time.time()
-            if ta > t_init + 1:
-                print("FPS =", fps)
+            if ta > t_init + 5:
+                print("FPS =", round(fps/5, 1))
                 t_init = time.time()
                 fps = 0
 
@@ -274,7 +274,7 @@ class YOLO:
             notes = letters_to_notes(letters)
             self.play_notes(notes)
 
-            image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
+            image = cv2.resize(image, (900, 900), interpolation=cv2.INTER_LINEAR)
             # Affichage du Semaphore
             cv2.imshow('Letters', image)
             # Affichage des trackbars
