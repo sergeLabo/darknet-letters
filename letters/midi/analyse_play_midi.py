@@ -771,8 +771,8 @@ def play_all_midi_files(FPS, fonts):
         
 if __name__ == '__main__':
 
-    # FPS de 17 pour IA, 60 pour letters
-    FPS = 17
+    # FPS de 35 pour IA, 60 pour letters
+    FPS = 35
 
     # Création des json
     create_all_json("./music/", FPS)

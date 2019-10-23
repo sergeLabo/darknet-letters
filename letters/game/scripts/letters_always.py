@@ -246,6 +246,9 @@ def main_json_to_image():
 
     # Aggrandissement de la fenêtre
     render.setWindowSize(gl.shot_size, gl.shot_size)
+
+    # Avance de la video
+    #video_refresh()
     
     gl.all_obj['Cube'].visible = False
     gl.all_obj["brouillard"].visible = True
@@ -315,22 +318,15 @@ def get_frame_notes():
     if gl.frame < len(gl.partitions[0]):
         for partition in gl.partitions:
             frame_notes.append(partition[gl.frame])
-            
-        # Création d'image sans objet 1 fois sur 100, 22000->220
-        if gl.phase == "get shot":
-            if gl.frame % 100 == 10:
-                print("Frame sans lettre !")
-                frame_notes = []
                 
         gl.frame += 1
         
     # Le morceaux est fini
     else:
         if gl.phase == "get shot":
-            # Relance de get_shot.json à une frame au hazard
-            gl.frame = randint(0, 200)
-            print("Relance à:", gl.frame)
-            frame_notes = []
+            # Fin
+            print("Fin de get_shot.json")
+            os._exit(0)
         if gl.phase == "music and letters":    
             # Kill de tous les threads et restart sur nouvelle musique
             new_music()
@@ -535,7 +531,7 @@ def save_json_to_image_shot():
 
 def convert_to_jpg_and_delete_png(png):
 
-    sleep(0.05)
+    sleep(0.10)
     img = cv2.imread(png)
 
     # Flou
@@ -546,7 +542,7 @@ def convert_to_jpg_and_delete_png(png):
     
     cv2.imwrite(jpg, img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
     print("        Conversion:", jpg)
-    sleep(0.05)
+    sleep(0.10)
 
     # Effacement du png
     os.remove(png)
@@ -555,9 +551,8 @@ def convert_to_jpg_and_delete_png(png):
 
 def blur(img):
     # Flou
-    k = int(gl.conf["json_to_image"]["blur"])
-    if k != 0:
-        img = cv2.blur(img, (k, k))
+    if gl.blur != 0:
+        img = cv2.blur(img, (gl.blur, gl.blur))
     return img
 
         
@@ -911,10 +906,14 @@ def set_letter_unvisible(lettre):
 
 
 def set_sun_color_energy():
-
-    gl.sun.energy = uniform(1, 4)
     
-    color = uniform(0.5, 1.0), uniform(0.5, 1.0), uniform(0.5, 1.0)
+    # Puissance de l'éclairage
+    gl.sun.energy = uniform(gl.sun_energy_min, gl.sun_energy_max)
+
+    # Couleur de l'éclairage
+    a = gl.sun_color_min
+    b = gl.sun_color_max
+    color = uniform(a, b), uniform(a, b), uniform(a, b)
     gl.sun.color = color
 
                  

@@ -1,5 +1,0 @@
-classes = 380
-train = data_02/train.txt
-valid = data_02/test.txt
-names = data_02/obj.names
-backup = data_02/backup

@@ -139,6 +139,8 @@ def set_variable():
     # Fond de l'image pour get shot
     gl.fond = gl.conf["blend"]["fond"]
 
+    # Flou pour json_to_image
+    gl.blur = int(gl.conf["json_to_image"]["blur"])
 
 def get_obj_num():
     """Dict de correspondance nom de l'objet:numéro"""
@@ -225,7 +227,7 @@ def get_file_list(directory, extentions):
 
 def get_get_shot_json():
 
-    gl.midi_json = str(LETTERS_DIR) + "/midi/get_shot.json"
+    gl.midi_json = str(LETTERS_DIR) + "/get_json_to_get_shot/get_shot.json"
 
     with open(gl.midi_json) as f:
         data = json.load(f)
@@ -348,6 +350,13 @@ def get_shot_init():
     print("\n\nInitialisation de get_shot\n")
 
 
+def get_sun_set():
+    gl.sun_energy_min = float(gl.conf["blend"]["sun_energy_min"])
+    gl.sun_energy_max = float(gl.conf["blend"]["sun_energy_max"])
+    gl.sun_color_min = float(gl.conf["blend"]["sun_color_min"])
+    gl.sun_color_max = float(gl.conf["blend"]["sun_color_max"])
+
+
 def convert_to_json_init():
     """Valable pour les FPS letters et IA
     letters va dans json_fps_60
@@ -428,13 +437,19 @@ def get_midi_json():
     all_json = gl.tools.get_all_files_list(js, ".json")
     # Tri des json alpha
     all_json = sorted(all_json)
-
+    #print("Tous les json:", all_json)
+    
     if gl.phase == "music and letters":
         # Reset de gl.nbr si fini
         if gl.nbr >= len(all_json):
             gl.nbr = 0
+            
     if gl.phase == "json to image":
-        print(gl.nbr, len(all_json))
+        if all_json == []:
+            print("Pas de fichier json à convertir en images")
+            os._exit(0)
+        if gl.nbr >= len(all_json):
+            gl.nbr = 0
         if gl.nbr == len(all_json):
             print("Fin des conversions")
             gl.phase == "intro"
@@ -443,7 +458,7 @@ def get_midi_json():
     gl.midi_json = all_json[gl.nbr]
     
     name = gl.midi_json.split("/")[-1]
-    print("    ", name[:-5], "\n")
+    print("\n    Fichier en cours", name[:-5], "\n")
     
     # Enregistrement du numéro du prochain fichier à lire
     if gl.phase == "music and letters":
@@ -506,6 +521,7 @@ def main():
     get_conf()
     set_variable()
     set_tempo()
+    get_sun_set()
 
     # Numéro de toutes les lettres entre 0 et 399
     get_obj_num()

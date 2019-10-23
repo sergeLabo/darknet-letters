@@ -12,9 +12,9 @@ elle est créée à la compilation des sources de darknet
 et se trouve dans ce dossier.
 
 Les fichiers:
-    - yolov3.cfg
-    - yolov3_best.weights
-    - obj.data
+    configpath
+    weightpath
+    metapath
 sont à définir dans letters.ini
 """
 
@@ -158,7 +158,7 @@ class YOLO:
             la_note = note[0]
             vol = note[1]
             
-            if 0 < la_note < 127:
+            if 0 < la_note < 128:
                 if 0 < player < len(self.canaux):
                     if not self.player[player].thread_dict[la_note]:
                         # #if vol < 50:
@@ -228,7 +228,7 @@ class YOLO:
         return shot_list
 
     def detect(self):
-        """FPS = 162 sur MSI sans détection: lecture + affichage = 6 ms"""
+        """FPS = 35 sur GTX1060"""
 
         shot_list = self.get_sorted_shot_list()
         i = 200
@@ -485,7 +485,6 @@ def cvDrawBoxes(detections, img):
     """
     letters = []
     for detection in detections:
-        # print(detection)
         # La lettre détectée
         lettre = detection[0].decode("utf-8")
 
@@ -494,9 +493,9 @@ def cvDrawBoxes(detections, img):
             letters.append(lettre)
 
             x, y, w, h = detection[2][0],\
-                detection[2][1],\
-                detection[2][2],\
-                detection[2][3]
+                            detection[2][1],\
+                            detection[2][2],\
+                            detection[2][3]
             xmin, ymin, xmax, ymax = convertBack(float(x), float(y),
                                                  float(w), float(h))
             pt1 = (xmin, ymin)
@@ -542,7 +541,17 @@ if __name__ == "__main__":
     sd_list = [x[0] for x in os.walk(dossier)]
     print("Liste des sous dossiers:", sd_list)
     for sd in sd_list:
+        # Pas le dossier principal
         if sd != "../json_to_image_shot":
-            print("Répertoire:", sd)
-            yolo = YOLO(sd)
-            yolo.detect()
+            
+            if "boney" in sd:
+                print("Répertoire:", sd)
+                yolo = YOLO(sd)
+                yolo.detect()
+                for i in range(10):
+                    for key in range(128):
+                        try:
+                            yolo.player[i].thread_dict[key] = 0
+                        except:
+                            pass
+                time.sleep(1)
