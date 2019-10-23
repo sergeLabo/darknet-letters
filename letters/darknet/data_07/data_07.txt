@@ -1,0 +1,68 @@
+diff yolov3-tiny_3l.cfg yolov3-tiny_3l_07.cfg
+7,9c7,9
+< subdivisions=16
+< width=608
+< height=608
+---
+> subdivisions=8
+> width=416
+> height=416
+17c17
+<
+---
+> flip=0
+20c20
+< max_batches = 200000
+---
+> max_batches=50000
+22c22
+< steps=180000,190000
+---
+> steps=40000,45000
+128c128
+< filters=21
+---
+> filters=1155
+131,132d130
+<
+<
+136c134
+< classes=2
+---
+> classes=380
+172c170
+< filters=21
+---
+> filters=1155
+178c176
+< classes=2
+---
+> classes=380
+216c214
+< filters=21
+---
+> filters=1155
+222c220
+< classes=2
+---
+> classes=380
+227c225
+< random=1
+\ Pas de fin de ligne à la fin du fichier
+---
+> random=1
+
+
+    size_min = 0.9
+    size_max = 1.2
+    shot_size = 416
+    blur_mini = 3
+    blur_maxi = 7
+    letters_scale = 1.07
+    sun_energy_min = 3
+    sun_energy_min = 4
+    sun_color_min = 0.6
+    sun_color_max = 1.0
+    police 0 en blanc au lieu de gris clair
+    les lettres sont plus grandes
+    le sun plus fort
