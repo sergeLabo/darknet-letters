@@ -1,0 +1,1298 @@
+bob_marley-no_woman_no_cry.mid
+
+ 8 118 True 
+ 0 17 False 
+ 0 32 False 
+
+Nombre d'instruments: 3
+
+
+
+
+Rocky-Eye_Of_The_Tiger_by_Survivor.mid
+
+ 0 33 False DIGITAL BASS        
+ 0 32 False BASS                
+ 0 28 False Rhythm Guitar       
+ 0 0 False Rhythm Keyboard     
+ 0 30 False Lead Guitar         
+ 0 48 False Strings             
+ 8 116 True Kick (36)           
+ 0 118 True Snare 2 (40)        
+ 8 117 True Closed HH (42)      
+ 0 117 True LOW Tom (41)        
+ 0 119 True Tamborine (54)      
+ 8 118 True Crash (49)          
+
+Nombre d'instruments: 12
+
+
+
+
+Itsi_bitsi_petit_bikini-Dalida.mid
+
+ 0 112 True DRUM R-8            
+ 0 3 False BASS S-330          
+ 0 64 False FANTASY D-110       
+ 0 79 False BRASS D-50          
+ 0 61 False PIANO MKS-20        
+ 0 11 False GUITARE PROTEUS     
+ 0 7 False GUITARE PROTEUS     
+ 0 0 False Mel
+ 0 118 True tom10               
+
+Nombre d'instruments: 9
+
+
+
+
+La panthere rose.mid
+
+ 0 0 False Piano  1
+ 0 32 False Basse  2
+ 0 26 False Guitjaz3
+ 0 66 False SaxTen 4
+ 0 48 False Cordes 5
+ 0 73 False Flute  6
+ 0 59 False TrompMu7
+ 0 56 False Trompet8
+ 0 56 False Trompet9
+ 0 115 True Drums 10
+ 0 65 False SaxAlt11
+ 0 57 False Tromb 12
+ 0 11 False Vibra 13
+
+Nombre d'instruments: 13
+
+
+
+
+Addams_Family.mid
+
+ 0 6 False Clavinet
+ 0 26 False Harpsichod
+ 0 6 False Harpsichod
+ 0 32 False Bass
+ 0 34 False Bass
+ 0 112 True Percussion
+ 0 116 True Drums
+
+Nombre d'instruments: 7
+
+
+
+
+X_Files_The_Movie.mid
+
+ 0 114 True The X Files
+ 0 0 False The X Files
+ 0 90 False The X Files
+ 0 33 False The X Files
+ 0 78 False The X Files
+ 0 119 False The X Files
+ 0 50 False The X Files
+ 0 94 False The X Files
+ 0 91 False The X Files
+ 0 49 False The X Files
+ 0 70 False The X Files
+
+Nombre d'instruments: 11
+
+
+
+
+gaynor_i_will_survive.mid
+
+ 0 65 False Piste 01
+ 0 0 False Séparer 01
+ 0 61 False Séparer 02
+ 0 45 False Séparer 03
+ 0 48 False Séparer 04
+ 0 46 False Séparer 05
+ 0 34 False Séparer 06
+ 0 113 True Séparer 07
+
+Nombre d'instruments: 8
+
+
+
+
+Voyages, voyages.mid
+
+ 0 1 False voix
+ 0 1 False Track 7
+ 0 35 False Bajo
+ 0 48 False VIOLINES
+ 0 89 False Calliope
+ 0 27 False Guitar
+ 0 82 False Track 12
+ 0 18 False Track 12
+ 0 88 False Track 15
+ 0 117 True Drums
+ 8 117 True Drums
+ 0 117 True Drums
+ 0 117 True Drums
+ 0 119 True Drums
+
+Nombre d'instruments: 14
+
+
+
+
+We are the champions.mid
+
+ 0 116 True Drum                
+ 0 33 False Bass                
+ 0 2 False Piano               
+ 0 73 False Melodie             
+ 0 50 False Strings             
+ 0 11 False Vibe                
+
+Nombre d'instruments: 6
+
+
+
+
+f_bagdad_cafe.mid
+
+ 0 88 False 
+ 0 4 False 
+ 0 71 False 
+ 0 51 False 
+ 0 48 False 
+ 8 117 True 
+ 0 22 False 
+ 0 92 False 
+
+Nombre d'instruments: 8
+
+
+
+
+Alexandrie_Alexandra-.mid
+
+ 0 1 False 
+ 0 33 False 
+ 0 52 False 
+ 0 65 False 
+ 0 25 False 
+ 0 78 False 
+ 0 73 False 
+ 0 48 False 
+ 0 66 False 
+ 0 57 False 
+ 0 115 True 
+ 0 56 False 
+ 0 60 False 
+
+Nombre d'instruments: 13
+
+
+
+
+f_il_etait_une_fois_dans_l_ouest.mid
+
+ 0 22 False 
+ 0 57 False solo des
+ 0 57 False Intro
+ 0 27 False guitar,1e
+ 0 27 False guitar,2e
+ 0 35 False C-bass
+ 0 14 False Tubular bel
+ 0 45 False Pizzicatostr
+ 0 47 False Pauken
+ 0 115 True Bekken
+ 0 48 False 1e stem
+ 0 48 False 2e stem
+ 0 0 False Effect
+ 0 48 False Strings
+ 0 48 False 1e stem
+ 0 52 False 
+ 0 53 False 
+ 0 29 False 
+
+Nombre d'instruments: 18
+
+
+
+
+Laforet-Viens_sur_la_montagne.mid
+
+ 0 65 False Melodie  4
+ 0 32 False Basse Ac 2
+ 0 24 False GuitareAc3
+ 0 53 False Voix Oohs5
+ 0 66 False Choeurs  6
+ 0 119 True Drums    ; Brush
+
+Nombre d'instruments: 6
+
+
+
+
+f_Le_Clan_des_Siciliens.mid
+
+ 0 24 False Guit 
+
+Nombre d'instruments: 1
+
+
+
+
+Gall France - Babacar.mid
+
+ 0 1 False Acc Piano
+ 0 36 False Slapbass1
+ 0 27 False CleanGtr
+ 0 73 False Chant
+ 0 63 False SynBras2
+ 0 66 False TenSax
+ 0 94 False HaloPad
+ 0 12 False Marimba
+ 0 33 False Basse
+ 0 117 True Drums
+ 0 10 False MusicBox
+ 0 54 False SynVoice
+
+Nombre d'instruments: 12
+
+
+
+
+mars attacks.mid
+
+ 0 3 False It's not unusual
+ 0 33 False by Tom Jones
+ 0 27 False Mars Attacks soundtrack
+ 0 28 False Sequenced by
+ 0 30 False Sequenced by
+ 0 57 False © Denis Rionnet
+ 0 61 False http://www.ad-valorem.fr/sph/midi/midi.html
+ 0 60 False http://www.ad-valorem.fr/sph/midi/midi.html
+ 0 59 False drionnet@dtr.fr
+ 0 67 False Dedicated to
+ 0 60 False 
+ 0 69 False 
+ 0 118 True 
+ 0 114 True 
+ 0 114 True 
+ 8 118 True 
+
+Nombre d'instruments: 16
+
+
+
+
+f_le_pont_de_la_riviere_kwai.mid
+
+ 0 78 False River Kwai-Melody
+ 0 56 False Trumpet
+ 0 72 False Piccolo
+ 0 57 False Trombone
+ 0 60 False Horns
+ 0 48 False Strings
+ 0 58 False Tuba
+ 0 53 False Voices
+ 0 114 True Percussion
+
+Nombre d'instruments: 9
+
+
+
+
+f_le_bon_la_brute_et_le_truand.mid
+
+
+Nombre d'instruments: 0
+
+
+
+
+zorro.mid
+
+ 0 65 False Theme From Zorro
+ 0 3 False George Bruns (1957)
+ 0 3 False Tof 4/5/97
+
+Nombre d'instruments: 3
+
+
+
+
+Dassin Joe - L'amerique.mid
+
+ 0 22 False Melody  
+ 0 0 False Piano   
+ 0 52 False Choir   
+ 0 48 False Strings 
+ 0 25 False Gitarre 
+ 0 24 False SoloGit 
+ 0 33 False Bass    
+ 0 113 True Drums   
+
+Nombre d'instruments: 8
+
+
+
+
+J'entends siffler le train.mid
+
+ 0 1 False 
+ 0 32 False 
+ 0 26 False 
+ 0 73 False mélodie
+ 0 27 False 
+ 0 17 False 
+ 0 60 False 
+ 0 53 False 
+ 0 53 False 
+ 0 118 True 
+
+Nombre d'instruments: 10
+
+
+
+
+Supertramp - School.mid
+
+ 0 4 False SCHOOL
+ 0 35 False By
+ 0 1 False SUPERTRAMP
+ 0 21 False Melody Track 1
+ 0 22 False Melody Track 2
+ 0 61 False Filipe MS Bento
+ 0 83 False 17th May 1996
+ 0 90 False Original Sequencing
+ 0 12 False By Rick Davies
+ 0 118 True and Roger Hodgson
+
+Nombre d'instruments: 10
+
+
+
+
+james-bond.mid
+
+ 0 35 False Sequence*Demixed 02
+ 0 11 False Sequence*Demixed 03
+ 0 28 False Sequence*Demixed 04
+ 0 27 False Sequence*Demixed 04
+ 0 65 False Sequence*Demixed 05
+ 0 66 False Sequence*Demixed 05
+ 0 57 False Sequence*Demixed 06
+ 0 60 False Sequence*Demixed 07
+ 0 48 False Sequence*Demixed 08
+ 0 15 False Sequence*Demixed 09
+ 0 27 False Sequence*Demixed 09
+ 0 112 True Sequence*Demixed 10
+ 0 59 False Sequence*Demixed 11
+ 0 28 False Sequence*Demixed 11
+ 0 27 False Sequence*Demixed 11
+ 0 57 False Sequence*Demixed 12
+ 0 67 False Sequence*Demixed 13
+ 0 56 False Sequence*Demixed 14
+ 0 61 False Sequence*Demixed 15
+ 0 127 False Sequence*Demixed 16
+
+Nombre d'instruments: 20
+
+
+
+
+Telephone - Le Jour S'est Leve.mid
+
+ 0 57 False Trombone
+ 0 5 False Chorused Piano
+ 0 84 False Lead 5 (charang)
+ 0 48 False String Ensemble 1
+ 0 49 False String Ensemble 2
+ 0 49 False String Ensemble 2
+ 0 25 False Acoustic Guitar (steel)
+ 0 35 False Fretless Bass
+ 0 28 False Electric Guitar (muted)
+ 0 117 True Batterie
+ 0 52 False Choir Aahs
+
+Nombre d'instruments: 11
+
+
+
+
+Jurassic_Park.mid
+
+ 0 0 False Piano
+ 0 0 False Piano 2
+ 0 48 False Strings
+ 0 48 False Strings 2
+ 0 60 False French Horn
+ 0 56 False Trumpets
+ 0 11 False Concert Bells
+ 0 56 False 2nd Trumpets
+ 0 42 False Cellos
+ 0 43 False Basses
+
+Nombre d'instruments: 10
+
+
+
+
+oh les filles oh les filles.mid
+
+ 0 1 False 
+ 0 32 False 
+ 0 30 False 
+ 0 5 False mélodie
+ 0 18 False 
+ 0 29 False 
+ 0 116 True 
+
+Nombre d'instruments: 7
+
+
+
+
+Laforet-Les_vendanges_de_l_amour.mid
+
+ 0 32 False Track 2
+ 0 0 False Track 3
+ 0 0 False Track 4
+ 0 75 False Track 5
+ 0 48 False Track 6
+ 0 28 False Track 7
+ 0 48 False Track 8
+ 0 112 True Track 9
+
+Nombre d'instruments: 8
+
+
+
+
+Rocky-Gonna_Fly_Now.mid
+
+ 0 114 True 
+ 0 33 False 
+ 0 4 False 
+ 0 65 False 
+ 0 52 False 
+ 0 65 False 
+ 0 52 False 
+ 0 66 False 
+ 0 52 False 
+ 0 66 False 
+ 0 52 False 
+ 0 67 False 
+ 0 56 False 
+ 0 56 False 
+ 0 56 False 
+ 0 56 False 
+ 0 57 False 
+ 0 57 False 
+ 0 57 False 
+ 0 57 False 
+
+Nombre d'instruments: 20
+
+
+
+
+2001-Also_Sprach_Zarathustra_Richard_Strauss.mid
+
+ 0 72 False Piccolo
+ 0 70 False Organ
+ 0 60 False French Horn 4
+ 0 60 False French Horn 1
+ 0 56 False Trumpet 1
+ 0 56 False Tuba
+ 0 57 False Trombone 1
+ 0 48 False Violin 2
+ 0 48 False Cello
+ 0 48 False Violin 1
+ 0 48 False Contrabass
+ 0 47 False Tympani
+ 0 114 True Cymbal
+
+Nombre d'instruments: 13
+
+
+
+
+pinkfloyd_thewall.mid
+
+ 0 35 False 
+ 0 33 False 
+ 0 27 False 
+ 0 28 False 
+ 0 30 False 
+ 0 16 False 
+ 0 52 False 
+ 0 95 False 
+ 8 118 True 
+ 0 48 False 
+ 0 29 False 
+ 0 26 False 
+ 0 29 False 
+ 0 29 False 
+
+Nombre d'instruments: 14
+
+
+
+
+West_Side_Story.mid
+
+ 0 11 False No. 1 Prologue      
+ 0 11 False WEST SIDE STORY     
+ 0 93 False Music by            
+ 0 13 False Music by            
+ 0 55 False Music by            
+ 0 93 False Leonard Bernstein   
+ 0 0 False                     
+ 0 0 False Sequence (c) 1992   
+ 0 45 False by Bob Pomicter, Jr.
+ 0 65 False Studio 46           
+ 0 65 False                     
+ 0 88 False NOTE:               
+ 0 56 False NOTE:               
+ 0 57 False While this sequence 
+ 0 62 False While this sequence 
+ 0 103 False is freeware, the    
+ 0 56 False is freeware, the    
+ 0 103 False author requests     
+ 0 48 False that this file NOT  
+ 0 48 False NOT BE DISTRIBUTED  
+ 0 50 False WITHOUT THE TRACK   
+ 0 16 False SHEET NOTES.TXT     
+ 0 50 False SHEET NOTES.TXT     
+ 8 116 True FILE AND ECHO.SCD   
+ 0 47 False FILE RECEIVED WITH  
+
+Nombre d'instruments: 25
+
+
+
+
+La bombe humaine.mid
+
+ 0 85 False Voix Lead
+ 0 53 False Voix 2
+ 0 27 False Guitare 1
+ 0 29 False Guitare 2
+ 0 35 False Basse
+ 8 116 True Drums
+ 0 85 False Voix Lead Port.
+ 0 29 False Guitare 1 Port.
+ 0 29 False Guitare 2 Port.
+ 0 35 False Basse Port.
+ 0 53 False Voix 2 Port.
+
+Nombre d'instruments: 11
+
+
+
+
+Goldfinger.mid
+
+ 0 49 False 
+ 0 47 False 
+ 0 52 False 
+ 0 48 False 
+ 0 43 False 
+ 8 117 True 
+ 0 73 False 
+ 0 57 False 
+ 0 32 False 
+ 0 1 False 
+ 0 60 False 
+
+Nombre d'instruments: 11
+
+
+
+
+Vian Boris - Fais Moi Mal Johnny.mid
+
+ 0 11 False Melodie
+ 0 115 False Melodie
+ 0 4 False piano electrique
+ 0 32 False basse
+ 8 118 True drums
+ 0 119 True drums
+ 0 26 False guitar
+ 0 65 False sax
+
+Nombre d'instruments: 8
+
+
+
+
+The_Matrix.mid
+
+ 0 100 False 
+ 0 30 False 
+ 0 29 False 
+ 0 48 False 
+ 0 52 False 
+ 0 51 False 
+ 0 38 False 
+ 8 116 True 
+
+Nombre d'instruments: 8
+
+
+
+
+Polnareff Michel - On Ira Tous Au Paradis.mid
+
+ 0 22 False Melodie 4
+ 0 33 False Basse   2
+ 0 25 False GuitarAc3
+ 0 50 False Strings 5
+ 0 52 False Choeurs 6
+ 0 90 False Polypad 7
+ 0 104 False Sitar   8
+ 0 27 False GuitarEl9
+ 0 113 True Drums    ; Standard 
+ 0 66 False Saxophone
+
+Nombre d'instruments: 10
+
+
+
+
+Mission impossible.mid
+
+ 0 73 False Flute
+ 0 38 False Synth Bass
+ 0 39 False Synth Bass 2
+ 0 55 False Orch Hit
+ 0 125 False Effects
+ 0 88 False Fantasia
+ 0 48 False Strings
+ 0 114 True Drums 1 
+ 0 32 False Bass
+ 0 61 False Brass
+ 0 112 True Drums 2 (Power)
+ 8 118 True Drums 2 (Power)
+ 0 116 True Drums 2 (Power)
+ 0 122 False Thunder
+ 0 95 False Sweep Pad
+
+Nombre d'instruments: 15
+
+
+
+
+jeux_interdits.mid
+
+ 0 24 False guitar
+ 0 24 False guitar
+ 0 24 False guitar
+ 0 24 False guitar
+ 0 24 False guitar
+ 0 24 False guitar
+
+Nombre d'instruments: 6
+
+
+
+
+le bon la brute.mid
+
+ 0 0 False Piano
+ 0 26 False Jazz Gt
+ 0 24 False Nylon Gt
+ 0 87 False Bass&Lead
+ 0 99 False Atmosphere
+ 0 90 False Polysynth
+ 0 60 False French Horn
+ 0 63 False Synth Brass
+ 0 48 False Strings
+ 0 49 False Slow Strings
+ 0 0 False Piano
+ 0 22 False Harmonica
+ 0 44 False Tremelo Strings
+ 0 119 False Reverse Cymbal
+ 0 127 False Gun Shot
+
+Nombre d'instruments: 15
+
+
+
+
+laziza.mid
+
+ 0 37 False 
+ 0 78 False 
+ 0 75 False 
+ 0 28 False 
+ 0 30 False 
+ 0 81 False 
+ 0 35 False 
+ 0 51 False 
+ 0 114 True 
+
+Nombre d'instruments: 9
+
+
+
+
+Yago_silva-Pink_Panther_Theme.mid
+
+
+Nombre d'instruments: 0
+
+
+
+
+Frank_Sinatra-My_Way.mid
+
+ 8 116 True My Way    GM
+ 0 6 False My Way    GM
+ 0 24 False My Way    GM
+ 0 46 False My Way    GM
+ 0 32 False My Way    GM
+ 0 65 False My Way    GM
+ 0 48 False My Way    GM
+ 0 61 False My Way    GM
+
+Nombre d'instruments: 8
+
+
+
+
+Conan_The_Barbarian.mid
+
+ 0 56 False Trumpet             
+ 0 60 False French Horn         
+ 0 48 False Strings             
+ 0 54 False Synvox              
+ 0 112 True Percussions         
+ 0 57 False Trombone            
+ 0 58 False Tuba (Left)         
+ 0 70 False Clarinet            
+ 0 56 False Trumpet 2           
+ 0 56 False High Trumpet        
+ 0 60 False French Horn         
+
+Nombre d'instruments: 11
+
+
+
+
+Psycho.mid
+
+ 0 48 False By Bernard Herrmann
+ 0 48 False 
+ 0 48 False 
+ 0 45 False 
+
+Nombre d'instruments: 4
+
+
+
+
+Mission_Impossible.mid
+
+ 0 73 False Flute
+ 0 38 False Synth Bass
+ 0 39 False Synth Bass 2
+ 0 55 False Orch Hit
+ 0 125 False Effects
+ 0 88 False Fantasia
+ 0 48 False Strings
+ 0 112 True Drums 1 
+ 0 32 False Bass
+ 0 61 False Brass
+ 8 118 True Drums 2 (Power)
+ 0 116 True Drums 2 (Power)
+ 8 118 True Drums 2 (Power)
+ 0 122 False Thunder
+ 0 95 False Sweep Pad
+
+Nombre d'instruments: 15
+
+
+
+
+MANU_CHAO-me_gustas_tu.mid
+
+ 0 113 True Manu Chao - Me gustas tú
+ 0 24 False Manu Chao - Me gustas tú
+ 0 26 False Manu Chao - Me gustas tú
+ 0 28 False Manu Chao - Me gustas tú
+ 0 26 False Manu Chao - Me gustas tú
+ 0 74 False Manu Chao - Me gustas tú
+ 0 127 False Manu Chao - Me gustas tú
+ 0 99 False Manu Chao - Me gustas tú
+ 0 65 False Manu Chao - Me gustas tú
+ 0 27 False Manu Chao - Me gustas tú
+ 0 32 False Manu Chao - Me gustas tú
+ 0 50 False Manu Chao - Me gustas tú
+ 0 11 False Manu Chao - Me gustas tú
+ 0 56 False Manu Chao - Me gustas tú
+ 0 0 False Manu Chao - Me gustas tú
+ 0 22 False Manu Chao - Me gustas tú
+
+Nombre d'instruments: 16
+
+
+
+
+NinoFerrertelephone.mid
+
+ 0 116 True Standard Set        
+ 0 16 False Acoustic Bs.        
+ 0 16 False Organ 1             
+ 0 16 False Organ 1             
+ 0 56 False Trumpet             
+ 0 1 False Piano 2             
+ 0 25 False Steel-Str.Gt.       
+ 0 62 False Synth Brass 1       
+
+Nombre d'instruments: 8
+
+
+
+
+sister act.mid
+
+ 0 62 False El Guitar
+ 0 47 False Sq Wave
+ 0 44 False Doc Solo
+ 0 25 False Syn Brass2
+ 0 8 False Organ
+ 0 42 False Oboe 2001
+ 0 116 False Snare Drum
+ 0 64 False Bass
+ 0 114 True Drums
+
+Nombre d'instruments: 9
+
+
+
+
+jurassic parc.mid
+
+ 0 48 False String 1
+ 0 48 False String 2
+ 0 49 False String 3
+ 0 49 False String 4
+ 0 73 False Flutes
+ 0 68 False Oboes
+ 0 70 False Bassoons
+ 0 57 False Trumpets
+ 0 57 False Trombones
+ 0 58 False Tubas
+ 0 60 False Fr. Horns
+ 0 69 False Choir
+ 0 46 False Harp
+ 0 9 False Glock(Bell)
+ 0 119 True Percussion
+
+Nombre d'instruments: 15
+
+
+
+
+d_la_marseillaise.mid
+
+ 0 48 False 
+ 0 48 False 
+ 0 118 True 
+ 0 0 False 
+ 0 58 False 
+ 0 68 False 
+ 0 61 False 
+ 0 61 False 
+ 0 9 False 
+ 0 60 False 
+ 0 42 False 
+
+Nombre d'instruments: 11
+
+
+
+
+Pulp_Fiction-Misirlou.mid
+
+ 0 4 False 
+ 0 56 False 
+ 0 35 False 
+ 0 31 False 
+ 0 26 False 
+ 0 27 False 
+ 0 25 False 
+ 0 114 True 
+ 8 118 True 
+ 0 119 True 
+ 8 117 True 
+ 0 114 True 
+ 0 116 True 
+
+Nombre d'instruments: 13
+
+
+
+
+Bongo bang (manu chao).mid
+
+ 0 17 False 
+ 0 35 False 
+ 0 26 False 
+ 0 53 False 
+ 0 54 False 
+ 0 25 False 
+ 0 4 False 
+ 0 108 False 
+ 0 61 False 
+ 0 114 True 
+
+Nombre d'instruments: 10
+
+
+
+
+Gall France - Les Sucettes 2.mid
+
+ 0 11 False karaoke
+ 0 0 False piano
+ 0 28 False guitare
+ 0 32 False basse
+ 0 57 False trombone solo
+ 0 61 False brass
+ 0 16 False hammond
+ 0 114 True drums
+
+Nombre d'instruments: 8
+
+
+
+
+Voulzy_Rockcollection.mid
+
+ 0 35 False 
+ 0 30 False 
+ 0 76 False 
+ 0 27 False 
+ 0 25 False 
+ 0 60 False 
+ 0 17 False 
+ 0 28 False 
+ 8 117 True 
+ 0 54 False 
+
+Nombre d'instruments: 10
+
+
+
+
+Tomber la chemise.mid
+
+
+Nombre d'instruments: 0
+
+
+
+
+Tomb Raider.mid
+
+ 0 68 False Oboe
+ 0 49 False strings
+ 0 46 False Harp
+ 0 60 False Horns
+ 0 60 False Horns
+ 0 60 False Horns
+ 0 52 False voice
+ 0 40 False violin
+
+Nombre d'instruments: 8
+
+
+
+
+topgun.mid
+
+ 0 2 False 
+ 0 34 False 
+ 0 5 False 
+ 0 117 False 
+ 0 36 False 
+ 0 0 False 
+
+Nombre d'instruments: 6
+
+
+
+
+beattles_yesterday.mid
+
+ 0 18 False WinJammer Demo
+ 0 1 False WinJammer Demo
+ 0 39 False WinJammer Demo
+ 0 39 False WinJammer Demo
+ 0 42 False WinJammer Demo
+ 0 32 False WinJammer Demo
+
+Nombre d'instruments: 6
+
+
+
+
+Quand la musique est bonne.mid
+
+ 0 35 False 
+ 0 76 False 
+ 0 28 False 
+ 0 29 False 
+ 0 48 False 
+ 0 65 False 
+ 0 66 False 
+ 0 114 True 
+ 0 94 False 
+ 0 53 False 
+ 0 53 False 
+ 0 52 False 
+ 0 52 False 
+
+Nombre d'instruments: 13
+
+
+
+
+beattles_michelle.mid
+
+ 0 32 False BASS / 1 / ACOUSTIC BASS
+ 0 100 False ACCENT  /  BRIGHTNESS
+ 0 5 False RHYTHM  / 1 /  CH  PIANO
+ 0 77 False MELODY / 1 / SHAKUHACHI
+ 0 95 False RHYTHM  / 2 / SWEEP PAD
+ 0 37 False BASS / 2 / SLAP
+ 0 44 False ACCENT / TREM STRINGS
+ 0 10 False ACCENT / 2 / MUSIC BOX
+ 0 88 False MELODY / 3 / FANTAPAD
+ 0 117 True DRUMZ
+
+Nombre d'instruments: 10
+
+
+
+
+Ca c'est vraiment toi.mid
+
+ 0 33 False 
+ 0 29 False 
+ 0 66 False Melodie
+ 0 30 False 
+ 0 29 False 
+ 0 29 False 
+ 0 30 False 
+ 0 115 True 
+
+Nombre d'instruments: 8
+
+
+
+
+titanic.mid
+
+ 0 88 False Pad
+ 0 35 False Bass
+ 0 78 False Whistle
+ 0 5 False Piano
+ 0 75 False Flute
+ 0 48 False Melodie
+ 0 29 False Overdrive Guitar
+ 0 89 False Pad
+ 0 49 False Strings
+ 0 118 True Purcusions
+
+Nombre d'instruments: 10
+
+
+
+
+independance day.mid
+
+ 0 71 False Woodwinds 1
+ 0 73 False Woodwinds 1
+ 0 48 False Strings 1
+ 0 40 False Strings 1
+ 0 71 False Woodwinds 2
+ 0 56 False Woodwinds 2
+ 0 57 False Woodwinds 2
+ 0 73 False Woodwinds 2
+ 0 48 False Strings 2
+ 0 42 False Strings 2
+ 0 47 False Timpani
+ 0 46 False Harp/Snare Drum
+ 0 127 False Harp/Snare Drum
+ 0 60 False Brass 1
+ 0 56 False Brass 1
+ 0 57 False Brass 2
+ 8 118 True Percussion
+
+Nombre d'instruments: 17
+
+
+
+
+f_la_fievre_du_samedi_soir.mid
+
+ 0 116 True 
+ 0 25 False 
+ 0 28 False 
+ 0 33 False 
+ 0 4 False 
+ 0 49 False 
+ 0 93 False 
+ 0 90 False 
+ 0 53 False 
+ 0 61 False 
+
+Nombre d'instruments: 10
+
+
+
+
+starwars.mid
+
+ 0 70 False Bassoon
+ 0 73 False Flute
+ 0 60 False Horns
+ 0 56 False Trumpets
+ 0 57 False Trombones
+ 0 46 False Harp
+ 0 1 False Piano
+ 0 48 False Strings
+ 0 48 False String 2
+ 0 44 False String 3
+ 0 47 False Timpani
+ 8 116 True Drums
+
+Nombre d'instruments: 12
+
+
+
+
+J'attendrai-Dalida.mid
+
+ 0 94 False Mélodie
+ 0 112 True Batterie
+ 0 35 False Basse
+ 0 4 False Clavier 1
+ 0 18 False Clavier 2
+ 0 54 False Clavier 3
+ 0 102 False Clavier 4
+ 0 46 False Clavier 5
+ 0 26 False Guitare 1
+ 0 26 False Guitare 2
+ 0 48 False Cordes
+ 0 56 False Cuivres 1
+ 0 62 False Cuivres 2
+ 0 57 False Cuivres 3
+ 0 73 False Flûte
+ 0 115 True Percussion
+
+Nombre d'instruments: 16
+
+
+
+
+Dutronc_cactus.mid
+
+ 0 117 True 
+ 0 28 False 
+ 0 29 False 
+ 0 32 False 
+
+Nombre d'instruments: 4
+
+
+
+
+gaynor_i_will_survive.mid
+
+ 0 65 False Piste 01
+ 0 0 False Séparer 01
+ 0 61 False Séparer 02
+ 0 45 False Séparer 03
+ 0 48 False Séparer 04
+ 0 46 False Séparer 05
+ 0 34 False Séparer 06
+ 0 116 True Séparer 07
+
+Nombre d'instruments: 8
+
+
+
+
+zorro.mid
+
+ 0 65 False Theme From Zorro
+ 0 3 False George Bruns (1957)
+ 0 3 False Tof 4/5/97
+
+Nombre d'instruments: 3
+
+
+
+
+oh les filles oh les filles.mid
+
+ 0 1 False 
+ 0 32 False 
+ 0 30 False 
+ 0 5 False mélodie
+ 0 18 False 
+ 0 29 False 
+ 0 117 True 
+
+Nombre d'instruments: 7
+
+
+
+
+Polnareff Michel - On Ira Tous Au Paradis.mid
+
+ 0 22 False Melodie 4
+ 0 33 False Basse   2
+ 0 25 False GuitarAc3
+ 0 50 False Strings 5
+ 0 52 False Choeurs 6
+ 0 90 False Polypad 7
+ 0 104 False Sitar   8
+ 0 27 False GuitarEl9
+ 0 117 True Drums    ; Standard 
+ 0 66 False Saxophone
+
+Nombre d'instruments: 10
+
+
+
+
+jeux_interdits.mid
+
+ 0 24 False guitar
+ 0 24 False guitar
+ 0 24 False guitar
+ 0 24 False guitar
+ 0 24 False guitar
+ 0 24 False guitar
+
+Nombre d'instruments: 6
+
+
+
+
+Dutronc_cactus.mid
+
+ 0 119 True 
+ 0 28 False 
+ 0 29 False 
+ 0 32 False 
+
+Nombre d'instruments: 4
+
+
+
+

@@ -1,0 +1,241 @@
+37999 Shot n° 37999 dans /media/serge/BACKUP/shot_10/shot/99/shot_37999.png
+{'a': 0, 'b': 1983, 'c': 1983, 'd': 1983, 'e': 1983, 'f': 1983, 'g': 1983, 'h': 1983, 'i': 1983, 'j': 1983, 'k': 1983, 'l': 1983, 'm': 1983, 'n': 1982, 'o': 1982, 'p': 1982, 'q': 1982, 'r': 1982, 's': 1982, 't': 1982, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0, 'J': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'O': 0, 'P': 0, 'Q': 0, 'R': 0, 'S': 0, 'T': 0}
+
+2000 - 1983 = frame blanche
+
+[blend]
+shot_every = 30
+total = 38000
+numero = 0
+fond = "video"
+shot_size = 416
+music_size = 1000
+plage_x = 4.5
+plage_y = 4.5
+size_min = 0.5
+size_max = 2.0
+letters_scale = 1.09
+fullscreen = 0
+sun_energy_min = 4
+sun_energy_max = 4
+sun_color_min = 1.0
+sun_color_max = 1.0
+toutes les textures en shadeless
+
+
+                            yolov3-tiny_3l_10.cfg
+
+./darknet partial data_10/yolov3-tiny_3l_10.cfg yolov3-tiny.weights data_10/yolov3-tiny.conv.15 15
+
+./darknet detector train data_10/obj.data data_10/yolov3-tiny_3l_10.cfg data_10/yolov3-tiny.conv.15 -map
+
+ calculation mAP (mean average precision)...
+3800
+ detections_count = 63085, unique_truth_count = 37690
+class_id = 0, name = font_0_b, ap = 96.21%       (TP = 195, FP = 5)
+class_id = 1, name = font_0_c, ap = 98.14%       (TP = 191, FP = 4)
+class_id = 2, name = font_0_d, ap = 95.37%       (TP = 169, FP = 6)
+class_id = 3, name = font_0_e, ap = 94.48%       (TP = 165, FP = 7)
+class_id = 4, name = font_0_f, ap = 96.50%       (TP = 192, FP = 8)
+class_id = 5, name = font_0_g, ap = 95.32%       (TP = 177, FP = 2)
+class_id = 6, name = font_0_h, ap = 95.58%       (TP = 180, FP = 4)
+class_id = 7, name = font_0_i, ap = 91.85%       (TP = 184, FP = 14)
+class_id = 8, name = font_0_j, ap = 92.85%       (TP = 186, FP = 8)
+class_id = 9, name = font_0_k, ap = 94.96%       (TP = 156, FP = 9)
+class_id = 10, name = font_0_l, ap = 83.62%      (TP = 141, FP = 25)
+class_id = 11, name = font_0_m, ap = 97.99%      (TP = 207, FP = 7)
+class_id = 12, name = font_0_n, ap = 95.37%      (TP = 183, FP = 4)
+class_id = 13, name = font_0_o, ap = 95.36%      (TP = 172, FP = 7)
+class_id = 14, name = font_0_p, ap = 95.77%      (TP = 175, FP = 6)
+class_id = 15, name = font_0_q, ap = 97.98%      (TP = 186, FP = 4)
+class_id = 16, name = font_0_r, ap = 95.68%      (TP = 200, FP = 7)
+class_id = 17, name = font_0_s, ap = 96.07%      (TP = 196, FP = 2)
+class_id = 18, name = font_0_t, ap = 98.50%      (TP = 196, FP = 3)
+class_id = 19, name = font_1_b, ap = 96.12%      (TP = 188, FP = 3)
+class_id = 20, name = font_1_c, ap = 99.80%      (TP = 190, FP = 5)
+class_id = 21, name = font_1_d, ap = 97.59%      (TP = 174, FP = 3)
+class_id = 22, name = font_1_e, ap = 99.01%      (TP = 174, FP = 3)
+class_id = 23, name = font_1_f, ap = 96.44%      (TP = 191, FP = 6)
+class_id = 24, name = font_1_g, ap = 99.27%      (TP = 184, FP = 3)
+class_id = 25, name = font_1_h, ap = 99.49%      (TP = 186, FP = 6)
+class_id = 26, name = font_1_i, ap = 98.07%      (TP = 205, FP = 4)
+class_id = 27, name = font_1_j, ap = 97.25%      (TP = 200, FP = 6)
+class_id = 28, name = font_1_k, ap = 97.59%      (TP = 164, FP = 3)
+class_id = 29, name = font_1_l, ap = 93.91%      (TP = 156, FP = 7)
+class_id = 30, name = font_1_m, ap = 99.73%      (TP = 206, FP = 2)
+class_id = 31, name = font_1_n, ap = 96.49%      (TP = 189, FP = 2)
+class_id = 32, name = font_1_o, ap = 97.01%      (TP = 175, FP = 3)
+class_id = 33, name = font_1_p, ap = 99.95%      (TP = 190, FP = 0)
+class_id = 34, name = font_1_q, ap = 97.74%      (TP = 185, FP = 2)
+class_id = 35, name = font_1_r, ap = 97.84%      (TP = 207, FP = 6)
+class_id = 36, name = font_1_s, ap = 97.75%      (TP = 198, FP = 1)
+class_id = 37, name = font_1_t, ap = 98.66%      (TP = 200, FP = 3)
+class_id = 38, name = font_2_b, ap = 98.32%      (TP = 199, FP = 2)
+class_id = 39, name = font_2_c, ap = 99.29%      (TP = 191, FP = 4)
+class_id = 40, name = font_2_d, ap = 98.75%      (TP = 177, FP = 1)
+class_id = 41, name = font_2_e, ap = 98.01%      (TP = 173, FP = 6)
+class_id = 42, name = font_2_f, ap = 98.74%      (TP = 200, FP = 2)
+class_id = 43, name = font_2_g, ap = 97.05%      (TP = 179, FP = 14)
+class_id = 44, name = font_2_h, ap = 97.31%      (TP = 186, FP = 2)
+class_id = 45, name = font_2_i, ap = 95.62%      (TP = 199, FP = 11)
+class_id = 46, name = font_2_j, ap = 95.70%      (TP = 199, FP = 12)
+class_id = 47, name = font_2_k, ap = 96.56%      (TP = 167, FP = 1)
+class_id = 48, name = font_2_l, ap = 96.08%      (TP = 173, FP = 8)
+class_id = 49, name = font_2_m, ap = 98.65%      (TP = 204, FP = 3)
+class_id = 50, name = font_2_n, ap = 98.24%      (TP = 195, FP = 10)
+class_id = 51, name = font_2_o, ap = 99.84%      (TP = 184, FP = 6)
+class_id = 52, name = font_2_p, ap = 99.36%      (TP = 187, FP = 3)
+class_id = 53, name = font_2_q, ap = 98.23%      (TP = 189, FP = 11)
+class_id = 54, name = font_2_r, ap = 97.85%      (TP = 205, FP = 5)
+class_id = 55, name = font_2_s, ap = 98.51%      (TP = 206, FP = 5)
+class_id = 56, name = font_2_t, ap = 97.76%      (TP = 199, FP = 8)
+class_id = 57, name = font_3_b, ap = 98.92%      (TP = 200, FP = 1)
+class_id = 58, name = font_3_c, ap = 99.81%      (TP = 194, FP = 2)
+class_id = 59, name = font_3_d, ap = 99.59%      (TP = 177, FP = 3)
+class_id = 60, name = font_3_e, ap = 99.24%      (TP = 177, FP = 4)
+class_id = 61, name = font_3_f, ap = 99.94%      (TP = 204, FP = 4)
+class_id = 62, name = font_3_g, ap = 99.83%      (TP = 184, FP = 2)
+class_id = 63, name = font_3_h, ap = 99.40%      (TP = 189, FP = 3)
+class_id = 64, name = font_3_i, ap = 98.50%      (TP = 204, FP = 2)
+class_id = 65, name = font_3_j, ap = 98.01%      (TP = 199, FP = 6)
+class_id = 66, name = font_3_k, ap = 98.80%      (TP = 171, FP = 4)
+class_id = 67, name = font_3_l, ap = 97.15%      (TP = 176, FP = 5)
+class_id = 68, name = font_3_m, ap = 99.83%      (TP = 210, FP = 2)
+class_id = 69, name = font_3_n, ap = 99.83%      (TP = 198, FP = 3)
+class_id = 70, name = font_3_o, ap = 99.75%      (TP = 180, FP = 1)
+class_id = 71, name = font_3_p, ap = 98.74%      (TP = 184, FP = 3)
+class_id = 72, name = font_3_q, ap = 99.34%      (TP = 189, FP = 2)
+class_id = 73, name = font_3_r, ap = 99.99%      (TP = 213, FP = 3)
+class_id = 74, name = font_3_s, ap = 99.48%      (TP = 206, FP = 6)
+class_id = 75, name = font_3_t, ap = 98.38%      (TP = 203, FP = 2)
+class_id = 76, name = font_4_b, ap = 98.74%      (TP = 196, FP = 1)
+class_id = 77, name = font_4_c, ap = 99.01%      (TP = 194, FP = 2)
+class_id = 78, name = font_4_d, ap = 99.37%      (TP = 178, FP = 2)
+class_id = 79, name = font_4_e, ap = 98.24%      (TP = 175, FP = 3)
+class_id = 80, name = font_4_f, ap = 99.37%      (TP = 200, FP = 4)
+class_id = 81, name = font_4_g, ap = 99.94%      (TP = 188, FP = 3)
+class_id = 82, name = font_4_h, ap = 99.89%      (TP = 194, FP = 2)
+class_id = 83, name = font_4_i, ap = 98.77%      (TP = 202, FP = 3)
+class_id = 84, name = font_4_j, ap = 98.96%      (TP = 208, FP = 4)
+class_id = 85, name = font_4_k, ap = 98.77%      (TP = 172, FP = 3)
+class_id = 86, name = font_4_l, ap = 92.26%      (TP = 165, FP = 7)
+class_id = 87, name = font_4_m, ap = 98.54%      (TP = 207, FP = 7)
+class_id = 88, name = font_4_n, ap = 99.37%      (TP = 195, FP = 2)
+class_id = 89, name = font_4_o, ap = 98.80%      (TP = 182, FP = 0)
+class_id = 90, name = font_4_p, ap = 99.43%      (TP = 187, FP = 2)
+class_id = 91, name = font_4_q, ap = 99.81%      (TP = 189, FP = 2)
+class_id = 92, name = font_4_r, ap = 99.34%      (TP = 208, FP = 4)
+class_id = 93, name = font_4_s, ap = 98.53%      (TP = 205, FP = 0)
+class_id = 94, name = font_4_t, ap = 98.39%      (TP = 200, FP = 5)
+class_id = 95, name = font_5_b, ap = 100.00%     (TP = 204, FP = 1)
+class_id = 96, name = font_5_c, ap = 99.35%      (TP = 195, FP = 7)
+class_id = 97, name = font_5_d, ap = 100.00%     (TP = 182, FP = 2)
+class_id = 98, name = font_5_e, ap = 99.44%      (TP = 180, FP = 4)
+class_id = 99, name = font_5_f, ap = 99.96%      (TP = 207, FP = 1)
+class_id = 100, name = font_5_g, ap = 99.32%     (TP = 185, FP = 4)
+class_id = 101, name = font_5_h, ap = 99.92%     (TP = 195, FP = 2)
+class_id = 102, name = font_5_i, ap = 99.03%     (TP = 206, FP = 1)
+class_id = 103, name = font_5_j, ap = 98.18%     (TP = 202, FP = 3)
+class_id = 104, name = font_5_k, ap = 99.95%     (TP = 174, FP = 2)
+class_id = 105, name = font_5_l, ap = 99.99%     (TP = 181, FP = 0)
+class_id = 106, name = font_5_m, ap = 98.99%     (TP = 212, FP = 1)
+class_id = 107, name = font_5_n, ap = 99.98%     (TP = 200, FP = 3)
+class_id = 108, name = font_5_o, ap = 99.90%     (TP = 185, FP = 2)
+class_id = 109, name = font_5_p, ap = 99.48%     (TP = 191, FP = 2)
+class_id = 110, name = font_5_q, ap = 99.93%     (TP = 192, FP = 1)
+class_id = 111, name = font_5_r, ap = 99.98%     (TP = 212, FP = 2)
+class_id = 112, name = font_5_s, ap = 99.50%     (TP = 208, FP = 2)
+class_id = 113, name = font_5_t, ap = 99.93%     (TP = 208, FP = 1)
+class_id = 114, name = font_6_b, ap = 96.09%     (TP = 192, FP = 10)
+class_id = 115, name = font_6_c, ap = 99.36%     (TP = 196, FP = 5)
+class_id = 116, name = font_6_d, ap = 99.94%     (TP = 179, FP = 2)
+class_id = 117, name = font_6_e, ap = 98.31%     (TP = 177, FP = 2)
+class_id = 118, name = font_6_f, ap = 98.50%     (TP = 203, FP = 3)
+class_id = 119, name = font_6_g, ap = 99.25%     (TP = 185, FP = 3)
+class_id = 120, name = font_6_h, ap = 99.92%     (TP = 194, FP = 4)
+class_id = 121, name = font_6_i, ap = 99.99%     (TP = 209, FP = 1)
+class_id = 122, name = font_6_j, ap = 99.52%     (TP = 208, FP = 1)
+class_id = 123, name = font_6_k, ap = 99.94%     (TP = 173, FP = 1)
+class_id = 124, name = font_6_l, ap = 98.90%     (TP = 180, FP = 2)
+class_id = 125, name = font_6_m, ap = 99.44%     (TP = 208, FP = 3)
+class_id = 126, name = font_6_n, ap = 99.91%     (TP = 195, FP = 1)
+class_id = 127, name = font_6_o, ap = 99.39%     (TP = 182, FP = 4)
+class_id = 128, name = font_6_p, ap = 98.88%     (TP = 187, FP = 2)
+class_id = 129, name = font_6_q, ap = 98.83%     (TP = 191, FP = 3)
+class_id = 130, name = font_6_r, ap = 99.87%     (TP = 210, FP = 3)
+class_id = 131, name = font_6_s, ap = 99.97%     (TP = 207, FP = 3)
+class_id = 132, name = font_6_t, ap = 99.46%     (TP = 206, FP = 3)
+class_id = 133, name = font_7_b, ap = 98.98%     (TP = 199, FP = 2)
+class_id = 134, name = font_7_c, ap = 99.99%     (TP = 196, FP = 2)
+class_id = 135, name = font_7_d, ap = 99.87%     (TP = 180, FP = 6)
+class_id = 136, name = font_7_e, ap = 99.93%     (TP = 180, FP = 1)
+class_id = 137, name = font_7_f, ap = 99.50%     (TP = 206, FP = 0)
+class_id = 138, name = font_7_g, ap = 99.42%     (TP = 186, FP = 0)
+class_id = 139, name = font_7_h, ap = 99.91%     (TP = 194, FP = 1)
+class_id = 140, name = font_7_i, ap = 99.52%     (TP = 209, FP = 2)
+class_id = 141, name = font_7_j, ap = 99.99%     (TP = 209, FP = 0)
+class_id = 142, name = font_7_k, ap = 99.99%     (TP = 175, FP = 2)
+class_id = 143, name = font_7_l, ap = 99.95%     (TP = 180, FP = 2)
+class_id = 144, name = font_7_m, ap = 99.97%     (TP = 213, FP = 2)
+class_id = 145, name = font_7_n, ap = 99.91%     (TP = 200, FP = 2)
+class_id = 146, name = font_7_o, ap = 99.99%     (TP = 186, FP = 1)
+class_id = 147, name = font_7_p, ap = 99.85%     (TP = 189, FP = 3)
+class_id = 148, name = font_7_q, ap = 98.93%     (TP = 191, FP = 1)
+class_id = 149, name = font_7_r, ap = 100.00%        (TP = 215, FP = 1)
+class_id = 150, name = font_7_s, ap = 99.04%     (TP = 207, FP = 1)
+class_id = 151, name = font_7_t, ap = 100.00%        (TP = 210, FP = 2)
+class_id = 152, name = font_8_b, ap = 99.40%     (TP = 199, FP = 3)
+class_id = 153, name = font_8_c, ap = 99.31%     (TP = 191, FP = 2)
+class_id = 154, name = font_8_d, ap = 98.40%     (TP = 175, FP = 1)
+class_id = 155, name = font_8_e, ap = 99.30%     (TP = 177, FP = 1)
+class_id = 156, name = font_8_f, ap = 99.09%     (TP = 199, FP = 3)
+class_id = 157, name = font_8_g, ap = 99.82%     (TP = 187, FP = 1)
+class_id = 158, name = font_8_h, ap = 99.38%     (TP = 192, FP = 4)
+class_id = 159, name = font_8_i, ap = 96.43%     (TP = 200, FP = 5)
+class_id = 160, name = font_8_j, ap = 96.09%     (TP = 201, FP = 9)
+class_id = 161, name = font_8_k, ap = 98.76%     (TP = 170, FP = 1)
+class_id = 162, name = font_8_l, ap = 93.07%     (TP = 165, FP = 4)
+class_id = 163, name = font_8_m, ap = 98.49%     (TP = 207, FP = 1)
+class_id = 164, name = font_8_n, ap = 98.38%     (TP = 197, FP = 6)
+class_id = 165, name = font_8_o, ap = 99.91%     (TP = 184, FP = 2)
+class_id = 166, name = font_8_p, ap = 100.00%        (TP = 192, FP = 1)
+class_id = 167, name = font_8_q, ap = 99.51%     (TP = 191, FP = 4)
+class_id = 168, name = font_8_r, ap = 99.92%     (TP = 212, FP = 3)
+class_id = 169, name = font_8_s, ap = 98.80%     (TP = 202, FP = 1)
+class_id = 170, name = font_8_t, ap = 98.11%     (TP = 199, FP = 4)
+class_id = 171, name = font_9_b, ap = 100.00%        (TP = 203, FP = 0)
+class_id = 172, name = font_9_c, ap = 98.90%     (TP = 192, FP = 2)
+class_id = 173, name = font_9_d, ap = 99.87%     (TP = 182, FP = 3)
+class_id = 174, name = font_9_e, ap = 99.43%     (TP = 179, FP = 0)
+class_id = 175, name = font_9_f, ap = 99.37%     (TP = 204, FP = 3)
+class_id = 176, name = font_9_g, ap = 99.99%     (TP = 189, FP = 2)
+class_id = 177, name = font_9_h, ap = 99.46%     (TP = 193, FP = 2)
+class_id = 178, name = font_9_i, ap = 99.50%     (TP = 206, FP = 1)
+class_id = 179, name = font_9_j, ap = 100.00%        (TP = 211, FP = 1)
+class_id = 180, name = font_9_k, ap = 99.43%     (TP = 175, FP = 2)
+class_id = 181, name = font_9_l, ap = 98.07%     (TP = 174, FP = 4)
+class_id = 182, name = font_9_m, ap = 99.86%     (TP = 212, FP = 0)
+class_id = 183, name = font_9_n, ap = 99.97%     (TP = 198, FP = 0)
+class_id = 184, name = font_9_o, ap = 99.92%     (TP = 181, FP = 2)
+class_id = 185, name = font_9_p, ap = 99.93%     (TP = 188, FP = 0)
+class_id = 186, name = font_9_q, ap = 99.47%     (TP = 192, FP = 1)
+class_id = 187, name = font_9_r, ap = 99.98%     (TP = 214, FP = 2)
+class_id = 188, name = font_9_s, ap = 100.00%        (TP = 208, FP = 0)
+class_id = 189, name = font_9_t, ap = 100.00%        (TP = 209, FP = 0)
+
+ for conf_thresh = 0.25, precision = 0.98, recall = 0.97, F1-score = 0.97
+ for conf_thresh = 0.25, TP = 36404, FP = 637, FN = 1286, average IoU = 85.97 %
+
+ IoU threshold = 50 %, used Area-Under-Curve for each unique Recall
+ mean average precision (mAP@0.50) = 0.985559, or 98.56 %
+Total Detection Time: 38.000000 Seconds
+
+Set -points flag:
+ `-points 101` for MS COCO
+ `-points 11` for PascalVOC 2007 (uncomment `difficult` in voc.data)
+ `-points 0` (AUC) for ImageNet, PascalVOC 2010-2012, your custom dataset
+
+ mean_average_precision (mAP@0.5) = 0.985559
+Saving weights to ../darknet/data_10/backup/yolov3-tiny_3l_10_40000.weights
+Saving weights to ../darknet/data_10/backup/yolov3-tiny_3l_10_last.weights
+Saving weights to ../darknet/data_10/backup/yolov3-tiny_3l_10_final.weights

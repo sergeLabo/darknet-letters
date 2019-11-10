@@ -1,0 +1,156 @@
+
+ESSAIS de PLAY LETTERS
+essai 01
+23 midi
+fond video
+reconnaissance médiocre
+
+essai 02
+avec data_10
+[blend]
+shot_every = 30
+total = 38000
+numero = 0
+fond = "brouillard"
+shot_size = 416
+music_size = 1000
+plage_x = 4.5
+plage_y = 4.5
+size_min = 0.5
+size_max = 2.0
+letters_scale = 1.09
+fullscreen = 0
+sun_energy_min = 4
+sun_energy_max = 4
+sun_color_min = 1.0
+sun_color_max = 1.0
+[play_letters]
+file_nbr = 1
+volume = 0
+blur_min = 0
+blur_max = 0
+fps = 35
+json_files = "../midi/json_38/non_git/ia"
+images_nbr = 1000
+shot_size = 416
+
+essai 03
+idem 02 mais
+fond = "video"
+
+essai 04
+idem 02 mais
+fond = "noir"
+
+essai 05
+idem 02 mais
+fond = "noir"
+size_min = 1.0
+size_max = 1.5
+
+essai 06
+idem 02 mais
+fond = "noir"
+size_min = 0.5
+size_max = 2.0
+blur = 3
+
+essai 07 un peu mieux que 06
+idem 06 mais
+fond = "noir"
+size_min = 1.0
+size_max = 1.0
+blur = 3
+
+
+essai 08
+[midi]
+fonts = "../midi/soundfont/MuseScore_General_Full.sf2"
+fps = 40
+file_nbr = 0
+json_files = "../midi/json_fps_40"
+
+[play_letters]
+volume = 0
+blur_min = 0
+blur_max = 0
+fps = 40
+json_files = "../midi/json_40/non_git/ia"
+images_nbr = 1500
+pl_shot = "/media/serge/BACKUP/play_letters_shot/pl_shot_08"
+shot_size = 416
+
+[blend]
+shot_every = 20
+total = 38000
+numero = 0
+fond = "brouillard"
+shot_size = 416
+music_size = 1000
+plage_x = 4.5
+plage_y = 4.5
+size_min = 0.8
+size_max = 0.8
+letters_scale = 1.09
+fullscreen = 0
+sun_energy_min = 4
+sun_energy_max = 4
+sun_color_min = 1.0
+sun_color_max = 1.0
+shot = ""
+
+[darknet]
+shot_size = 416
+thresh = 75
+hier_thresh = 75
+nms = 5
+blur_mini = 3
+blur_maxi = 3
+configpath = "../darknet/data_11/yolov3-tiny_3l_11.cfg"
+weightpath = "../darknet/data_11/backup/yolov3-tiny_3l_11_best.weights"
+metapath = "../darknet/data_11/obj.data"
+
+essai 08
+premier test avec benchmark.py
+
+Musique: oh les filles oh les filles
+font_table [8, 7, 9, 5, 4, 1, 6]
+Nombre de notes de l'IA: 1500
+Nombre total de notes en entrée = 22157
+Nombre de notes bien reconnues  = 43
+0.002
+
+Musique: zorro
+font_table [9, 4, 2]
+Nombre de notes de l'IA: 1500
+Nombre total de notes en entrée = 6502
+Nombre de notes bien reconnues  = 268
+0.041
+
+Musique: Polnareff Michel - On Ira Tous Au Paradis
+font_table [6, 9, 2, 0, 7, 4, 8, 5, 3, 1]
+Nombre de notes de l'IA: 1500
+Nombre total de notes en entrée = 32983
+Nombre de notes bien reconnues  = 282
+0.009
+
+Musique: jeux_interdits
+font_table [4, 9, 3, 8, 6, 2]
+Nombre de notes de l'IA: 1500
+Nombre total de notes en entrée = 8355
+Nombre de notes bien reconnues  = 132
+0.016
+
+Musique: gaynor_i_will_survive
+font_table [6, 1, 2, 3, 4, 0, 9, 5]
+Nombre de notes de l'IA: 1500
+Nombre total de notes en entrée = 49405
+Nombre de notes bien reconnues  = 70
+0.001
+
+Musique: Dutronc_cactus
+font_table [5, 0, 6, 8]
+Nombre de notes de l'IA: 1500
+Nombre total de notes en entrée = 9325
+Nombre de notes bien reconnues  = 14
+0.002

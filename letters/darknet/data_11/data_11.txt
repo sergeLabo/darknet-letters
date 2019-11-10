@@ -1,0 +1,53 @@
+[midi]
+fonts = "../midi/soundfont/MuseScore_General_Full.sf2"
+fps = 40
+file_nbr = 0
+json_files = "../midi/json_fps_40"
+
+[play_letters]
+volume = 0
+blur_min = 3
+blur_max = 3
+fps = 40
+json_files = "../midi/json_40/non_git/ia"
+images_nbr = 1500
+pl_shot = "/media/serge/BACKUP/play_letters_shot/pl_shot_07"
+shot_size = 416
+
+[blend]
+shot_every = 20
+total = 38000
+numero = 0
+fond = "noir"
+shot_size = 416
+music_size = 1000
+plage_x = 4.5
+plage_y = 4.5
+size_min = 0.8
+size_max = 0.8
+letters_scale = 1.09
+fullscreen = 0
+sun_energy_min = 4
+sun_energy_max = 4
+sun_color_min = 1.0
+sun_color_max = 1.0
+shot = "/media/serge/BACKUP/shot_11/shot/"
+
+[darknet]
+shot_size = 416
+thresh = 67
+hier_thresh = 50
+nms = 50
+blur_mini = 3
+blur_maxi = 3
+configpath = "../darknet/data_11/yolov3-tiny_3l_11.cfg"
+weightpath = "../darknet/data_11/backup/yolov3-tiny_3l_11_best.weights"
+metapath = "../darknet/data_11/obj.data"
+
+37999 Shot n° 37999 dans /media/serge/BACKUP/letters_shot/shot_11/99/shot_37999.png
+{'a': 0, 'b': 1983, 'c': 1983, 'd': 1983, 'e': 1983, 'f': 1983, 'g': 1983, 'h': 1983, 'i': 1983, 'j': 1983, 'k': 1983, 'l': 1983, 'm': 1983, 'n': 1982, 'o': 1982, 'p': 1982, 'q': 1982, 'r': 1982, 's': 1982, 't': 1982, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0, 'J': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'O': 0, 'P': 0, 'Q': 0, 'R': 0, 'S': 0, 'T': 0}
+
+
+début avec yolov3-tiny_11.cfg mais nan au bout d'une heure
+reprise vers 18h avec yolov3-tiny_3l_11.cfg créé avec yolov3-tiny_3l_10.cfg, mais subdivisions=4
+avec 2 pas assez de mémoire
