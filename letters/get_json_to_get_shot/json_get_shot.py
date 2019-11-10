@@ -71,18 +71,18 @@ for n in range(10):
     # Boucle pour arriver aux nombre de shot à faire
     for rep in range(loop):
         # Répétition pour avoir une frame vide toutes les 114
-        for w in range(3):
+        for w in range(6):  # 3 avec majuscules, 6 sans
             # Minuscules
             for i in range(len(l)):
                 note, volume = l[i], 0
                 note_vol = [[note, volume]]
                 part.append(note_vol)
 
-            # Majuscules
-            for i in range(len(l)):
-                note, volume = 0, l[i]
-                note_vol = [[note, volume]]
-                part.append(note_vol)
+            # ## Majuscules
+            # #for i in range(len(l)):
+                # #note, volume = 0, l[i]
+                # #note_vol = [[note, volume]]
+                # #part.append(note_vol)
 
         # Frame sans note tous les 114 (notes, volumes)
         part.append([])

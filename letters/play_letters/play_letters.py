@@ -20,6 +20,8 @@ sont à définir dans letters.ini
 
 
 import os, sys
+import subprocess
+import gc
 import time
 import re
 import textwrap
@@ -27,56 +29,71 @@ import cv2
 import numpy as np
 import darknet
 from random import randint
+import json
 
 # Import du dossier parent soit letters
 # Pas d'import possible direct du dossier parent
 # ValueError: attempted relative import beyond top-level package
-
 sys.path.append("..")
 from letters_path import LettersPath
-
 lp = LettersPath()
 letters_dir = lp.letters_dir
-CONF = lp.conf
-shot_control_dir = lp.shot_control_dir
-
 sys.path.append(lp.get_midi_directory())
-from analyse_play_midi import OneInstrumentPlayer
 
+from analyse_play_midi import OneInstrumentPlayer
 from pymultilame import MyConfig, MyTools
 
 
 class YOLO:
 
     def __init__(self, images_directory):
-        
-        self.images_directory = images_directory
-        
+
+        self.lp = LettersPath()
+        self.CONF = self.lp.conf
+
+        # Mes outils
         self.mt = MyTools()
+
+        # Boucle opencv
         self.loop = 1
+
+        # Récup des images
+        self.images_directory = images_directory
+        self.shot_list = self.get_sorted_shot_list()
+        self.all_shot = self.get_all_shot()
+        # nom du morceau
+        self.filename = self.images_directory.split("/")[-1]
 
         # Initialisation de la détection
         self.set_darknet()
 
         # Paramètres de détections
-        self.thresh = int(CONF['darknet']['thresh'])
-        self.hier_thresh = int(CONF['darknet']['hier_thresh'])
-        self.nms = int(CONF['darknet']['nms'])
+        self.thresh = int(self.CONF['darknet']['thresh'])
+        self.hier_thresh = int(self.CONF['darknet']['hier_thresh'])
+        self.nms = int(self.CONF['darknet']['nms'])
+
+        # Windows
+        cv2.namedWindow('Reglage')
+        cv2.moveWindow('Reglage', 0, 25)  # 810, 25)
+        cv2.namedWindow('Letters')
+        cv2.moveWindow('Letters', 0, 25)
 
         # Trackbars
         self.create_trackbar()
         self.set_init_tackbar_position()
 
         # Midi
-        self.fonts = CONF['midi']['fonts']
+        self.fonts = self.CONF['midi']['fonts']
         self.set_canaux()
-        self.player = {}
+        self.notes_en_cours = []
+        self.players = {}
         self.set_players()
+        self.all_notes = []
 
     def set_darknet(self):
-        configPath = CONF['darknet']['configpath']
-        weightPath = CONF['darknet']['weightpath']
-        metaPath = CONF['darknet']['metapath']
+        configPath = self.CONF['darknet']['configpath']
+        weightPath = self.CONF['darknet']['weightpath']
+        metaPath = self.CONF['darknet']['metapath']
 
         self.netMain = darknet.load_net_custom(configPath.encode("ascii"),
                                                 weightPath.encode("ascii"),
@@ -99,7 +116,7 @@ class YOLO:
                         self.altNames = [x.strip() for x in namesList]
             except TypeError:
                 print("Erreur self.altNames")
-                
+
         # Create an image we reuse for each detect
         self.darknet_image = darknet.make_image(\
                                         darknet.network_width(self.netMain),
@@ -120,10 +137,10 @@ class YOLO:
         for line in lines:
             line_list = line.split(" ")
             self.canaux.append(line_list)
-                    
+
     def set_players(self):
         """Crée les players pour chaque canal"""
-        
+
         for i in range(len(self.canaux)):
             if i < 10:
                 # Les drums ne sont pas sur le channel,
@@ -131,41 +148,12 @@ class YOLO:
                 channel = i
                 bank = int(self.canaux[i][0])
                 bank_number = int(self.canaux[i][1])
-                self.player[i] = OneInstrumentPlayer(self.fonts,
+                self.players[i] = OneInstrumentPlayer(self.fonts,
                                                      channel,
                                                      bank,
                                                      bank_number)
-        print("Nombre de player:", len(self.player))
-            
-    def play_notes(self, notes):
-        """[(note, volume, police), ...] = [(45, 124, 2), ... ]"""
 
-        notes_en_cours = []
-        for note in notes:
-            #if note[2] < 9:
-            notes_en_cours.append([note[0], note[2]])
-
-        # Stop des notes en cours et absentes de notes
-        for i in range(len(self.player)):
-            for key, val in self.player[i].thread_dict.items():
-                if (key, i) not in notes_en_cours:
-                    self.player[i].thread_dict[key] = 0
-
-        # play des nouvelles notes
-        for note in notes:
-            
-            player = note[2]
-            la_note = note[0]
-            vol = note[1]
-            
-            if 0 < la_note < 128:
-                if 0 < player < len(self.canaux):
-                    if not self.player[player].thread_dict[la_note]:
-                        # #if vol < 50:
-                            # #vol = 100
-                        print("Player: {:>2} note: {:>3} volume: {:>3}"\
-                                .format(player, la_note, vol))
-                        self.player[player].thread_play_note(la_note, vol)
+        print("Nombre de player:", len(self.players))
 
     def create_trackbar(self):
         """
@@ -173,22 +161,27 @@ class YOLO:
         hier_thresh       min 0 max 1
         nms               min 0 max 1
         """
-        cv2.namedWindow('Reglage')
-        self.reglage_img = np.zeros((10, 600, 3), np.uint8)
 
-        cv2.createTrackbar('threshold__', 'Reglage', 0, 100,
+        self.reglage_img = np.zeros((100, 600, 3), np.uint8)
+        self.reglage_img = put_text(self.reglage_img,
+                                    self.filename,
+                                    (10, 50),
+                                    size=0.8,
+                                    thickness=2)
+
+        cv2.createTrackbar('threshold_', 'Reglage', 0, 100,
                                             self.onChange_thresh)
         cv2.createTrackbar('hier_thresh', 'Reglage', 0, 100,
                                             self.onChange_hier_thresh)
-        cv2.createTrackbar('nms', 'Reglage', 0, 100,
+        cv2.createTrackbar('nms_____', 'Reglage', 0, 100,
                                             self.onChange_nms)
 
     def set_init_tackbar_position(self):
         """setTrackbarPos(trackbarname, winname, pos) -> None"""
 
-        cv2.setTrackbarPos('threshold__', 'Reglage', self.thresh)
+        cv2.setTrackbarPos('threshold_', 'Reglage', self.thresh)
         cv2.setTrackbarPos('hier_thresh', 'Reglage', self.hier_thresh)
-        cv2.setTrackbarPos('nms', 'Reglage', self.nms)
+        cv2.setTrackbarPos('nms_____', 'Reglage', self.nms)
 
     def onChange_thresh(self, thresh):
         """min=1 max=100 step=1 default=0.5"""
@@ -216,50 +209,136 @@ class YOLO:
 
     def get_sorted_shot_list(self):
 
-        fli = self.mt.get_all_files_list(self.images_directory, ".jpg")
+        images = self.mt.get_all_files_list(self.images_directory, ".jpg")
 
-        shot_list = [0]*len(fli)
-        for image in fli:
-            # ../json_to_image/s_j_to_i_2677.jpg devient s_j_to_i_2677.jpg
-            nbr = image.split("/")[-1].split("_")[-1][:-4]  # 2677
-            # TODO Bug si images supprimées dans le dossier
-            shot_list[int(nbr)] = image
+        shot_list = [0]*len(images)
 
+        # Récup du numéro le plus petit, les numéros ensuite se suivent
+        mini = 10000000
+        for image in images:
+            nbr = int(image.split("/")[-1].split("_")[-1][:-4])
+            if nbr < mini:
+                mini = nbr
+        print("Indice des images mini =", mini)
+        
+        # Tri des images
+        n = 0
+        for image in images:
+            # De 500 à 1500
+            # ../play_letters/s_j_to_i_1243.jpg devient s_j_to_i_1243.jpg
+            nbr = int(image.split("/")[-1].split("_")[-1][:-4])  # 1243
+            shot_list[nbr - mini] = image
+                
         return shot_list
 
+    def get_all_shot(self):
+        """Charge en mémoire toutes les images du dossiers à lire par l'IA"""
+
+        print("\n\nChargement de toutes les images en RAM. Patience ...\n\n")
+        all_shot = []
+        for shot_file in self.shot_list:
+            img = cv2.imread(shot_file)
+            all_shot.append(img)
+        return all_shot
+
+    def notes_cleaning(self, notes):
+        # Suppression des doublons
+        clean_notes = []
+        for note in notes:
+            if note not in clean_notes:
+                clean_notes.append(note)
+
+        # Validation des notes
+        new_notes = []
+        for player, note, vol in notes:
+            # player 0 à len(self.canaux)
+            if player < 0 or player >= len(self.canaux):
+                player = None
+
+            # note 1 à 127
+            if note < 1 or note > 127:
+                note = None
+
+            # Volume 0 à 127:
+            if vol > 127: vol = 127
+            if vol < 0: vol = 0
+
+            if player and note and vol:
+                new_notes.append([player, note, vol])
+
+        return new_notes
+
+    def play_notes(self, notes):
+        """new_notes = [(police, note, volume), ...] = [(45, 124, 2), ... ]
+        self.players[i].thread_dict[key] = 0
+        """
+
+        new_notes = self.notes_cleaning(notes)
+
+        # Notes en en_cours ******************************************
+        en_cours = []
+        # 10 players
+        for i in range(len(self.players)):
+            # key=note, val=thread en cours 0 ou 1
+            for key, val in self.players[i].thread_dict.items():
+                if val != 0:
+                    en_cours.append((i, key))
+
+        # Fin des notes qui ne sont plus en en_cours *****************
+        # notes = [(player, note, volume), ...]
+        # en_cours = [(player, note), ... ]
+        for ec in en_cours:
+            player, note = ec
+            ssss = [player, note, 127]  # list et non tuple !!
+            if ssss not in new_notes:
+                self.players[player].thread_dict[note] = 0
+
+        # Lancement des nouvelles notes ******************************
+        for player, note, vol in new_notes:
+            if (player, note) not in en_cours:
+                self.players[player].thread_play_note(note, 127)  # vol)
+
+    def save_all_notes(self):
+        """
+        /bla...bla/play_letters_shot_jpg_3/bob_sheriff
+        to
+        /bla...bla/play_letters_shot_jpg_3/bob_sheriff.json
+        """
+
+        # Soustraction du chemin de shot_dir
+
+        json_name = self.images_directory + "_b.json"
+
+        with open(json_name, 'w') as f_out:
+            json.dump(self.all_notes, f_out)
+        f_out.close()
+        print('Enregistrement de:', json_name)
+
     def detect(self):
-        """FPS = 35 sur GTX1060"""
+        """FPS = 40 sur GTX1060"""
 
-        shot_list = self.get_sorted_shot_list()
-        i = 200
+        i = 500
         fps = 0
-        print("Nombre d'images:", len(shot_list))
         t_init = time.time()
+        tempo = 1
+        t_tempo = time.time()
 
-        print("Dossier:", self.images_directory)
-        
         while self.loop:
-            name = shot_list[i]
-            i += 1
-            fps += 1
-            ta = time.time()
-            if ta > t_init + 5:
-                print("FPS =", round(fps/5, 1))
-                t_init = time.time()
-                fps = 0
+            # Récup d'une image
+            img = self.all_shot[i]
 
             # Capture des positions des sliders
-            self.thresh = cv2.getTrackbarPos('threshold__','Reglage')
+            self.thresh = cv2.getTrackbarPos('threshold_','Reglage')
             self.hier_thresh = cv2.getTrackbarPos('hier_thresh','Reglage')
             self.nms = cv2.getTrackbarPos('nms','Reglage')
 
-            img = cv2.imread(name)
+            img_resized = cv2.resize(img,
+                                    (darknet.network_width(self.netMain),
+                                    darknet.network_height(self.netMain)),
+                                    interpolation=cv2.INTER_LINEAR)
 
-            img_resized = cv2.resize(img, (darknet.network_width(self.netMain),
-                                           darknet.network_height(self.netMain)),
-                                           interpolation=cv2.INTER_LINEAR)
-
-            darknet.copy_image_from_bytes(self.darknet_image, img_resized.tobytes())
+            darknet.copy_image_from_bytes(self.darknet_image,
+                                          img.tobytes())
 
             detections_l = darknet.detect_image(self.netMain,
                                                 self.metaMain,
@@ -268,27 +347,53 @@ class YOLO:
                                                 self.hier_thresh/100,
                                                 self.nms/100)
 
-            # Application des détections dan sl'image
-            image, letters = cvDrawBoxes(detections_l, img_resized)
-
+            # Application des détections dans l'image
+            image, letters = cvDrawBoxes(detections_l, img)
             notes = letters_to_notes(letters)
             self.play_notes(notes)
 
-            image = cv2.resize(image, (900, 900), interpolation=cv2.INTER_LINEAR)
+            # Ajout des notes pour enregistrement à la fin
+            self.all_notes.append(notes)
+
+            image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
             # Affichage du Semaphore
             cv2.imshow('Letters', image)
             # Affichage des trackbars
             cv2.imshow('Reglage', self.reglage_img)
 
-            # Attente
-            k = cv2.waitKey(1)
-            if i == len(shot_list) :
+            # Comptage
+            i += 1
+            fps += 1
+            ta = time.time()
+
+            # Pour fps = 40 soit ta - t_tempo = 0.025
+            tempo = int(1000 * (0.035 - (ta - t_tempo)))
+            if tempo < 1:
+                tempo = 1
+            t_tempo = ta
+
+            if ta > t_init + 1:
+                print("FPS =", round(fps, 1))
+                t_init = time.time()
+                fps = 0
+
+            # Echap pour quitter, attente
+            if cv2.waitKey(tempo) == 27:
                 self.loop = 0
-            # Echap pour quitter
-            if k == 27:
+
+            # Gestion de la fin du morceaux
+            if i == len(self.shot_list) :
                 self.loop = 0
 
         cv2.destroyAllWindows()
+
+        # Enregistrement des notes
+        self.save_all_notes()
+
+        # Fin des fluidsynth
+        for i in range(len(self.players)):
+            self.players[i].stop_audio()
+        time.sleep(0.3)
 
 
 CONVERSION = {  "b": 1,
@@ -422,10 +527,9 @@ def letters_to_notes(letters):
         toutes les notes de l'image = ["font_0_b", "font_1_l"]
 
     Retourne les notes en clair:
-        notes = [(note, volume, police), ...] = [(45,124, 2), ... ]
+        notes = [[player, note, vol], ...] = [(45,124, 2), ... ]
 
     notes_d[police] = [ 10+5, 100+20+4]
-
     """
 
     notes = []
@@ -446,7 +550,7 @@ def letters_to_notes(letters):
 
     for k, v in notes_d.items():
         if v[0] != 0:
-            notes.append([v[0], v[1], k])
+            notes.append([k, v[0], 127])  # v[1]])
 
     return notes
 
@@ -456,14 +560,15 @@ def put_text(img, text, xy, size, thickness):
                       color[, thickness[, lineType[, bottomLeftOrigin]]])
     """
 
-    cv2.putText(img,
-                text,
-                (xy[0], xy[1]),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                size,
-                [0, 255, 255],
-                thickness,
-                cv2.LINE_AA)
+    img = cv2.putText(img,
+                        text,
+                        (xy[0], xy[1]),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        size,
+                        [0, 255, 255],
+                        thickness,
+                        cv2.LINE_AA)
+    return img
 
 
 def convertBack(x, y, w, h):
@@ -516,42 +621,26 @@ def cvDrawBoxes(detections, img):
     return img, letters
 
 
-def crop(img):
-    """
-    Coupe les 2 cotés pour avoir une image carrée
-    à partir de l'image de la cam:
-    x = int((a - b)/2)
-    y = 0
-    frame = frame[y:y+h, x:x+w]
-    """
-
-    a = img.shape[1]  # 640
-    b = img.shape[0]  # 480
-    # A couper de chaque coté
-    c = abs(int((a - b)/2))
-
-    return img[0:b, c:c+b]
-
-
 if __name__ == "__main__":
 
+    CONF = lp.conf
+
     # Dossier des dossiers des images à convertir en musique
-    dossier = CONF["play_letters"]["dossier"]
-    
+    dossier = CONF["play_letters"]["pl_shot"]
+
     sd_list = [x[0] for x in os.walk(dossier)]
     print("Liste des sous dossiers:", sd_list)
     for sd in sd_list:
         # Pas le dossier principal
-        if sd != "../json_to_image_shot":
+        if sd != dossier:
+            print("Répertoire:", sd)
+            yolo = YOLO(sd)
+            yolo.detect()
+
+            # ## Reset de la RAM GPU
+            # #darknet.free_network(yolo.netMain)
             
-            if "boney" in sd:
-                print("Répertoire:", sd)
-                yolo = YOLO(sd)
-                yolo.detect()
-                for i in range(10):
-                    for key in range(128):
-                        try:
-                            yolo.player[i].thread_dict[key] = 0
-                        except:
-                            pass
-                time.sleep(1)
+            print("Morceau suivant")
+
+    print("Done")
+    os._exit(0)

@@ -54,8 +54,7 @@ from scripts.letters_once import main as letters_once_main
 from scripts.letters_once import get_shot_init
 from scripts.letters_once import music_and_letters_init
 from scripts.letters_once import intro_init
-from scripts.letters_once import convert_to_json_init
-from scripts.letters_once import json_to_image_init
+from scripts.letters_once import music_to_shot_init
 
 
 HELP = """
@@ -65,14 +64,8 @@ HELP = """
      
  2 - Fabrication des shot
                 pour l'IA
-                
- 3 - Conversion des musiques midis
-            en json pour Letters
-            
- 4 - Conversion des musiques midis
-            en json pour l'IA
-        
- 5 - Conversion des musiques en image
+                        
+ 3 - Conversion des musiques en image
  
  H - Help
  
@@ -102,12 +95,8 @@ def main():
         main_music_and_letters()
     if gl.phase == "get shot":
         main_get_shot()
-    if gl.phase == "get json letters":
-        main_convert_to_json()
-    if gl.phase == "get json IA":
-        main_convert_to_json()
-    if gl.phase == "json to image":
-        main_json_to_image()
+    if gl.phase == "music to shot":
+        main_music_to_shot()
 
 
 def main_intro():
@@ -115,7 +104,7 @@ def main_intro():
     render.setWindowSize(1000, 1000)
         
     if gl.info == "":
-        gl.all_obj["Cube"].visible = True
+        gl.all_obj["Cube"].visible = False
         gl.all_obj["brouillard"].visible = False
         gl.info = "H = Help"  
 
@@ -166,8 +155,14 @@ def main_get_shot():
     if gl.fond == "brouillard":
         gl.all_obj["Video"].visible = False   
         gl.all_obj["brouillard"].visible = True
+
+    if gl.fond == "noir":
+        gl.all_obj["Video"].visible = False   
+        gl.all_obj["brouillard"].visible = False
+
+    tempo = gl.tempo['shot'].tempo
     
-    if gl.tempo['shot'].tempo == 5:
+    if tempo == 5:
         # Reset de la liste des noms d'objets blender à afficher
         gl.obj_name_list_to_display = []
 
@@ -183,11 +178,11 @@ def main_get_shot():
         hide_unplayed_letters()
     
     # Save position des lettres frame avant d'enreg
-    if gl.tempo['shot'].tempo == 10:
+    if tempo == 10:
         gl.previous_datas = get_objets_position_size()
 
     # Enregistre les shots
-    if gl.tempo['shot'].tempo == 15:
+    if tempo == 15:
         sub_dir = get_sub_dir()
         save_txt_file(gl.previous_datas, sub_dir)
         sleep(0.01)
@@ -200,63 +195,34 @@ def main_get_shot():
     end()
 
 
-def main_convert_to_json():
-    """Conversion en json
-    Ne marche pas: pendant la conversion le script et le jeu s'arrête ... !
-    Si dans un thread, de nombreux threads vont tourner en même temps ... !
-    Il faut un truc dans AnalyseMidi qui informe de la fin d'une conversion. 
-    """
-
-    gl.all_obj["brouillard"].visible = False
-    gl.all_obj["Cube"].visible = False
-    gl.all_obj["Video"].visible = False
-    
-    # Si plus de midi
-    print(gl.json_file_nbr, len(gl.all_midi_files))
-    if gl.json_file_nbr > len(gl.all_midi_files):
-        gl.phase = "intro"
-        gl.endGame()
-    # bug ici sur le dernier midi_file
-    midi_file = gl.all_midi_files[gl.json_file_nbr]
-    
-    # Nouvelle conversion si le précédent est fini
-    if gl.convert_to_json_end:
-        thread_convert_to_json(midi_file)
-        gl.json_file_nbr += 1
-        # Suppression de l'extension
-        filename = Path(midi_file).with_suffix('').name
-        gl.info = "Fichier en cours:\n\n" + filename
-        
-    # La conversion en cours est-elle finie ?
-    gl.convert_to_json_end = gl.conversion.end
-
-
-def thread_convert_to_json(midi_file):
-
-    print("\n\nConversion de:", midi_file)
-    gl.conversion = AnalyseMidi(midi_file, gl.FPS)
-    thread_convert = threading.Thread(target=gl.conversion.save_midi_json)
-    thread_convert.start()
-
-
-def main_json_to_image():
+def main_music_to_shot():
     """Idem music_and_letters mais sans music et
     idem get_shot mais sans le json get shot
     """
 
     # Aggrandissement de la fenêtre
-    render.setWindowSize(gl.shot_size, gl.shot_size)
+    render.setWindowSize(gl.shot_size_music_to_shot,
+                         gl.shot_size_music_to_shot)
 
-    # Avance de la video
-    #video_refresh()
-    
     gl.all_obj['Cube'].visible = False
-    gl.all_obj["brouillard"].visible = True
-    gl.all_obj["Video"].visible = False
-    
+
+    if gl.fond == "video":
+        gl.all_obj["Video"].visible = True
+        gl.all_obj["brouillard"].visible = False
+        # Avance de la video
+        video_refresh()
+
+    if gl.fond == "brouillard":
+        gl.all_obj["Video"].visible = False   
+        gl.all_obj["brouillard"].visible = True
+        
+    if gl.fond == "noir":
+        gl.all_obj["Video"].visible = False   
+        gl.all_obj["brouillard"].visible = False   
+
     tempo = gl.tempo['shot'].tempo
 
-    if gl.tempo['shot'].tempo == int(tempo/5):  # 10 sur 50
+    if tempo == 5:  
         # Reset de la liste des noms d'objets blender à afficher
         gl.obj_name_list_to_display = []
 
@@ -269,18 +235,14 @@ def main_json_to_image():
         hide_unplayed_letters()
     
     # Save position des lettres frame avant d'enreg
-    if gl.tempo['shot'].tempo == int(2*tempo/5):  # 20 sur 50
+    if tempo == 10:  
         gl.previous_datas = get_objets_position_size()
 
     # Enregistre les shots
-    if gl.tempo['shot'].tempo == int(3*tempo/5):  # 30 sur 50
-        gl.png = save_json_to_image_shot()
+    if tempo == 15:  
+        gl.png = save_music_to_shot_shot()
         sleep(0.01)
         gl.numero += 1
-
-    # Conversion en jpg et effacement du png
-    if gl.tempo['shot'].tempo == int(4*tempo/5):  # 40 sur 50
-        convert_to_jpg_and_delete_png(gl.png)
 
     # Fin du json
     end()
@@ -288,7 +250,8 @@ def main_json_to_image():
     
 def video_refresh():
     """call this function every frame to ensure update of the texture."""
-    gl.my_video.refresh(True)
+    if gl.fond == "video":
+        gl.my_video.refresh(True)
 
 
 def cylinder_rotation():
@@ -376,13 +339,20 @@ def display(instrum, note, volume):
     cv, dv, uv = conversion(volume, "maj")
 
     # Liste des lettres à afficher
-    to_display = [un, dn, cn, uv, dv, cv]
+    if gl.phase == "music and letters":
+        to_display = [un, dn, cn, uv, dv, cv]
+    if gl.phase == "get shot" or gl.phase == "music to shot":
+        if gl.majuscules:
+            to_display = [un, dn, cn, uv, dv, cv]
+        # Sans les majuscules, le volume sera forcé à 127 en lecture par IA
+        else:
+            to_display = [un, dn, cn]
 
     # Affichage des lettres
     for letter in to_display:
         if letter:
             # Polices shuffle
-            font = gl.fonts_dict[instrum]
+            font = gl.fonts_list[instrum]
             ob = "font_" + str(font) + "_" + letter
             gl.obj_name_list_to_display.append(ob)
             letter_obj = gl.all_obj[ob]
@@ -516,13 +486,13 @@ def save_shot(sub_dir):
     print(gl.frame-1, "Shot n°", gl.numero, "dans", png)
 
 
-def save_json_to_image_shot():
+def save_music_to_shot_shot():
     """Les jpg et les png sont mélangés,
     le png est detruit après conversion.
     """
 
     # ./shot/5/shot_41254.png"""
-    png = os.path.join(gl.json_to_image_sub_directory, 's_j_to_i_' + str(gl.numero) + '.png')
+    png = os.path.join(gl.music_to_shot_sub_directory, 's_j_to_i_' + str(gl.numero) + '.png')
     render.makeScreenshot(png)
     print("Shot n°", gl.numero, "dans", png)
     
@@ -535,7 +505,7 @@ def convert_to_jpg_and_delete_png(png):
     img = cv2.imread(png)
 
     # Flou
-    img = blur(img)
+    img = apply_blur(img)
     
     # Remplacement de l'extension png en jpg
     jpg = str(Path(png).with_suffix('.jpg'))
@@ -549,15 +519,18 @@ def convert_to_jpg_and_delete_png(png):
     sleep(0.05)
 
 
-def blur(img):
+def apply_blur(img):
+    
+    blur = randint(gl.blur_min, gl.blur_max)
+    
     # Flou
-    if gl.blur != 0:
-        img = cv2.blur(img, (gl.blur, gl.blur))
+    if blur != 0:
+        img = cv2.blur(img, (blur, blur))
     return img
 
         
 def get_name_file_shot(sub_dir):
-    """gl.json_to_image_sub_directory = letters/json_to_image"""
+    """gl.music_to_shot_sub_directory = letters/music_to_shot"""
 
     return os.path.join(gl.shot_directory,
                             str(sub_dir),
@@ -619,7 +592,7 @@ def kill():
     # Il faut laisser du temps au temps
     sleep(1)
     if gl.phase != "get shot" \
-    and gl.phase != "json to image"\
+    and gl.phase != "music to shot"\
     and gl.phase != "get json":
         # Error au lancement
         try:
@@ -690,25 +663,11 @@ def keyboard():
         gl.info = "Début de get shot"
         kill()   
         get_shot_init()
-
-    # get json from midi file
-    elif gl.keyboard.events[events.PAD3] == gl.KX_INPUT_JUST_ACTIVATED:
-        print("Début de conversion des midi en json pour letters")
-        gl.phase = "get json letters"
-        kill()   
-        convert_to_json_init()
-
-    # get json from midi file = create json
-    elif gl.keyboard.events[events.PAD4] == gl.KX_INPUT_JUST_ACTIVATED:
-        print("Début de conversion des midi en json pour l'IA")
-        gl.phase = "get json IA"
-        kill()   
-        convert_to_json_init()
         
     # conversion d'un json en image
-    elif gl.keyboard.events[events.PAD5] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.PAD3] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Conversion d'un json en image") 
-        json_to_image_init()
+        music_to_shot_init()
          
     # Help
     elif gl.keyboard.events[events.HKEY] == gl.KX_INPUT_JUST_ACTIVATED:
@@ -929,7 +888,7 @@ def end():
             gl.endGame()
 
     # Limitation du nombre d'images pour test
-    if gl.phase == "json to image":
-        if gl.numero >= gl.conf["json_to_image"]["images_nbr"]:
+    if gl.phase == "music to shot":
+        if gl.numero >= gl.conf["play_letters"]["images_nbr"]:
             print("Fin de la conversion du json en images")
-            json_to_image_init()
+            music_to_shot_init()

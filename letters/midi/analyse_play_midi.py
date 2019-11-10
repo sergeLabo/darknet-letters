@@ -67,7 +67,7 @@ class AnalyseMidi:
     Sous répertoires et sous sous répertoires possible dans /music
     """
 
-    def __init__(self, midi_file, FPS):
+    def __init__(self, midi_file, FPS, volume=""):
         """Un seul fichier midi
         FPS de 10 à 1000, 50 ou 100 est bien
         Plus le FPS est élevé, plus le temps de calcul est long !
@@ -77,6 +77,8 @@ class AnalyseMidi:
 
         self.midi_file = midi_file
         self.FPS = FPS
+        self.volume = volume
+        
         self.end_time = 0
         self.instruments = None
         self.instruments = []
@@ -215,7 +217,9 @@ class AnalyseMidi:
 
         # velocity maxi entre 0 et 127
         partition = normalize_velocity(partition)
-
+        if self.volume == "flat":
+            partition = flatten_partition(partition)
+        
         return partition
         
     def get_instrument_roll(self, partition):
@@ -259,11 +263,14 @@ class AnalyseMidi:
         json_name = self.get_json_name()
         with open(json_name, 'w') as f_out:
             json.dump(json_data, f_out)
+        f_out.close()
         print('Enregistrement de:', json_name)
 
         # Pour Blender
         self.end = 1
-    
+
+        return self.instruments
+        
     def get_json_name(self):
         """Le fichier midi_file est le chemin relatif du fichier dans :
         ./midi/music/
@@ -282,7 +289,7 @@ class AnalyseMidi:
         
         # Remplacement de music par json
         json_name = filename.replace("music/",
-                                     "json_fps_" + str(self.FPS) + "/")
+                                     "json_" + str(self.FPS) + "/")
 
         print("Nom du fichier json", json_name)
         
@@ -324,6 +331,13 @@ class AnalyseMidi:
             
         # Sous sous répertoires
         if len(json_name_abs.parts) - index_midi == 5:
+            # Création du sous répertoire
+            sd_fin = json_name_abs.parts[1:index_midi + 3]
+            sd = a.joinpath(*sd_fin)
+            print("Sous dossier", sd)
+            self.mytools.create_directory(sd)
+            
+            # Création des sous sous répertoires
             ssd_fin = json_name_abs.parts[1:index_midi + 4]
             ssd = a.joinpath(*ssd_fin)
             print("Sous sous dossier", ssd)
@@ -498,8 +512,12 @@ class OneInstrumentPlayer:
 
         # Pour gérer les threads
         self.thread_dict = {}
+        # #self.volume = {}
         for i in range(128):
+            # Pour gérer les notes
             self.thread_dict[i] = 0
+            # Pour gérer les volumes avec l'IA
+            # #self.volume[i] = 0
 
     def set_audio(self):
         """Spécifique à FluidR3_GM.sf2
@@ -587,7 +605,8 @@ class PlayJsonFile:
 
         with open(self.midi_json) as f:
             data = json.load(f)
-
+        f.close()
+        
         partitions = data["partitions"]
         instruments = data["instruments"]
 
@@ -677,14 +696,27 @@ def normalize_velocity(partition):
 
     return partition
 
-
+def flatten_partition(partition):
+    """Set les volume=velocity à 127"""
+    
+    print("Volume de la partition à 127")
+    for c in range(len(partition)):
+        if partition[c]:
+            note = partition[c][0][0]
+            volume = 127
+            partition[c] = [(note, volume)]
+            
+    return partition
+    
 def cut_the_top_off_note_volume(note, volume):
+    
     # note entre 0 et 127, volume entre 0 et maxi
     maxi = 127
     if note < 0: note = 0
     if note > 127: note = 127
     if volume < 0: volume = 0
     if volume > maxi: volume = maxi
+    
     return note, volume
 
 
@@ -726,22 +758,39 @@ def json_file_list_in_json_dir():
     return get_file_list(directory, extentions)
 
 
-def create_all_json(directory, FPS):
+def create_all_json(directory, FPS, volume):
     """Création des json des fichiers midi de file_list"""
 
     # Création des json
     extentions = [".midi", "mid", "kar", "Mid", "MID"]
     file_list = get_file_list(directory, extentions)
     print("Nombre de fichiers midi à analyser:", len(file_list))
+    all_instruments = {}
     for midi in file_list:
-        create_one_json(midi, FPS)
+        if "guillaume" not in midi:
+            instruments = create_one_json(midi, FPS, volume)
+            all_instruments[midi] = instruments
+
+    save_all_instruments(all_instruments, FPS)
 
 
-def create_one_json(midi_file, FPS):
+def save_all_instruments(all_instruments, FPS):
+    """dans ./all_instruments"""
+    
+    # Save du json
+    json_name = "./all_instruments_" + str(FPS) + ".json"
+    with open(json_name, 'w') as f_out:
+        json.dump(all_instruments, f_out)
+    f_out.close()
+
+    
+def create_one_json(midi_file, FPS, volume):
     """Création d'un json"""
 
-    am = AnalyseMidi(midi_file, FPS)
-    am.save_midi_json()
+    am = AnalyseMidi(midi_file, FPS, volume)
+    instruments = am.save_midi_json()
+    
+    return instruments
 
 
 def play_all_json(directory, FPS, fonts):
@@ -771,11 +820,15 @@ def play_all_midi_files(FPS, fonts):
         
 if __name__ == '__main__':
 
-    # FPS de 35 pour IA, 60 pour letters
-    FPS = 35
+    # FPS de 40 pour IA, 60 pour letters
+    FPS = 40
 
+    # pour forcer le volume pour l'IA bête
+    # Set le volume à 127 dans le json
+    volume = "flat"
+    
     # Création des json
-    create_all_json("./music/", FPS)
+    create_all_json("./music/", FPS, volume)
     
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
@@ -783,6 +836,7 @@ if __name__ == '__main__':
     fonts = "./soundfont/MuseScore_General_Full.sf2"
     # #fonts = "./soundfont/FluidR3_GM.sf2"
     # #fonts = "./soundfont/percussion/142-Cymbal Roll.sf2"
+    
     # ## Analyse et play d'une music
     # #midi_file = "./music/pas_pour_github/Capri.mid"
     # #analyse_play_one_midi(midi_file, FPS, fonts)

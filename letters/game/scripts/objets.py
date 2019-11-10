@@ -9,6 +9,8 @@
 Exemple:
 font_2_a font_2_A font_0_z font_9_t
 lettres de a à t et A à T
+
+Version sans majuscules
 """
 
 from pymultilame import MyTools
@@ -27,9 +29,9 @@ def get_objects():
         for minus in MINUS:
             ob = "font_" + str(font) + "_" + minus
             objets.append(ob)
-        for majus in MAJUS:
-            ob = "font_" + str(font) + "_" + majus
-            objets.append(ob)
+        # #for majus in MAJUS:
+            # #ob = "font_" + str(font) + "_" + majus
+            # #objets.append(ob)
 
     print(len(objets))
     print(objets)

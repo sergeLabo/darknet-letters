@@ -103,7 +103,7 @@ def get_sorted_files(fli):
 
     files_list = [0]*len(fli)
     for image in fli:
-        # ../json_to_image/s_j_to_i_2677.jpg s_j_to_i_2677.jpg
+        # ../truc/s_j_to_i_2677.jpg s_j_to_i_2677.jpg
         nbr = image.split("/")[-1].split("_")[-1][:-4]  # 2677
         files_list[int(nbr)] = image
         
