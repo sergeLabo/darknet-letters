@@ -23,6 +23,7 @@ import os, sys
 import subprocess
 import gc
 import time
+from datetime import datetime
 import re
 import textwrap
 import cv2
@@ -74,7 +75,7 @@ class YOLO:
 
         # Windows
         cv2.namedWindow('Reglage')
-        cv2.moveWindow('Reglage', 0, 25)  # 810, 25)
+        cv2.moveWindow('Reglage', 810, 25)
         cv2.namedWindow('Letters')
         cv2.moveWindow('Letters', 0, 25)
 
@@ -220,7 +221,7 @@ class YOLO:
             if nbr < mini:
                 mini = nbr
         print("Indice des images mini =", mini)
-        
+
         # Tri des images
         n = 0
         for image in images:
@@ -228,7 +229,7 @@ class YOLO:
             # ../play_letters/s_j_to_i_1243.jpg devient s_j_to_i_1243.jpg
             nbr = int(image.split("/")[-1].split("_")[-1][:-4])  # 1243
             shot_list[nbr - mini] = image
-                
+
         return shot_list
 
     def get_all_shot(self):
@@ -306,8 +307,8 @@ class YOLO:
         """
 
         # Soustraction du chemin de shot_dir
-
-        json_name = self.images_directory + "_b.json"
+        date = "_" + datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")
+        json_name = self.images_directory + date + ".json"
 
         with open(json_name, 'w') as f_out:
             json.dump(self.all_notes, f_out)
@@ -373,7 +374,7 @@ class YOLO:
             t_tempo = ta
 
             if ta > t_init + 1:
-                print("FPS =", round(fps, 1))
+                #print("FPS =", round(fps, 1))
                 t_init = time.time()
                 fps = 0
 
@@ -639,8 +640,8 @@ if __name__ == "__main__":
 
             # ## Reset de la RAM GPU
             # #darknet.free_network(yolo.netMain)
-            
-            print("Morceau suivant")
+
+            print("\n\nMorceau suivant\n")
 
     print("Done")
     os._exit(0)

@@ -1,0 +1,51 @@
+[midi]
+fonts = "../midi/soundfont/MuseScore_General_Full.sf2"
+fps = 40
+file_nbr = 0
+json_files = "../midi/json_fps_40"
+
+[play_letters]
+volume = 0
+blur_min = 3
+blur_max = 3
+fps = 40
+json_files = "../midi/json_40/non_git/ia"
+images_nbr = 1500
+pl_shot = "/media/serge/BACKUP/play_letters_shot/pl_shot_07"
+shot_size = 416
+
+[blend]
+shot_every = 20
+total = 38000
+numero = 0
+fond = "brouillard" foncé RGB
+shot_size = 416
+music_size = 1000
+plage_x = 4.5
+plage_y = 4.5
+size_min = 0.8
+size_max = 0.8
+letters_scale = 1.09
+fullscreen = 0
+sun_energy_min = 4
+sun_energy_max = 4
+sun_color_min = 1.0
+sun_color_max = 1.0
+shot = "/media/serge/BACKUP/shot_11/shot/"
+
+[darknet]
+shot_size = 416
+thresh = 67
+hier_thresh = 50
+nms = 50
+blur_mini = 3
+blur_maxi = 3
+configpath = "../darknet/data_11/yolov3-tiny_3l_11.cfg"
+weightpath = "../darknet/data_11/backup/yolov3-tiny_3l_11_best.weights"
+metapath = "../darknet/data_11/obj.data"
+
+./darknet partial data_12/yolov3-tiny_3l_12.cfg yolov3-tiny.weights data_12/yolov3-tiny.conv.15 15
+./darknet detector train data_12/obj.data data_12/yolov3-tiny_3l_12.cfg data_12/yolov3-tiny.conv.15 -map
+
+stop à 30000
+reste 10000 à faire

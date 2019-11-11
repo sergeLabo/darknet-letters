@@ -79,7 +79,8 @@ class LettersPath(LettersConfig):
     def set_shot_jpg_dir(self):
         """Chemin en str dans ini"""
         
-        self.shot_jpg_dir = Path(str(self.shot_dir) + "_jpg")
+        #self.shot_jpg_dir = Path(str(self.shot_dir) + "_jpg")
+        self.shot_jpg_dir = Path(self.conf["blend"]["shot_jpg"])
 
     @property
     def get_letters_path(self):

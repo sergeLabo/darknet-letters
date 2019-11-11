@@ -54,6 +54,9 @@ class BlurAndConvert:
     def __init__(self):
         self.mt = MyTools()
 
+        self.blur_mini = CONF["darknet"]["blur_mini"]
+        self.blur_maxi = CONF["darknet"]["blur_maxi"]
+        
         # Dossiers
         self.shot = shot_dir
         print("Dossier shot:", self.shot)
@@ -87,9 +90,8 @@ class BlurAndConvert:
 
     def blur(self, img):
         # Flou
-        blur_mini = CONF["darknet"]["blur_mini"]
-        blur_maxi = CONF["darknet"]["blur_maxi"]
-        k = random.randint(blur_mini, blur_maxi)
+
+        k = random.randint(self.blur_mini, self.blur_maxi)
         if k != 0:
             img = cv2.blur(img, (k, k))
         return img

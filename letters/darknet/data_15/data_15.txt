@@ -32,15 +32,23 @@ sun_energy_max = 4
 sun_color_min = 1.0
 sun_color_max = 1.0
 shot = "/media/serge/BACKUP/letters_shot/shot_15/shot_15"
-shot_jpg = "/media/serge/BACKUP/letters_shot/shot_16/shot_16_jpg"
 
 [darknet]
-shot_size = 800
+shot_size = 640
 thresh = 42
 hier_thresh = 42
 nms = 33
 blur_mini = 0
 blur_maxi = 0
-configpath = "../darknet/data_14/yolov3-tiny_14.cfg"
-weightpath = "../darknet/data_14/backup/yolov3-tiny_14_best.weights"
-metapath = "../darknet/data_14/obj.data"
+configpath = "../darknet/data_15/yolov3-tiny_15.cfg"
+weightpath = "../darknet/data_15/backup/yolov3-tiny_15_best.weights"
+metapath = "../darknet/data_15/obj.data"
+
+
+ln -s /media/data/projets/darknet-letters/letters/darknet/data_15/ /media/data/projets/darknet/data_15
+
+export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}
+
+./darknet partial data_15/yolov3-tiny_15.cfg yolov3-tiny.weights data_15/yolov3-tiny.conv.15 15
+
+./darknet detector train data_15/obj.data data_15/yolov3-tiny_15.cfg data_15/yolov3-tiny.conv.15 -map

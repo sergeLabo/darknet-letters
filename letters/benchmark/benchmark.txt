@@ -113,44 +113,93 @@ metapath = "../darknet/data_11/obj.data"
 essai 08
 premier test avec benchmark.py
 
+Faux
 Musique: oh les filles oh les filles
-font_table [8, 7, 9, 5, 4, 1, 6]
 Nombre de notes de l'IA: 1500
 Nombre total de notes en entrée = 22157
 Nombre de notes bien reconnues  = 43
-0.002
-
 Musique: zorro
-font_table [9, 4, 2]
 Nombre de notes de l'IA: 1500
 Nombre total de notes en entrée = 6502
 Nombre de notes bien reconnues  = 268
-0.041
-
 Musique: Polnareff Michel - On Ira Tous Au Paradis
-font_table [6, 9, 2, 0, 7, 4, 8, 5, 3, 1]
 Nombre de notes de l'IA: 1500
 Nombre total de notes en entrée = 32983
 Nombre de notes bien reconnues  = 282
-0.009
-
 Musique: jeux_interdits
-font_table [4, 9, 3, 8, 6, 2]
 Nombre de notes de l'IA: 1500
 Nombre total de notes en entrée = 8355
 Nombre de notes bien reconnues  = 132
-0.016
-
 Musique: gaynor_i_will_survive
 font_table [6, 1, 2, 3, 4, 0, 9, 5]
-Nombre de notes de l'IA: 1500
 Nombre total de notes en entrée = 49405
 Nombre de notes bien reconnues  = 70
-0.001
-
 Musique: Dutronc_cactus
-font_table [5, 0, 6, 8]
 Nombre de notes de l'IA: 1500
 Nombre total de notes en entrée = 9325
 Nombre de notes bien reconnues  = 14
-0.002
+Fin de Faux
+
+essai 09 avec
+yolov3-tiny_14_best.weights
+premier calcul réussi avec yolov3-tiny 2 layers
+
+Musique: oh les filles oh les filles
+Nombre de notes par partition en entrèe: 10094
+Nombre de partitions: 7
+Nombre de frame dans notes_in: 10094
+Nombre de notes dans notes_in: 22157
+Nombre de notes out: 1500
+font_table [8, 7, 9, 5, 4, 1, 6]
+Nombre de notes en entrée  = 22157
+Nombre de notes reconnues  = 27 soit 0.001
+
+Musique: zorro
+Nombre de notes par partition en entrèe: 2860
+Nombre de partitions: 3
+Nombre de frame dans notes_in: 2860
+Nombre de notes dans notes_in: 6502
+Nombre de notes out: 1500
+font_table [9, 4, 2]
+Nombre de notes en entrée  = 6502
+Nombre de notes reconnues  = 150 soit 0.023
+
+Musique: Polnareff Michel - On Ira Tous Au Paradis
+Nombre de notes par partition en entrèe: 6862
+Nombre de partitions: 10
+Nombre de frame dans notes_in: 6862
+Nombre de notes dans notes_in: 32983
+Nombre de notes out: 1500
+font_table [6, 9, 2, 0, 7, 4, 8, 5, 3, 1]
+Nombre de notes en entrée  = 32983
+Nombre de notes reconnues  = 163 soit 0.005
+
+Musique: jeux_interdits
+Nombre de notes par partition en entrèe: 2603
+Nombre de partitions: 6
+Nombre de frame dans notes_in: 2603
+Nombre de notes dans notes_in: 8355
+Nombre de notes out: 1500
+font_table [4, 9, 3, 8, 6, 2]
+Nombre de notes en entrée  = 8355
+Nombre de notes reconnues  = 76 soit 0.009
+
+Musique: gaynor_i_will_survive
+Nombre de notes par partition en entrèe: 12129
+Nombre de partitions: 8
+Nombre de frame dans notes_in: 12129
+Nombre de notes dans notes_in: 49405
+Nombre de notes out: 1500
+font_table [6, 1, 2, 3, 4, 0, 9, 5]
+Nombre de notes en entrée  = 49405
+Nombre de notes reconnues  = 36 soit 0.001
+
+Musique: Dutronc_cactus
+Nombre de notes par partition en entrèe: 5929
+Nombre de partitions: 4
+Nombre de frame dans notes_in: 5929
+Nombre de notes dans notes_in: 9325
+Nombre de notes out: 1500
+font_table [5, 0, 6, 8]
+Nombre de notes en entrée  = 9325
+Nombre de notes reconnues  = 6 soit 0.001

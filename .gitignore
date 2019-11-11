@@ -5,6 +5,7 @@
 # divers
 old/
 .old/
+*.py_old
 
 # music
 z_guillaume/
@@ -29,7 +30,7 @@ json_to_image_shot/
 
 # darknet
 *.conv.*
-libdarknet.so
+*.so
 *.weights
 shot/
 shot_jpg/
@@ -37,7 +38,12 @@ shot_control/
 video/
 json_to_image/
 get_shot.json
+train.txt
+test.txt
+all_instruments*
 
+# doc
+*.mkv
 
 # Blender
 *.blend1
