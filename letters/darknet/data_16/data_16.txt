@@ -1,0 +1,54 @@
+[midi]
+fonts = "/media/data/3D/projets/darknet-letters/letters/midi/soundfont/MuseScore_General_Full.sf2"
+fps = 60
+file_nbr = 16
+json_files = "/media/data/3D/projets/darknet-letters/letters/midi/json_60"
+
+[play_letters]
+volume = 0
+blur_min = 3
+blur_max = 3
+fps = 40
+json_files = "/media/data/3D/projets/darknet-letters/letters/midi/json_40/non_git/ia"
+images_nbr = 2000
+pl_shot = "/media/data/3D/projets/darknet-letters/letters/pl_shot_07"
+shot_size = 640
+
+[blend]
+shot_every = 20
+total = 38000
+numero = 0
+fond = "noir"
+shot_size = 800
+music_size = 1000
+plage_x = 4.5
+plage_y = 4.5
+size_min = 0.8
+size_max = 0.8
+letters_scale = 1.09
+fullscreen = 1
+sun_energy_min = 4
+sun_energy_max = 4
+sun_color_min = 1.0
+sun_color_max = 1.0
+shot = "/media/serge/BACKUP/letters_shot/shot_15/shot_15"
+
+[darknet]
+shot_size = 640
+thresh = 42
+hier_thresh = 42
+nms = 33
+blur_mini = 0
+blur_maxi = 0
+configpath = "../darknet/data_15/yolov3-tiny_15.cfg"
+weightpath = "../darknet/data_15/backup/yolov3-tiny_15_best.weights"
+metapath = "../darknet/data_15/obj.data"
+
+
+ln -s /media/data/projets/darknet-letters/letters/darknet/data_16/ /media/data/projets/darknet/data_16
+
+export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}
+
+./darknet partial data_16/yolov3-tiny_16.cfg yolov3-tiny.weights data_16/yolov3-tiny.conv.15 15
+
+./darknet detector train data_16/obj.data data_16/yolov3-tiny_16.cfg data_16/yolov3-tiny.conv.15 -map
