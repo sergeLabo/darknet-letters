@@ -62,6 +62,7 @@ class YOLO:
         self.images_directory = images_directory
         self.shot_list = self.get_sorted_shot_list()
         self.all_shot = self.get_all_shot()
+
         # nom du morceau
         self.filename = self.images_directory.split("/")[-1]
 
@@ -225,7 +226,7 @@ class YOLO:
         # Tri des images
         n = 0
         for image in images:
-            # De 500 à 1500
+            # Si de 500 à 1500
             # ../play_letters/s_j_to_i_1243.jpg devient s_j_to_i_1243.jpg
             nbr = int(image.split("/")[-1].split("_")[-1][:-4])  # 1243
             shot_list[nbr - mini] = image
@@ -303,10 +304,9 @@ class YOLO:
         """
         /bla...bla/play_letters_shot_jpg_3/bob_sheriff
         to
-        /bla...bla/play_letters_shot_jpg_3/bob_sheriff.json
+        /bla...bla/play_letters_shot_jpg_3/bob_sheriff_data.json
         """
 
-        # Soustraction du chemin de shot_dir
         date = "_" + datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")
         json_name = self.images_directory + date + ".json"
 
@@ -318,7 +318,7 @@ class YOLO:
     def detect(self):
         """FPS = 40 sur GTX1060"""
 
-        i = 500
+        i = 0
         fps = 0
         t_init = time.time()
         tempo = 1
@@ -333,10 +333,12 @@ class YOLO:
             self.hier_thresh = cv2.getTrackbarPos('hier_thresh','Reglage')
             self.nms = cv2.getTrackbarPos('nms','Reglage')
 
+            # #im = cv2.resize(img, (640, 640), interpolation=cv2.INTER_LINEAR)
+
             img_resized = cv2.resize(img,
                                     (darknet.network_width(self.netMain),
-                                    darknet.network_height(self.netMain)),
-                                    interpolation=cv2.INTER_LINEAR)
+                                     darknet.network_height(self.netMain)),
+                                     interpolation=cv2.INTER_LINEAR)
 
             darknet.copy_image_from_bytes(self.darknet_image,
                                           img.tobytes())
@@ -374,7 +376,7 @@ class YOLO:
             t_tempo = ta
 
             if ta > t_init + 1:
-                #print("FPS =", round(fps, 1))
+                print("FPS =", round(fps, 1))
                 t_init = time.time()
                 fps = 0
 
@@ -627,21 +629,22 @@ if __name__ == "__main__":
     CONF = lp.conf
 
     # Dossier des dossiers des images à convertir en musique
-    dossier = CONF["play_letters"]["pl_shot"]
+    dossier = CONF["play_letters"]["pl_shot_jpg"]
 
     sd_list = [x[0] for x in os.walk(dossier)]
     print("Liste des sous dossiers:", sd_list)
     for sd in sd_list:
         # Pas le dossier principal
         if sd != dossier:
-            print("Répertoire:", sd)
-            yolo = YOLO(sd)
-            yolo.detect()
+            if "zorro" in sd:
+                print("Répertoire:", sd)
+                yolo = YOLO(sd)
+                yolo.detect()
 
-            # ## Reset de la RAM GPU
-            # #darknet.free_network(yolo.netMain)
+                # ## Reset de la RAM GPU
+                # #darknet.free_network(yolo.netMain)
 
-            print("\n\nMorceau suivant\n")
+                print("\n\nMorceau suivant\n")
 
     print("Done")
     os._exit(0)

@@ -148,58 +148,384 @@ Musique: oh les filles oh les filles
 Nombre de notes par partition en entrèe: 10094
 Nombre de partitions: 7
 Nombre de frame dans notes_in: 10094
-Nombre de notes dans notes_in: 22157
 Nombre de notes out: 1500
+Nombre de notes réelles à jouer en entrée: 26874
 font_table [8, 7, 9, 5, 4, 1, 6]
-Nombre de notes en entrée  = 22157
+Nombre de notes en entrée  = 26874
 Nombre de notes reconnues  = 27 soit 0.001
+
 
 Musique: zorro
 Nombre de notes par partition en entrèe: 2860
 Nombre de partitions: 3
 Nombre de frame dans notes_in: 2860
-Nombre de notes dans notes_in: 6502
 Nombre de notes out: 1500
+Nombre de notes réelles à jouer en entrée: 8124
 font_table [9, 4, 2]
-Nombre de notes en entrée  = 6502
-Nombre de notes reconnues  = 150 soit 0.023
+Nombre de notes en entrée  = 8124
+Nombre de notes reconnues  = 150 soit 0.018
+
 
 Musique: Polnareff Michel - On Ira Tous Au Paradis
 Nombre de notes par partition en entrèe: 6862
 Nombre de partitions: 10
 Nombre de frame dans notes_in: 6862
-Nombre de notes dans notes_in: 32983
 Nombre de notes out: 1500
+Nombre de notes réelles à jouer en entrée: 20208
 font_table [6, 9, 2, 0, 7, 4, 8, 5, 3, 1]
-Nombre de notes en entrée  = 32983
-Nombre de notes reconnues  = 163 soit 0.005
+Nombre de notes en entrée  = 20208
+Nombre de notes reconnues  = 163 soit 0.008
+
 
 Musique: jeux_interdits
 Nombre de notes par partition en entrèe: 2603
 Nombre de partitions: 6
 Nombre de frame dans notes_in: 2603
-Nombre de notes dans notes_in: 8355
 Nombre de notes out: 1500
+Nombre de notes réelles à jouer en entrée: 7437
 font_table [4, 9, 3, 8, 6, 2]
-Nombre de notes en entrée  = 8355
-Nombre de notes reconnues  = 76 soit 0.009
+Nombre de notes en entrée  = 7437
+Nombre de notes reconnues  = 76 soit 0.01
+
 
 Musique: gaynor_i_will_survive
 Nombre de notes par partition en entrèe: 12129
 Nombre de partitions: 8
 Nombre de frame dans notes_in: 12129
-Nombre de notes dans notes_in: 49405
 Nombre de notes out: 1500
+Nombre de notes réelles à jouer en entrée: 35700
 font_table [6, 1, 2, 3, 4, 0, 9, 5]
-Nombre de notes en entrée  = 49405
+Nombre de notes en entrée  = 35700
 Nombre de notes reconnues  = 36 soit 0.001
+
 
 Musique: Dutronc_cactus
 Nombre de notes par partition en entrèe: 5929
 Nombre de partitions: 4
 Nombre de frame dans notes_in: 5929
-Nombre de notes dans notes_in: 9325
 Nombre de notes out: 1500
+Nombre de notes réelles à jouer en entrée: 13158
 font_table [5, 0, 6, 8]
-Nombre de notes en entrée  = 9325
-Nombre de notes reconnues  = 6 soit 0.001
+Nombre de notes en entrée  = 13158
+Nombre de notes reconnues  = 6 soit 0.0
+
+essai 1 essai 1 essai 1 essai 1 essai 1 essai 1 essai 1 essai 1 essai 1 essai 1 essai 1 essai 1
+
+Musique: oh les filles oh les filles
+2860
+Nombre de notes par partition en entrèe: 10094
+Nombre de partitions: 7
+Nombre de frame dans notes_in: 10094
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 3279
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/oh les filles oh les filles/instruments.txt
+['0 1 8', '0 32 7', '0 30 9', '0 5 5', '0 18 4', '0 29 1', '0 117 6']
+font_table [8, 7, 9, 5, 4, 1, 6]
+Nombre de notes en entrée  = 3279
+Nombre de notes reconnues  = 1215 soit 0.371
+
+
+Musique: zorro
+2860
+Nombre de notes par partition en entrèe: 2860
+Nombre de partitions: 3
+Nombre de frame dans notes_in: 2860
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 5625
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/zorro/instruments.txt
+['0 65 9', '0 3 4', '0 3 2']
+font_table [9, 4, 2]
+Nombre de notes en entrée  = 5625
+Nombre de notes reconnues  = 1453 soit 0.258
+
+
+Musique: Polnareff Michel - On Ira Tous Au Paradis
+2860
+Nombre de notes par partition en entrèe: 6862
+Nombre de partitions: 10
+Nombre de frame dans notes_in: 6862
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 2187
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/Polnareff Michel - On Ira Tous Au Paradis/instruments.txt
+['0 22 6', '0 33 9', '0 25 2', '0 50 0', '0 52 7', '0 90 4', '0 104 8', '0 27 5', '0 117 3', '0 66 1']
+font_table [6, 9, 2, 0, 7, 4, 8, 5, 3, 1]
+Nombre de notes en entrée  = 2187
+Nombre de notes reconnues  = 838 soit 0.383
+
+
+Musique: jeux_interdits
+2860
+Nombre de notes par partition en entrèe: 2603
+Nombre de partitions: 6
+Nombre de frame dans notes_in: 2603
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 4557
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/jeux_interdits/instruments.txt
+['0 24 4', '0 24 9', '0 24 3', '0 24 8', '0 24 6', '0 24 2']
+font_table [4, 9, 3, 8, 6, 2]
+Nombre de notes en entrée  = 4557
+Nombre de notes reconnues  = 839 soit 0.184
+
+
+Musique: gaynor_i_will_survive
+2860
+Nombre de notes par partition en entrèe: 12129
+Nombre de partitions: 8
+Nombre de frame dans notes_in: 12129
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 3540
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/gaynor_i_will_survive/instruments.txt
+['0 65 6', '0 0 1', '0 61 2', '0 45 3', '0 48 4', '0 46 0', '0 34 9', '0 116 5']
+font_table [6, 1, 2, 3, 4, 0, 9, 5]
+Nombre de notes en entrée  = 3540
+Nombre de notes reconnues  = 1622 soit 0.458
+
+
+Musique: Dutronc_cactus
+2860
+Nombre de notes par partition en entrèe: 5929
+Nombre de partitions: 4
+Nombre de frame dans notes_in: 5929
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 975
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/Dutronc_cactus/instruments.txt
+['0 119 5', '0 28 0', '0 29 6', '0 32 8']
+font_table [5, 0, 6, 8]
+Nombre de notes en entrée  = 975
+Nombre de notes reconnues  = 194 soit 0.199
+
+
+essai 2 essai 2 essai 2 essai 2 essai 2 essai 2 essai 2 essai 2 essai 2 essai 2 essai 2 essai 2
+Musique: oh les filles oh les filles
+2860
+Nombre de notes par partition en entrèe: 10094
+Nombre de partitions: 7
+Nombre de frame dans notes_in: 10094
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 3279
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/oh les filles oh les filles/instruments.txt
+['0 1 8', '0 32 7', '0 30 9', '0 5 5', '0 18 4', '0 29 1', '0 117 6']
+font_table [8, 7, 9, 5, 4, 1, 6]
+Nombre de notes en entrée  = 3279
+Nombre de notes reconnues  = 1172 soit 0.357
+
+
+Musique: zorro
+2860
+Nombre de notes par partition en entrèe: 2860
+Nombre de partitions: 3
+Nombre de frame dans notes_in: 2860
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 5625
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/zorro/instruments.txt
+['0 65 9', '0 3 4', '0 3 2']
+font_table [9, 4, 2]
+Nombre de notes en entrée  = 5625
+Nombre de notes reconnues  = 1090 soit 0.194
+
+
+Musique: Polnareff Michel - On Ira Tous Au Paradis
+2860
+Nombre de notes par partition en entrèe: 6862
+Nombre de partitions: 10
+Nombre de frame dans notes_in: 6862
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 2187
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/Polnareff Michel - On Ira Tous Au Paradis/instruments.txt
+['0 22 6', '0 33 9', '0 25 2', '0 50 0', '0 52 7', '0 90 4', '0 104 8', '0 27 5', '0 117 3', '0 66 1']
+font_table [6, 9, 2, 0, 7, 4, 8, 5, 3, 1]
+Nombre de notes en entrée  = 2187
+Nombre de notes reconnues  = 501 soit 0.229
+
+
+Musique: jeux_interdits
+2860
+Nombre de notes par partition en entrèe: 2603
+Nombre de partitions: 6
+Nombre de frame dans notes_in: 2603
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 4557
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/jeux_interdits/instruments.txt
+['0 24 4', '0 24 9', '0 24 3', '0 24 8', '0 24 6', '0 24 2']
+font_table [4, 9, 3, 8, 6, 2]
+Nombre de notes en entrée  = 4557
+Nombre de notes reconnues  = 675 soit 0.148
+
+
+Musique: gaynor_i_will_survive
+2860
+Nombre de notes par partition en entrèe: 12129
+Nombre de partitions: 8
+Nombre de frame dans notes_in: 12129
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 3540
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/gaynor_i_will_survive/instruments.txt
+['0 65 6', '0 0 1', '0 61 2', '0 45 3', '0 48 4', '0 46 0', '0 34 9', '0 116 5']
+font_table [6, 1, 2, 3, 4, 0, 9, 5]
+Nombre de notes en entrée  = 3540
+Nombre de notes reconnues  = 1464 soit 0.414
+
+
+Musique: Dutronc_cactus
+2860
+Nombre de notes par partition en entrèe: 5929
+Nombre de partitions: 4
+Nombre de frame dans notes_in: 5929
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 975
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/Dutronc_cactus/instruments.txt
+['0 119 5', '0 28 0', '0 29 6', '0 32 8']
+font_table [5, 0, 6, 8]
+Nombre de notes en entrée  = 975
+Nombre de notes reconnues  = 144 soit 0.148
+
+
+essai 3 essai 3 essai 3 essai 3 essai 3 essai 3 essai 3 essai 3 essai 3 essai 3 essai 3 essai 3 essai 3 
+Musique: oh les filles oh les filles
+2860
+Nombre de notes par partition en entrèe: 10094
+Nombre de partitions: 7
+Nombre de frame dans notes_in: 10094
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 3279
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/oh les filles oh les filles/instruments.txt
+['0 1 8', '0 32 7', '0 30 9', '0 5 5', '0 18 4', '0 29 1', '0 117 6']
+font_table [8, 7, 9, 5, 4, 1, 6]
+Nombre de notes en entrée  = 3279
+Nombre de notes reconnues  = 0 soit 0.0
+
+
+Musique: zorro
+2860
+Nombre de notes par partition en entrèe: 2860
+Nombre de partitions: 3
+Nombre de frame dans notes_in: 2860
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 5625
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/zorro/instruments.txt
+['0 65 9', '0 3 4', '0 3 2']
+font_table [9, 4, 2]
+Nombre de notes en entrée  = 5625
+Nombre de notes reconnues  = 0 soit 0.0
+
+
+Musique: Polnareff Michel - On Ira Tous Au Paradis
+2860
+Nombre de notes par partition en entrèe: 6862
+Nombre de partitions: 10
+Nombre de frame dans notes_in: 6862
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 2187
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/Polnareff Michel - On Ira Tous Au Paradis/instruments.txt
+['0 22 6', '0 33 9', '0 25 2', '0 50 0', '0 52 7', '0 90 4', '0 104 8', '0 27 5', '0 117 3', '0 66 1']
+font_table [6, 9, 2, 0, 7, 4, 8, 5, 3, 1]
+Nombre de notes en entrée  = 2187
+Nombre de notes reconnues  = 0 soit 0.0
+
+
+Musique: jeux_interdits
+2860
+Nombre de notes par partition en entrèe: 2603
+Nombre de partitions: 6
+Nombre de frame dans notes_in: 2603
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 4557
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/jeux_interdits/instruments.txt
+['0 24 4', '0 24 9', '0 24 3', '0 24 8', '0 24 6', '0 24 2']
+font_table [4, 9, 3, 8, 6, 2]
+Nombre de notes en entrée  = 4557
+Nombre de notes reconnues  = 0 soit 0.0
+
+
+Musique: gaynor_i_will_survive
+2860
+Nombre de notes par partition en entrèe: 12129
+Nombre de partitions: 8
+Nombre de frame dans notes_in: 12129
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 3540
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/gaynor_i_will_survive/instruments.txt
+['0 65 6', '0 0 1', '0 61 2', '0 45 3', '0 48 4', '0 46 0', '0 34 9', '0 116 5']
+font_table [6, 1, 2, 3, 4, 0, 9, 5]
+Nombre de notes en entrée  = 3540
+Nombre de notes reconnues  = 0 soit 0.0
+
+
+Musique: Dutronc_cactus
+2860
+Nombre de notes par partition en entrèe: 5929
+Nombre de partitions: 4
+Nombre de frame dans notes_in: 5929
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 975
+Fichier instruments_txt /media/serge/BACKUP/play_letters_shot/pl_shot_08_jpg/Dutronc_cactus/instruments.txt
+['0 119 5', '0 28 0', '0 29 6', '0 32 8']
+font_table [5, 0, 6, 8]
+Nombre de notes en entrée  = 975
+Nombre de notes reconnues  = 0 soit 0.0
+
+essai 4 essai 4 essai 4 essai 4 essai 4 essai 4 essai 4 essai 4 essai 4 essai 4 essai 4 essai 4
+Musique: oh les filles oh les filles
+2860
+Nombre de notes par partition en entrèe: 10094
+Nombre de partitions: 7
+Nombre de frame dans notes_in: 10094
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 3279
+Nombre de notes en entrée  = 3279
+Nombre de notes reconnues  = 1505 soit 0.459
+
+
+Musique: zorro
+2860
+Nombre de notes par partition en entrèe: 2860
+Nombre de partitions: 3
+Nombre de frame dans notes_in: 2860
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 5625
+Nombre de notes en entrée  = 5625
+Nombre de notes reconnues  = 1588 soit 0.282
+
+
+Musique: Polnareff Michel - On Ira Tous Au Paradis
+2860
+Nombre de notes par partition en entrèe: 6862
+Nombre de partitions: 10
+Nombre de frame dans notes_in: 6862
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 2187
+Nombre de notes en entrée  = 2187
+Nombre de notes reconnues  = 970 soit 0.444
+
+
+Musique: jeux_interdits
+2860
+Nombre de notes par partition en entrèe: 2603
+Nombre de partitions: 6
+Nombre de frame dans notes_in: 2603
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 4557
+Nombre de notes en entrée  = 4557
+Nombre de notes reconnues  = 1077 soit 0.236
+
+
+Musique: gaynor_i_will_survive
+2860
+Nombre de notes par partition en entrèe: 12129
+Nombre de partitions: 8
+Nombre de frame dans notes_in: 12129
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 3540
+Nombre de notes en entrée  = 3540
+Nombre de notes reconnues  = 1628 soit 0.46
+
+
+Musique: Dutronc_cactus
+2860
+Nombre de notes par partition en entrèe: 5929
+Nombre de partitions: 4
+Nombre de frame dans notes_in: 5929
+Nombre de frame dans notes out: 2000
+Nombre de notes réelles à jouer en entrée: 975
+Nombre de notes en entrée  = 975
+Nombre de notes reconnues  = 134 soit 0.137

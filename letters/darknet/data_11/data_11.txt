@@ -49,5 +49,5 @@ metapath = "../darknet/data_11/obj.data"
 
 
 début avec yolov3-tiny_11.cfg mais nan au bout d'une heure
-reprise vers 18h avec yolov3-tiny_3l_11.cfg créé avec yolov3-tiny_3l_10.cfg, mais subdivisions=4
-avec 2 pas assez de mémoire
+reprise vers 18h avec yolov3-tiny_3l_11.cfg créé avec yolov3-tiny_3l_10.cfg, mais subdivisions=8
+avec 2 et 4 pas assez de mémoire

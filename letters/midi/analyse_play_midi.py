@@ -696,6 +696,7 @@ def normalize_velocity(partition):
 
     return partition
 
+
 def flatten_partition(partition):
     """Set les volume=velocity à 127"""
     
@@ -707,6 +708,7 @@ def flatten_partition(partition):
             partition[c] = [(note, volume)]
             
     return partition
+
     
 def cut_the_top_off_note_volume(note, volume):
     
@@ -767,9 +769,8 @@ def create_all_json(directory, FPS, volume):
     print("Nombre de fichiers midi à analyser:", len(file_list))
     all_instruments = {}
     for midi in file_list:
-        if "guillaume" not in midi:
-            instruments = create_one_json(midi, FPS, volume)
-            all_instruments[midi] = instruments
+        instruments = create_one_json(midi, FPS, volume)
+        all_instruments[midi] = instruments
 
     save_all_instruments(all_instruments, FPS)
 
@@ -819,16 +820,18 @@ def play_all_midi_files(FPS, fonts):
 
         
 if __name__ == '__main__':
-
-    # FPS de 40 pour IA, 60 pour letters
-    FPS = 40
-
-    # pour forcer le volume pour l'IA bête
-    # Set le volume à 127 dans le json
-    volume = "flat"
     
-    # Création des json
-    create_all_json("./music/", FPS, volume)
+    # Création de tous les json à FPS 60 pour blender display
+    # #FPS = 60
+    # #volume = ""
+    # #create_all_json("./music/", FPS, volume)
+
+    # Création des json pour test de l'IA
+    # Pour forcer le volume pour l'IA bête
+    # Set le volume à 127 partout dans les json
+    FPS = 40
+    volume = "flat"
+    create_all_json("./music/non_git/ia", FPS, volume)
     
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"

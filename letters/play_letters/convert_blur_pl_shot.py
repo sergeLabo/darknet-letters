@@ -56,6 +56,8 @@ class BlurAndConvert:
         # Dossiers
         self.shot = CONF["play_letters"]["pl_shot"]
         print("Dossier play_letters:", self.shot)
+        self.shot_jpg = CONF["play_letters"]["pl_shot_jpg"]
+        print("Dossier play_letters jpg:", self.shot_jpg)
         self.create_shot_jpg_dir()
 
         # Liste des sous-dossiers avec le dossier play_letters_shot
@@ -93,7 +95,6 @@ class BlurAndConvert:
             copyfile(txt, dst)
 
     def create_shot_jpg_dir(self):
-        self.shot_jpg = self.shot + "_jpg"
         
         print("Dossier pl_shot_jpg:", self.shot_jpg)
         # Si le dossier n'existe pas, je le crée
@@ -122,7 +123,8 @@ class BlurAndConvert:
 
     def save_to_jpg(self):
         n = 0
-
+        size = CONF["play_letters"]["shot_size"]
+        
         for png in self.all_png_files:
             if n % 100 == 0 and n != 0:
                 a = len(self.all_png_files)
@@ -133,6 +135,9 @@ class BlurAndConvert:
             # Lecture de png
             img = cv2.imread(png)
 
+            # Retaillage avec size de letters.ini
+            img = cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
+            
             # Flou
             img = self.apply_blur(img)
 
