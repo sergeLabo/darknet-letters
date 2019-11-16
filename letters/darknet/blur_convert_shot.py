@@ -54,8 +54,9 @@ class BlurAndConvert:
     def __init__(self):
         self.mt = MyTools()
 
-        self.blur_mini = CONF["darknet"]["blur_mini"]
-        self.blur_maxi = CONF["darknet"]["blur_maxi"]
+        self.blur_mini = CONF["letters_shot_jpg"]["blur_mini"]
+        self.blur_maxi = CONF["letters_shot_jpg"]["blur_maxi"]
+        self.size = CONF["letters_shot_jpg"]["shot_size"]
         
         # Dossiers
         self.shot = shot_dir
@@ -98,7 +99,6 @@ class BlurAndConvert:
 
     def save_to_jpg(self):
         n = 0
-        size = CONF["darknet"]["shot_size"]
 
         for png in self.all_png_files:
             if n % 100 == 0 and n != 0:
@@ -113,7 +113,7 @@ class BlurAndConvert:
             img = self.blur(img)
 
             # Retaillage avec size de letters.ini
-            img = cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
+            img = cv2.resize(img, (self.size, self.size), interpolation=cv2.INTER_AREA)
 
             # On travaille avec Path
             png_path = Path(png)

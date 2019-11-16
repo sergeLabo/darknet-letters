@@ -111,12 +111,16 @@ def main_intro():
 
 def main_music_and_letters():
     # Aggrandissement de la fenêtre
-    if gl.conf["blend"]["fullscreen"] == 1:
+    if gl.conf["music_and_letters"]["fullscreen"] == 1:
         render.setFullScreen(True)
     else:
         render.setWindowSize(gl.music_size, gl.music_size)
+
+    if gl.tempo["cube"].tempo < 120:
+        gl.all_obj["Cube"].visible = True
+    else:
+        gl.all_obj["Cube"].visible = False
         
-    gl.all_obj["Cube"].visible = False
     gl.all_obj["brouillard"].visible = False
     # Reset de la liste des noms d'objet blender à afficher
     gl.obj_name_list_to_display = []
@@ -201,8 +205,8 @@ def main_music_to_shot():
     """
 
     # Aggrandissement de la fenêtre
-    render.setWindowSize(gl.shot_size_music_to_shot,
-                         gl.shot_size_music_to_shot)
+    render.setWindowSize(gl.shot_size,
+                         gl.shot_size)
 
     gl.all_obj['Cube'].visible = False
 
@@ -362,18 +366,22 @@ def display(instrum, note, volume):
 
 
 def get_sub_dir():
-    """60000/100=600 fichiers par dossier
-    12345/600=20
-    59623/100=596
-    600 = 60000/100
-    59950/(60000/100) 59950/600=99
+    """38000/100=380 fichiers par dossier
+    1000/380 = 2,xx
     """
 
-    sub_dir = int(gl.numero/(gl.total/100))
+    # Nombre de fichiers par dossier
+    nb = gl.nombre_shot_total/100
+    
+    sub_dir = int(gl.numero/nb)
+    
     if sub_dir < 0:
         print("Sous dossier négatif", gl.numero)
+        sub_dir = 0
     if sub_dir > 99:
         print("Sous dossier > 99", gl.numero)
+        sub_dir = 99
+        
     return sub_dir
 
 
@@ -487,10 +495,6 @@ def save_shot(sub_dir):
 
 
 def save_music_to_shot_shot():
-    """Les jpg et les png sont mélangés,
-    le png est detruit après conversion.
-    """
-
     # ./shot/5/shot_41254.png"""
     png = os.path.join(gl.music_to_shot_sub_directory, 's_j_to_i_' + str(gl.numero) + '.png')
     render.makeScreenshot(png)
@@ -878,9 +882,11 @@ def set_sun_color_energy():
                  
 def end():
 
-    # Limite par nombre_shot_total dans ini
-    if gl.numero >= gl.nombre_shot_total:
-        gl.endGame()
+    # Fin de get_shot
+    if gl.phase == "get shot":
+        if gl.numero >= gl.nombre_shot_total:
+            print("Fin de get_shot")
+            gl.endGame()
 
     # Fin de la partition
     if gl.partitions:  # bug
@@ -889,6 +895,6 @@ def end():
 
     # Limitation du nombre d'images pour test
     if gl.phase == "music to shot":
-        if gl.numero >= gl.conf["play_letters"]["images_nbr"]:
+        if gl.numero >= gl.nombre_shot_total:
             print("Fin de la conversion du json en images")
             music_to_shot_init()

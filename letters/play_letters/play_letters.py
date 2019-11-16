@@ -1,7 +1,6 @@
 #!python3
 # -*- coding: UTF-8 -*-
 
-
 """
 Reconnaissance de lettres dans une image
 
@@ -16,6 +15,8 @@ Les fichiers:
     weightpath
     metapath
 sont à définir dans letters.ini
+
+Définir ESSAI qui indice le json de sortie avec toutes les notes jouées.
 """
 
 
@@ -23,7 +24,7 @@ import os, sys
 import subprocess
 import gc
 import time
-from datetime import datetime
+#from datetime import datetime
 import re
 import textwrap
 import cv2
@@ -44,6 +45,8 @@ sys.path.append(lp.get_midi_directory())
 from analyse_play_midi import OneInstrumentPlayer
 from pymultilame import MyConfig, MyTools
 
+# Définir le numéro de l'essai, utilisé dans le benchmark
+ESSAI = 5
 
 class YOLO:
 
@@ -306,10 +309,12 @@ class YOLO:
         to
         /bla...bla/play_letters_shot_jpg_3/bob_sheriff_data.json
         """
-
-        date = "_" + datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")
-        json_name = self.images_directory + date + ".json"
-
+        # Pas prarique
+        #date = "_" + datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")
+        #json_name = self.images_directory + date + ".json"
+        
+        json_name = self.images_directory + "_" + str(ESSAI) + ".json"
+        
         with open(json_name, 'w') as f_out:
             json.dump(self.all_notes, f_out)
         f_out.close()

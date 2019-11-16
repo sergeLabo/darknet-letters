@@ -1,0 +1,5 @@
+classes = 190
+train = ../darknet/data_20/train.txt
+valid = ../darknet/data_20/test.txt
+names = ../darknet/data_20/obj.names
+backup = ../darknet/data_20/backup

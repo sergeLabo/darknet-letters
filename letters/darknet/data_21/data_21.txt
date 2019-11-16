@@ -34,7 +34,7 @@ blur_mini = 0
 blur_maxi = 0
 
 [pl_shot_essai_unused_section]
-essai = "pl_shot_13_jpg"
+essai = "pl_shot_11_jpg"
 
 [play_letters_shot]
 nombre_shot_total = 2000
@@ -43,11 +43,11 @@ fond = "video"
 letters_scale = 1.05
 size_min = 1.0
 size_max = 1.0
-blur_min = 3
-blur_max = 3
+blur_min = 0
+blur_max = 0
 volume = 0
 json_files = "../midi/json_40/non_git/ia"
-pl_shot = "/media/serge/BACKUP/play_letters_shot/pl_shot_13"
+pl_shot = "/media/serge/BACKUP/play_letters_shot/pl_shot_11"
 
 [play_letters]
 thresh = 50
@@ -57,3 +57,6 @@ pl_shot = "../pl_shot_"
 configpath = "../darknet/data_21/yolov3-tiny_3l_21.cfg"
 weightpath = "../darknet/data_21/backup/yolov3-tiny_3l_21_best.weights"
 metapath = "../darknet/data_21/obj.data"
+
+37999 Shot n° 37999 dans /media/serge/BACKUP/letters_shot/shot_21/shot_21/99/shot_37999.png
+{'a': 0, 'b': 1983, 'c': 1983, 'd': 1983, 'e': 1983, 'f': 1983, 'g': 1983, 'h': 1983, 'i': 1983, 'j': 1983, 'k': 1983, 'l': 1983, 'm': 1983, 'n': 1982, 'o': 1982, 'p': 1982, 'q': 1982, 'r': 1982, 's': 1982, 't': 1982, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0, 'J': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'O': 0, 'P': 0, 'Q': 0, 'R': 0, 'S': 0, 'T': 0}

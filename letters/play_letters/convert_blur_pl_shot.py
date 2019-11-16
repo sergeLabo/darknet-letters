@@ -50,13 +50,14 @@ class BlurAndConvert:
 
     def __init__(self):
         self.mt = MyTools()
-        self.blur_min = CONF["play_letters"]["blur_min"]
-        self.blur_max = CONF["play_letters"]["blur_max"]
+        self.blur_min = CONF["play_letters_shot"]["blur_min"]
+        self.blur_max = CONF["play_letters_shot"]["blur_max"]
+        self.size = CONF["play_letters_shot"]["shot_size"]
 
         # Dossiers
-        self.shot = CONF["play_letters"]["pl_shot"]
+        self.shot = CONF["play_letters_shot"]["pl_shot"]
         print("Dossier play_letters:", self.shot)
-        self.shot_jpg = CONF["play_letters"]["pl_shot_jpg"]
+        self.shot_jpg = self.shot + "_jpg"
         print("Dossier play_letters jpg:", self.shot_jpg)
         self.create_shot_jpg_dir()
 
@@ -123,7 +124,6 @@ class BlurAndConvert:
 
     def save_to_jpg(self):
         n = 0
-        size = CONF["play_letters"]["shot_size"]
         
         for png in self.all_png_files:
             if n % 100 == 0 and n != 0:
@@ -136,7 +136,7 @@ class BlurAndConvert:
             img = cv2.imread(png)
 
             # Retaillage avec size de letters.ini
-            img = cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
+            img = cv2.resize(img, (self.size, self.size), interpolation=cv2.INTER_AREA)
             
             # Flou
             img = self.apply_blur(img)

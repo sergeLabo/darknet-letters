@@ -62,7 +62,6 @@ def get_conf():
     gl.tools =  MyTools()
 
     gl.letters_dir = str(LETTERS_DIR.resolve())
-    #print("Chemin du dossier letters dans le BGE:", gl.letters_dir)
 
     # Dossier *.ini
     ini_file = gl.letters_dir + "/letters.ini"
@@ -73,7 +72,8 @@ def get_conf():
 def set_tempo():
 
     # Création des objects
-    tempo_liste = [ ("seconde", 60),
+    tempo_liste = [ ("cube", 9999999999),
+                    ("seconde", 60),
                     ("shot", int(gl.conf['blend']['shot_every'])),
                     ("info", 180)]
 
@@ -112,35 +112,21 @@ def set_variable():
     gl.info_news = 0
     gl.all_obj["Text_info"]["Text"] = gl.info
 
-    # nombre de shot total
-    gl.nombre_shot_total = gl.conf['blend']['total']
     gl.previous_datas = ""
-
-    # Numero conservé au changement de morceau
-    gl.numero = gl.conf['blend']['numero']
-    gl.total = gl.conf['blend']['total']
-    if gl.numero >= gl.total:
-        gl.numero = gl.total
-
+    gl.numero = 0
+        
     # Dimension des fenêtres
-    gl.music_size = gl.conf["blend"]["music_size"]
-    gl.shot_size = gl.conf["blend"]["shot_size"]
-    gl.shot_size_music_to_shot = gl.conf["play_letters"]["shot_size"]
+    gl.music_size = gl.conf["music_and_letters"]["music_size"]
 
     # Position et dimension des lettres
     gl.plage_x = gl.conf["blend"]["plage_x"]
     gl.plage_y = gl.conf["blend"]["plage_y"]
-    gl.size_min = gl.conf["blend"]["size_min"]
-    gl.size_max = gl.conf["blend"]["size_max"]
-    gl.scale = gl.conf["blend"]["letters_scale"]
-    gl.majuscules = gl.conf["play_letters"]["volume"]
 
     # Eclairage
     gl.sun = gl.all_obj["Sun"]
 
-    # Fond de l'image pour get shot
-    # possible: noir ou brouillard ou video":
-    gl.fond = gl.conf["blend"]["fond"]
+    # Avec ou sans majuscules
+    gl.majuscules = gl.conf["play_letters_shot"]["volume"]
 
     
 def get_obj_num():
@@ -195,7 +181,7 @@ def create_directories():
     """Création de 100 dossiers pour letters."""
 
     # Dossier d'enregistrement des images
-    gl.shot_directory = gl.conf['blend']["shot"]
+    gl.shot_directory = gl.conf['letters_shot']["shot"]
 
     # Création du dossier si n'existe pas
     gl.tools.create_directory(gl.shot_directory)
@@ -239,7 +225,7 @@ def get_get_shot_json():
     print("Nombre de notes du morceau en frame:", len(gl.partitions[0]))
 
 
-def fonts_shuffle():
+def fonts_shuffle(name):
     """Le désordre des polices permet de rendre aléatoire
     le choix de la police pour chaque instrument.
     liste en désordre = [9, 5, 1, 4 ...] 10 items
@@ -258,6 +244,19 @@ def fonts_shuffle():
     for i in range(n):
         gl.fonts_list.append(L[i])
 
+    # Spécial pour benchmark, pour ces 6 fichiers
+    if "oh les filles" in name:
+        gl.fonts_list = [8, 7, 9, 5, 4, 1, 6]
+    if "zorro" in name:
+        gl.fonts_list = [9, 4, 2]
+    if "On Ira Tous Au Paradis" in name:
+        gl.fonts_list = [6, 9, 2, 0, 7, 4, 8, 5, 3, 1 ]
+    if "jeux_interdits" in name:
+        gl.fonts_list = [4, 9, 3, 8, 6, 2]
+    if "gaynor_i_will_survive" in name:
+        gl.fonts_list = [6, 1, 2, 3, 4, 0, 9, 5]
+    if "Dutronc_cactus" in name:
+        gl.fonts_list = [5, 0, 6, 8] 
 
 def get_channel():
     """16 channel maxi
@@ -293,7 +292,7 @@ def init_midi():
         instrum = [[0, 25], false, "Bass"]
     """
 
-    fonts = gl.conf["midi"]["fonts"]
+    fonts = gl.conf["music_and_letters"]["fonts"]
     channels = get_channel()
 
     # Création d'un dict des objets pour jouer chaque instrument
@@ -326,6 +325,8 @@ def music_and_letters_init():
     init_midi()
     sleep(1)
     gl.phase = "music and letters"
+    gl.size_min = gl.conf["music_and_letters"]["size_min"]
+    gl.size_max = gl.conf["music_and_letters"]["size_max"]
 
 
 def get_shot_init():
@@ -335,12 +336,23 @@ def get_shot_init():
     gl.fonts_list = []
     for i in range(10):
         gl.fonts_list.append(i)
-        
+
+    # Fond de l'image pour get shot
+    # possible: noir ou brouillard ou video":
+    gl.fond = gl.conf["letters_shot"]["fond"]
     if gl.fond == "video":
         set_video()
         
     gl.phase = "get shot"
+    
+    # letters shot
+    gl.nombre_shot_total = gl.conf['letters_shot']['nombre_shot_total']
+    gl.shot_size = gl.conf["letters_shot"]["shot_size"]
 
+    gl.size_min = gl.conf["letters_shot"]["size_min"]
+    gl.size_max = gl.conf["letters_shot"]["size_max"]
+    gl.scale = gl.conf["letters_shot"]["letters_scale"]
+        
     # Pour occurence avec get shot
     gl.comptage = {}
 
@@ -416,16 +428,16 @@ def get_midi_json():
     """
 
     if gl.phase == "music and letters":
-        gl.nbr = gl.conf["midi"]["file_nbr"]
-        js = gl.conf["midi"]["json_files"]
-
+        gl.nbr = gl.conf["music_and_letters"]["file_nbr"]
+        js = gl.conf["music_and_letters"]["json_files"]
+        gl.tempo["cube"].reset()
+        
     if gl.phase == "music to shot":
-        js = gl.conf["play_letters"]["json_files"]
+        js = gl.conf["play_letters_shot"]["json_files"]
 
     all_json = gl.tools.get_all_files_list(js, ".json")
     # Tri des json alpha
     all_json = sorted(all_json)
-    print("Tous les json:", all_json)
     
     if gl.phase == "music and letters":
         # Reset de gl.nbr si fini
@@ -443,13 +455,13 @@ def get_midi_json():
             os._exit(0)
             
     gl.midi_json = all_json[gl.nbr]
-    
+
     name = gl.midi_json.split("/")[-1]
     print("\n    Fichier en cours", name[:-5], "\n")
     
     # Enregistrement du numéro du prochain fichier à lire
     if gl.phase == "music and letters":
-        section = "midi"
+        section = "music_and_letters"
         gl.ma_conf.save_config(section, "file_nbr", gl.nbr + 1)
 
     # Lecture du json
@@ -461,8 +473,13 @@ def get_midi_json():
     gl.instruments = data["instruments"]  # [instrument_1.program, ...
     gl.partition_nbr = len(gl.partitions)
 
-    # Pour choix 2 et 3 et 5
-    fonts_shuffle()
+    # Vérification d'un json valide
+    if not len(gl.partitions) > 0:
+        print("Json non valide:", name)
+        os._exit(0)
+        
+    # Pour choix 2 et 3
+    fonts_shuffle(name)
 
     # Sous dossiers et fichier texte
     if gl.phase == "music to shot":
@@ -489,10 +506,23 @@ def music_to_shot_init():
     set_variable()
     
     # Dossiers des images
-    gl.music_to_shot_directory = gl.conf["play_letters"]["pl_shot"]
+    gl.music_to_shot_directory = gl.conf["play_letters_shot"]["pl_shot"]
     gl.tools.create_directory(gl.music_to_shot_directory)
 
     gl.phase = "music to shot"
+    
+    # Play letters shot
+    gl.nombre_shot_total = gl.conf['play_letters_shot']['nombre_shot_total']
+    gl.shot_size = gl.conf["play_letters_shot"]["shot_size"]
+
+    gl.size_min = gl.conf["play_letters_shot"]["size_min"]
+    gl.size_max = gl.conf["play_letters_shot"]["size_max"]
+    gl.scale = gl.conf["play_letters_shot"]["letters_scale"]
+
+    # Fond de l'image pour get shot
+    # possible: noir ou brouillard ou video":
+    gl.fond = gl.conf["play_letters_shot"]["fond"]
+    
     get_midi_json()
 
     if gl.fond == "video":
