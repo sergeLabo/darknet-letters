@@ -13,23 +13,30 @@ Cette sortie est comparée avec le json d'origine qui a servi à créer les imag
 """
 
 
-
+import sys
 from glob import glob
 from pathlib import Path
 from datetime import datetime
 
 from pymultilame import MyTools
 
+# Import du dossier parent soit letters
+# Pas d'import possible direct du dossier parent
+# ValueError: attempted relative import beyond top-level package
+sys.path.append("..")
+from letters_path import LettersPath
+lp = LettersPath()
+
 
 # Définir le numéro de l'essai, utilisé dans play_letters
 # Se retrouve dans le nom des json
-ESSAI = 5
+ESSAI = lp.conf["benchmark"]["essai"]
 
 # Dossier avec les json de musique qui ont servi à fabriquer les pl_shot
-DOSSIER_IN = "../midi/json_40/non_git/ia/"
+DOSSIER_IN = lp.conf["benchmark"]["dossier_in"]
 
 # Dossier des pl_shot avec les json _4.json
-DOSSIER_OUT = "/media/serge/BACKUP/play_letters_shot/pl_shot_10_jpg/"
+DOSSIER_OUT = lp.conf["benchmark"]["dossier_out"]
 
 
 class Benchmark:
@@ -68,7 +75,8 @@ class Benchmark:
         # Nombre de notes réelles à jouer en entrée, sans les notes []
         # et jusqu'à self.frames
         self.notes_in_nbr = self.get_notes_in_nbr()
-        
+        self.count_in = 0
+                
         # L'efficacité
         self.efficiency = 0
         self.score = 0
@@ -164,14 +172,15 @@ class Benchmark:
         # Morceau en entrée plus grand que la sortie
         if len(self.notes_in_corrected) >= self.frames:
             for frame in range(self.frames):
-                if len(self.notes_in_corrected[frame]) > 0:
-                    notes_in_nbr += len(self.notes_in_corrected[frame][0])
+                for note in self.notes_in_corrected[frame]:
+                    if note:
+                        notes_in_nbr += 1
         else:
             print("Le morceaux est trop court")
             notes_in_nbr = 0
             
         print("Nombre de notes réelles à jouer en entrée:", notes_in_nbr)
-
+        
         return notes_in_nbr
 
     def fonts_reallocation(self):
@@ -222,13 +231,19 @@ class Benchmark:
         
         # Score des notes justes
         for frame in range(self.frames):  # 2000
-            #print(frame, notes_in_corrected[frame])
             for note in self.notes_in_corrected[frame]:
+                if note:
+                    self.count_in += 1
                 if note in self.notes_out[frame]:
                     self.score += 1
-
-        if self.notes_in_nbr != 0:
-            self.efficiency = round((self.score / self.notes_in_nbr), 3)
+                    
+            # #print(frame, 'in ', self.notes_in_corrected[frame],
+                         # #'out', self.notes_out[frame], self.score,
+                         # #'self.count_in', self.count_in)
+        print("Recomptage des notes en entrée:", self.count_in)
+        
+        if self.count_in != 0:
+            self.efficiency = round((self.score / self.count_in), 3)
             print("Nombre de notes reconnues  =", self.score,
                   "soit", self.efficiency)
         else:
@@ -380,27 +395,27 @@ class BenchmarkBatch:
         
         for sb in self.all_sub_directories:
             name = Path(sb).name
-            #if name == "zorro":
+            # if name == "Dutronc_cactus":  # "zorro":
             bm = Benchmark(name, self.essai)
             data += "    Reconnue: " + str(bm.score) +\
                     "    Name: " + name +\
-                    "    Nombre de notes en entrées: " + str(bm.notes_in_nbr) +\
+                    "    Nombre de notes en entrées: " + str(bm.count_in) +\
                     "    Efficacité: " + str(bm.efficiency) + "\n"
 
-            efficiency.append([bm.score, bm.notes_in_nbr])
+            efficiency.append([bm.score, bm.count_in])
             total.append([bm.notes_in_dict, bm.notes_out_dict])
 
-        # Efficacité par police
-        bilan_glob, bilan_per_font, verif_1, verif_2 = self.fonts_bench(total)
+        # ## Efficacité par police
+        # #bilan_glob, bilan_per_font, verif_1, verif_2 = self.fonts_bench(total)
 
         # Vérification
         final_check = self.check(efficiency)
 
-        data += "\n" + str(bilan_glob) + "\n"
-        data += str(bilan_per_font) + "\n"
-        data += str(final_check) + "\n"
-        data += verif_1 + "\n"
-        data += verif_2 + "\n"
+        # #data += "\n" + str(bilan_glob) + "\n"
+        # #data += str(bilan_per_font) + "\n"
+        data += "\nCheck final:" + str(final_check) + "\n"
+        # #data += verif_1 + "\n"
+        # #data += verif_2 + "\n"
                  
         print("\n\n")
         print(data)
