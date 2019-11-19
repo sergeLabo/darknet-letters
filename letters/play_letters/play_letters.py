@@ -24,7 +24,6 @@ import os, sys
 import subprocess
 import gc
 import time
-#from datetime import datetime
 import re
 import textwrap
 import cv2
@@ -45,15 +44,14 @@ sys.path.append(lp.get_midi_directory())
 from analyse_play_midi import OneInstrumentPlayer
 from pymultilame import MyConfig, MyTools
 
-# Définir le numéro de l'essai, utilisé dans le benchmark
-ESSAI = 5
 
 class YOLO:
 
-    def __init__(self, images_directory):
+    def __init__(self, images_directory, essai):
 
         self.lp = LettersPath()
         self.CONF = self.lp.conf
+        self.essai = essai
 
         # Mes outils
         self.mt = MyTools()
@@ -73,9 +71,9 @@ class YOLO:
         self.set_darknet()
 
         # Paramètres de détections
-        self.thresh = int(self.CONF['darknet']['thresh'])
-        self.hier_thresh = int(self.CONF['darknet']['hier_thresh'])
-        self.nms = int(self.CONF['darknet']['nms'])
+        self.thresh = int(self.CONF['play_letters']['thresh'])
+        self.hier_thresh = int(self.CONF['play_letters']['hier_thresh'])
+        self.nms = int(self.CONF['play_letters']['nms'])
 
         # Windows
         cv2.namedWindow('Reglage')
@@ -88,7 +86,7 @@ class YOLO:
         self.set_init_tackbar_position()
 
         # Midi
-        self.fonts = self.CONF['midi']['fonts']
+        self.fonts = self.CONF['music_and_letters']['fonts']
         self.set_canaux()
         self.notes_en_cours = []
         self.players = {}
@@ -96,9 +94,9 @@ class YOLO:
         self.all_notes = []
 
     def set_darknet(self):
-        configPath = self.CONF['darknet']['configpath']
-        weightPath = self.CONF['darknet']['weightpath']
-        metaPath = self.CONF['darknet']['metapath']
+        configPath = self.CONF['play_letters']['configpath']
+        weightPath = self.CONF['play_letters']['weightpath']
+        metaPath = self.CONF['play_letters']['metapath']
 
         self.netMain = darknet.load_net_custom(configPath.encode("ascii"),
                                                 weightPath.encode("ascii"),
@@ -193,21 +191,21 @@ class YOLO:
         if thresh == 0: thresh = 5
         if thresh == 100: thresh = 95
         self.thresh = int(thresh)
-        self.save_change('darknet', 'thresh', self.thresh)
+        self.save_change('play_letters', 'thresh', self.thresh)
 
     def onChange_hier_thresh(self, hier_thresh):
         """min=1 max=100 step=1 default=0.5"""
         if hier_thresh == 0: hier_thresh = 5
         if hier_thresh == 100: hier_thresh = 95
         self.hier_thresh = int(hier_thresh)
-        self.save_change('darknet', 'hier_thresh', self.hier_thresh)
+        self.save_change('play_letters', 'hier_thresh', self.hier_thresh)
 
     def onChange_nms(self, nms):
         """min=1 max=100 step=1 default=0.5"""
         if nms == 0: nms = 5
         if nms == 100: nms = 95
         self.nms = int(nms)
-        self.save_change('darknet', 'nms', self.nms)
+        self.save_change('play_letters', 'nms', self.nms)
 
     def save_change(self, section, key, value):
         lp.save_config(section, key, value)
@@ -312,9 +310,9 @@ class YOLO:
         # Pas prarique
         #date = "_" + datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")
         #json_name = self.images_directory + date + ".json"
-        
-        json_name = self.images_directory + "_" + str(ESSAI) + ".json"
-        
+
+        json_name = self.images_directory + "_" + str(self.essai) + ".json"
+
         with open(json_name, 'w') as f_out:
             json.dump(self.all_notes, f_out)
         f_out.close()
@@ -634,22 +632,25 @@ if __name__ == "__main__":
     CONF = lp.conf
 
     # Dossier des dossiers des images à convertir en musique
-    dossier = CONF["play_letters"]["pl_shot_jpg"]
+    dossier = CONF["play_letters_shot"]["pl_shot"] + "_jpg"
+
+    # Définir le numéro de l'essai, utilisé dans le benchmark
+    essai = CONF["play_letters"]["essai"]
 
     sd_list = [x[0] for x in os.walk(dossier)]
     print("Liste des sous dossiers:", sd_list)
     for sd in sd_list:
         # Pas le dossier principal
         if sd != dossier:
-            if "zorro" in sd:
-                print("Répertoire:", sd)
-                yolo = YOLO(sd)
-                yolo.detect()
+            #if "zorro" in sd:
+            print("Répertoire:", sd)
+            yolo = YOLO(sd, essai)
+            yolo.detect()
 
-                # ## Reset de la RAM GPU
-                # #darknet.free_network(yolo.netMain)
+            # ## Reset de la RAM GPU
+            # #darknet.free_network(yolo.netMain)
 
-                print("\n\nMorceau suivant\n")
+            print("\n\nMorceau suivant\n")
 
     print("Done")
     os._exit(0)
