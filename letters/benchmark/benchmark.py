@@ -13,7 +13,7 @@ Cette sortie est comparée avec le json d'origine qui a servi à créer les imag
 """
 
 
-import sys
+import os, sys
 from glob import glob
 from pathlib import Path
 from datetime import datetime
@@ -80,13 +80,8 @@ class Benchmark:
         # L'efficacité
         self.efficiency = 0
         self.score = 0
-
-        # Dict des notes in par font
-        self.notes_in_dict = self.get_notes_dict(self.notes_in_corrected)
-
-        # Dict des notes out par font
-        self.notes_out_dict = self.get_notes_dict(self.notes_out)
-            
+        self.bad = 0
+        
         # Exécution du script
         self.bench()
                     
@@ -197,37 +192,15 @@ class Benchmark:
             for i in range(len(note)):
                 if note[i]:
                     new = [self.notes_out_dict_table[note[i][0]], note[i][1], 127]
-                else:
-                    new = []
-                note_attr.append(new)
+                    note_attr.append(new)
             notes_in_corrected.append(note_attr)
             
         return notes_in_corrected
 
-    def get_notes_dict(self, notes):
-        """Avec les notes au format notes_out,
-        répartit les notes par font
+    def notes_bench_good(self):
+        """Analyse les notes en entrée et en sortie pour trouver
+        le nombre de bonnes notes
         """
-
-        # dict à 0
-        notes_dict = {}
-        for i in range(10):
-            notes_dict[i] = 0
-
-        # Attention seulement self.frames à prendre en entrée
-        i = 0
-        for notes_frame in notes:
-            if i < self.frames + 1:
-                for note in notes_frame:
-                    # #print(note)  # [7, 39, 127]
-                    if note:
-                        notes_dict[note[0]] += 1
-                    i += 1
-
-        return notes_dict
-
-    def notes_bench(self):
-        """Analyse les notes en entrée et en sortie"""
         
         # Score des notes justes
         for frame in range(self.frames):  # 2000
@@ -248,34 +221,76 @@ class Benchmark:
                   "soit", self.efficiency)
         else:
             print("Pas de notes en entrées")
+            
+    def notes_bench_bad(self):
+        """Analyse les notes en entrée et en sortie pour trouver
+        les fausses notes.
+        """
+        
+        # Score des fausses notes
+        for frame in range(self.frames):  # 2000
+            for note in self.notes_out[frame]:
+                if note not in self.notes_in_corrected[frame]:
+                    self.bad += 1
+
+        print("Nombre de mauvaise notes:",  self.bad)
+
+    def get_notes_dict(self, notes):
+        """Avec notes_out ou notes_in,
+        [
+        [[4, 71, 127], [9, 63, 127], [3, 59, 127], [6, 44, 127]],
+        [[4, 71, 127], [3, 59, 127], [6, 44, 127]],
+        ...
+        ]
+        
+        calcule le nombre de note par font
+        {0: 425, ...}
+        """
+        
+        notes_dict = {}
+        for i in range(10):
+            notes_dict[i] = 0
+
+        for i in range(2000):
+            for note in notes[i]:
+                notes_dict[note[0]] += 1                
+        
+        # Vérification somme des valeurs = nbre de notes entrées ou sortie
+        total = 0
+        for k, v in notes_dict.items():
+            # font = k, nombre = v
+            total += v
+        print("    Total des notes par font:", total)
+                
+        return notes_dict
         
     def fonts_bench(self):
-        """Analyse les polices
-        entrée = [8, 41, 127] = note
-        sortie = [6, 41, 127]
-        % de lettres reconnues en fonction des polices
-        
-        Pour 0: 100 lettres sur 200 soit 100/200
-        
+        """Calcul de l'efficacité par police
+        self.notes_in_corrected
+        self.notes_out
+        font_in_0 : 452
+        font_out_0 : 123
+        font_eff_0 = font_out_0 / font_in_0
         """
-        for frame in range(self.frames):  # 2000
-            for note in self.notes_in_corrected[frame]:
-                # Comptage des lettres en entrées par font
-                if len(note) > 0:
-                    self.notes_in_dict[note[0]] += 1
-                # C'est une bonne note
-                if note in self.notes_out[frame]:
-                    self.notes_out_dict[note[0]] += 1
-        print()
-        for i in range(10):
-            if self.notes_in_dict[i] != 0:
-                r = self.notes_out_dict[i] / self.notes_in_dict[i]
-                print("Police:", i, "reconnue", round(r, 3))
-                    
+        
+        print("Dict des notes en entrée:")
+        notes_in = self.get_notes_dict(self.notes_in_corrected)
+        print("Dict des notes en sortie:")
+        notes_out = self.get_notes_dict(self.notes_out)
+
+        # notes_in = {0: 0, 1: 1725, 2: 38, 3: 741, 4: 1569, 5: 465, 6: 1180,
+        #             7: 0, 8: 0, 9: 1348}
+        score = 0
+        for p in range(10):
+            if notes_in[p] != 0:
+                score = notes_out[p] / notes_in[p]
+            print(score)
+            
     def bench(self):
         """Compare l'entrées et la sortie"""
         
-        self.notes_bench()
+        self.notes_bench_good()
+        self.notes_bench_bad()
         self.fonts_bench()
 
             
@@ -320,63 +335,6 @@ class BenchmarkBatch:
         print("    ", fichier)
         self.mt.write_data_in_file(data, fichier, "w")
         
-    def fonts_bench(self, total):
-        """Etude par polices:
-        total = 
-        [ in 
-        {0: 0, 1: 0, 2: 310, 3: 356, 4: 557, 5: 0, 6: 922, 7: 0, 8: 382, 9: 300},
-        out
-        {0: 5, 1: 62, 2: 203, 3: 199, 4: 192, 5: 6, 6: 566, 7: 0, 8: 196, 9: 201}
-        ], 6 fois
-        """
-        
-        print("\nBilan global des polices:")
-        a = [0]*10
-        b = [0]*10
-        for in_out in total:
-            for i in range(10):
-                a[i] += in_out[0][i]
-                b[i] += in_out[1][i]
-
-        bilan_glob = ""
-        for i in range(10): 
-            c = b[i] / a[i]
-            bilan_glob += str(("Police:", i, round(c, 3), b[i], a[i])) + "\n"
-        print(bilan_glob)
-
-        g = 0
-        h = 0
-        for i in range(10):
-            g += a[i]
-            h += b[i]
-        
-        print("\nVérification:")
-        verif_1 = str(("    Efficacité globale 1:", round(h/g, 3)))
-        print(verif_1)
-        
-        e = 0
-        s = 0
-        for in_out in total:
-            for i in range(10):
-                e += in_out[0][i]
-                s += in_out[1][i]
-        verif_2 = str(("    Efficacité globale 2:", round(s/e, 3)))
-        print(verif_2)
-        
-        print("\nBilan détaillé des polices:")
-        bilan_per_font = ""
-        for in_out in total:
-            print()
-            for i in range(10):
-                if in_out[0][i] != 0:
-                    d = in_out[1][i] / in_out[0][i]
-                    bilan_per_font += str((i, round(d, 3), in_out[1][i],
-                                                           in_out[0][i])) + "\n"
-                    
-        print(bilan_per_font)
-
-        return bilan_glob, bilan_per_font, verif_1, verif_2
-        
     def check(self, efficiency):
         i = 0
         o = 0
@@ -384,13 +342,12 @@ class BenchmarkBatch:
             i += eff[1]
             o += eff[0]
         final_check = round(o / i, 3)
-        print("\nVérification finale:", final_check)
+        print("\nEfficacité globale:", final_check)
         
         return final_check
 
     def batch(self):
         data = ""
-        total = []
         efficiency = []
         
         for sb in self.all_sub_directories:
@@ -398,24 +355,17 @@ class BenchmarkBatch:
             # if name == "Dutronc_cactus":  # "zorro":
             bm = Benchmark(name, self.essai)
             data += "    Reconnue: " + str(bm.score) +\
+                    "    Bad: " + str(bm.bad) +\
                     "    Name: " + name +\
                     "    Nombre de notes en entrées: " + str(bm.count_in) +\
                     "    Efficacité: " + str(bm.efficiency) + "\n"
 
             efficiency.append([bm.score, bm.count_in])
-            total.append([bm.notes_in_dict, bm.notes_out_dict])
-
-        # ## Efficacité par police
-        # #bilan_glob, bilan_per_font, verif_1, verif_2 = self.fonts_bench(total)
-
+            
         # Vérification
         final_check = self.check(efficiency)
 
-        # #data += "\n" + str(bilan_glob) + "\n"
-        # #data += str(bilan_per_font) + "\n"
         data += "\nCheck final:" + str(final_check) + "\n"
-        # #data += verif_1 + "\n"
-        # #data += verif_2 + "\n"
                  
         print("\n\n")
         print(data)

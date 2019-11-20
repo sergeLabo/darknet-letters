@@ -16,7 +16,10 @@ Les fichiers:
     metapath
 sont à définir dans letters.ini
 
-Définir ESSAI qui indice le json de sortie avec toutes les notes jouées.
+Définir aussi:
+[benchmark]
+[essai]
+qui indicie le json de sortie avec toutes les notes jouées.
 """
 
 
@@ -635,7 +638,7 @@ if __name__ == "__main__":
     dossier = CONF["play_letters_shot"]["pl_shot"] + "_jpg"
 
     # Définir le numéro de l'essai, utilisé dans le benchmark
-    essai = CONF["play_letters"]["essai"]
+    essai = CONF["benchmark"]["essai"]
 
     sd_list = [x[0] for x in os.walk(dossier)]
     print("Liste des sous dossiers:", sd_list)

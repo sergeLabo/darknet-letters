@@ -464,6 +464,7 @@ class PlayOneMidiPartition:
                 volume = event[0][1]
                 # Je joue
                 self.play_note(note, volume)
+                print(note, volume)
                 # Je stope les autres notes que note !
                 self.stop_notes(note)
             sleep(1/self.FPS)
@@ -831,7 +832,7 @@ if __name__ == '__main__':
     # Set le volume à 127 partout dans les json
     FPS = 40
     volume = "flat"
-    create_all_json("./music/non_git/ia", FPS, volume)
+    # #create_all_json("./music/non_git/ia", FPS, volume)
     
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
@@ -852,8 +853,8 @@ if __name__ == '__main__':
     # ## Play de tous les midi
     # #play_all_midi_files(FPS, fonts)
             
-    # ## Joue les json
-    # #play_all_json("./json/pas_pour_github", FPS, fonts)
+    # Joue les json
+    play_all_json("../midi/json_40/non_git/ia", FPS, fonts)
 
     # ## Création d'un json pour to_image
     # #f = "./music/pas_pour_github/axel_f-crazy_frog.mid"
