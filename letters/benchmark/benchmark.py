@@ -59,6 +59,11 @@ class Benchmark:
         self.frames = len(self.notes_out)
         print("Nombre de frame dans notes out:", self.frames)
 
+        total_out = 0
+        for frame in range(self.frames):
+            total_out += len(self.notes_out[frame])
+        print("Nombre total de notes en sortie:", total_out)
+        
         # Notes en entrée
         self.notes_in = self.get_notes_in()
         
@@ -100,6 +105,7 @@ class Benchmark:
         
         notes_out = self.mt.get_json_file(DOSSIER_OUT + self.name + "_" +\
                                           self.essai + ".json")
+            
         return notes_out
 
     def get_fonts_table(self):
@@ -277,21 +283,23 @@ class Benchmark:
         notes_in = self.get_notes_dict(self.notes_in_corrected)
         print("Dict des notes en sortie:")
         notes_out = self.get_notes_dict(self.notes_out)
-
+        print(notes_in)
+        print(notes_out )
         # notes_in = {0: 0, 1: 1725, 2: 38, 3: 741, 4: 1569, 5: 465, 6: 1180,
         #             7: 0, 8: 0, 9: 1348}
         score = 0
         for p in range(10):
+            print(notes_in[p])
             if notes_in[p] != 0:
                 score = notes_out[p] / notes_in[p]
-            print(score)
+            # #print(score)
             
     def bench(self):
         """Compare l'entrées et la sortie"""
         
         self.notes_bench_good()
         self.notes_bench_bad()
-        self.fonts_bench()
+        #self.fonts_bench()
 
             
 class BenchmarkBatch:
