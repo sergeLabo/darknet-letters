@@ -653,7 +653,7 @@ def keyboard():
             new_music()
         
     # music and letters
-    elif gl.keyboard.events[events.PAD1] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.PAD1] == gl.KX_INPUT_JUST_ACTIVATED or gl.keyboard.events[events.AKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de music and letters")
         gl.phase = "music and letters"
         gl.info = "Début de music and letters"
@@ -661,7 +661,7 @@ def keyboard():
         music_and_letters_init()    
 
     # get shot
-    elif gl.keyboard.events[events.PAD2] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.PAD2] == gl.KX_INPUT_JUST_ACTIVATED or gl.keyboard.events[events.BKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de get shot")
         gl.phase = "get shot"
         gl.info = "Début de get shot"
@@ -669,7 +669,7 @@ def keyboard():
         get_shot_init()
         
     # conversion d'un json en image
-    elif gl.keyboard.events[events.PAD3] == gl.KX_INPUT_JUST_ACTIVATED:
+    elif gl.keyboard.events[events.PAD3] == gl.KX_INPUT_JUST_ACTIVATED or gl.keyboard.events[events.CKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Conversion d'un json en image") 
         music_to_shot_init()
          

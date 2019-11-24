@@ -50,12 +50,16 @@ from pymultilame import MyConfig, MyTools
 
 class YOLO:
 
-    def __init__(self, images_directory, essai):
+    def __init__(self, images_directory, essai, test=0, weights=""):
 
         self.lp = LettersPath()
         self.CONF = self.lp.conf
         self.essai = essai
-
+        self.test = test
+        self.weights = weights
+        print("Fichier de poids utilisé:", self.weights)
+        self.get_weights_file_indice()
+        
         # Mes outils
         self.mt = MyTools()
 
@@ -95,10 +99,37 @@ class YOLO:
         self.players = {}
         self.set_players()
         self.all_notes = []
+        
+    def get_weights_file_indice(self):
+        """Uniquement pour test
+        weightpath =
+        ../darknet/data_22/backup/yolov3-tiny_3l_22_best.weights
+        début = ../darknet/data_22/backup/yolov3-tiny_3l_22_
+        fin = .weights
+        """
 
+        a =len("/media/data/3D/projets/darknet-letters/letters/darknet/data_21/backup/yolov3-tiny_3l_21_")
+        b =len(".weights")
+        print(a, b, len(self.weights), self.weights)
+        indice = str(self.weights[a:-b])
+        print("Indice du test:", indice)
+        
+        return indice
+        
     def set_darknet(self):
+        """Si weight_influence_test,
+        teste tous les
+        yolov3-tiny_3l_22_xxxxxxx.weights
+        du dossier backup
+        """
+        
         configPath = self.CONF['play_letters']['configpath']
-        weightPath = self.CONF['play_letters']['weightpath']
+
+        if not self.test:
+            weightPath = self.CONF['play_letters']['weightpath']
+        else:
+            weightPath = self.weights
+            
         metaPath = self.CONF['play_letters']['metapath']
 
         self.netMain = darknet.load_net_custom(configPath.encode("ascii"),
@@ -310,12 +341,19 @@ class YOLO:
         to
         /bla...bla/play_letters_shot_jpg_3/bob_sheriff_data.json
         """
-        # Pas prarique
-        #date = "_" + datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")
-        #json_name = self.images_directory + date + ".json"
 
-        json_name = self.images_directory + "_" + str(self.essai) + ".json"
-
+        if not self.weight_influence:
+            json_name = self.images_directory + "_" + str(self.essai) + ".json"
+        else:
+            # les fichiers sont dans 1 sous dossier indice
+            indice = self.get_weights_file_indice()
+            json_name = 
+                        "/" + indice +\
+                        self.images_directory +\
+                        "_" +\
+                        str(self.essai) +\
+                        ".json"
+            
         with open(json_name, 'w') as f_out:
             json.dump(self.all_notes, f_out)
         f_out.close()
@@ -382,7 +420,7 @@ class YOLO:
             t_tempo = ta
 
             if ta > t_init + 1:
-                print("FPS =", round(fps, 1))
+                # #print("FPS =", round(fps, 1))
                 t_init = time.time()
                 fps = 0
 
@@ -630,6 +668,41 @@ def cvDrawBoxes(detections, img):
     return img, letters
 
 
+def play_letters(dossier, essai, test, weights):
+    """Joue les sous-dossiers du dossier"""
+    
+    sd_list = [x[0] for x in os.walk(dossier)]
+    print("Liste des sous dossiers:", sd_list)
+    for sd in sd_list:
+        # Pas le dossier principal
+        if sd != dossier:
+            print("Répertoire:", sd)
+            yolo = YOLO(sd, essai, test, weights)
+            yolo.detect()
+
+            # ## Reset de la RAM GPU
+            # #darknet.free_network(yolo.netMain)
+
+            print("\n\nMorceau suivant\n")
+
+    print("Done")
+    
+
+def test(dossier, essai):
+    mt = MyTools()
+    
+    w_dir = "/media/data/3D/projets/darknet-letters/letters/darknet/data_22/backup"
+    w_list = mt.get_all_files_list(w_dir, ".weights")
+    print("\n\nTous les fichiers de poids:", w_list)
+    
+    for w in w_list:
+        # Pas le dossier principal
+        print("\n\nFichier de poids en cours:", w, "\n\n")
+        print(len(w))
+        if w != w_dir:
+            play_letters(dossier, essai, test=1, weights=w)
+
+            
 if __name__ == "__main__":
 
     CONF = lp.conf
@@ -640,20 +713,9 @@ if __name__ == "__main__":
     # Définir le numéro de l'essai, utilisé dans le benchmark
     essai = CONF["benchmark"]["essai"]
 
-    sd_list = [x[0] for x in os.walk(dossier)]
-    print("Liste des sous dossiers:", sd_list)
-    for sd in sd_list:
-        # Pas le dossier principal
-        if sd != dossier:
-            #if "zorro" in sd:
-            print("Répertoire:", sd)
-            yolo = YOLO(sd, essai)
-            yolo.detect()
+    # #test = 0
+    # #play_letters(dossier, essai, test, "")
 
-            # ## Reset de la RAM GPU
-            # #darknet.free_network(yolo.netMain)
+    test(dossier, essai)
 
-            print("\n\nMorceau suivant\n")
-
-    print("Done")
     os._exit(0)

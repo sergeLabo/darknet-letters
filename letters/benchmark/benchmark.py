@@ -41,13 +41,15 @@ DOSSIER_OUT = lp.conf["benchmark"]["dossier_out"]
 
 class Benchmark:
 
-    def __init__(self, name, essai):
+    def __init__(self, name, essai, test=0):
         """Le nombre de notes de l'entrée doit être supérieur à la sortie
         Correspond à moins de 2000 images dans out !
         """
 
         self.name = name
         self.essai = str(essai)
+        self.test = test
+        
         self.mt = MyTools()
 
         print("\nAnalyse de:    ", self.name)
@@ -102,10 +104,20 @@ class Benchmark:
         """Récupérées dans le json créé par play_letters dans le dossier
         des dossiers des images.
         """
-        
-        notes_out = self.mt.get_json_file(DOSSIER_OUT + self.name + "_" +\
-                                          self.essai + ".json")
-            
+        if not self.test:        
+            out = DOSSIER_OUT + self.name + "_" + self.essai + ".json"
+        else:
+            out = DOSSIER_OUT + "test/" +\
+                               str(self.test) +\
+                               "/" +\
+                               self.name +\
+                               "_" +\
+                               self.essai +\
+                               ".json"
+                  
+        print("Fichier de sortie:", out)
+        notes_out = self.mt.get_json_file(out)
+                                          
         return notes_out
 
     def get_fonts_table(self):
@@ -207,6 +219,8 @@ class Benchmark:
         """Analyse les notes en entrée et en sortie pour trouver
         le nombre de bonnes notes
         """
+
+        all_good_notes = []
         
         # Score des notes justes
         for frame in range(self.frames):  # 2000
@@ -215,6 +229,7 @@ class Benchmark:
                     self.count_in += 1
                 if note in self.notes_out[frame]:
                     self.score += 1
+                    all_good_notes.append(note)
                     
             # #print(frame, 'in ', self.notes_in_corrected[frame],
                          # #'out', self.notes_out[frame], self.score,
@@ -227,96 +242,100 @@ class Benchmark:
                   "soit", self.efficiency)
         else:
             print("Pas de notes en entrées")
-            
+
+        # Pour calcul par police
+        allocation = self.notes_allocation(all_good_notes)
+        print("Répartition des bonnes notes:", allocation)
+
+        return allocation
+        
     def notes_bench_bad(self):
         """Analyse les notes en entrée et en sortie pour trouver
         les fausses notes.
         """
-        
+
+        all_bad_notes = []
         # Score des fausses notes
         for frame in range(self.frames):  # 2000
             for note in self.notes_out[frame]:
                 if note not in self.notes_in_corrected[frame]:
                     self.bad += 1
-
-        print("Nombre de mauvaise notes:",  self.bad)
-
-    def get_notes_dict(self, notes):
-        """Avec notes_out ou notes_in,
-        [
-        [[4, 71, 127], [9, 63, 127], [3, 59, 127], [6, 44, 127]],
-        [[4, 71, 127], [3, 59, 127], [6, 44, 127]],
-        ...
-        ]
+                    all_bad_notes.append(note)
+                    
+        # Pour calcul par police
+        allocation = self.notes_allocation(all_bad_notes)
+        print("Répartition des mauvaises notes:", allocation)
         
-        calcule le nombre de note par font
-        {0: 425, ...}
-        """
-        
-        notes_dict = {}
-        for i in range(10):
-            notes_dict[i] = 0
+        print("\nNombre de mauvaise notes:",  self.bad)
 
-        for i in range(2000):
-            for note in notes[i]:
-                notes_dict[note[0]] += 1                
-        
-        # Vérification somme des valeurs = nbre de notes entrées ou sortie
-        total = 0
-        for k, v in notes_dict.items():
-            # font = k, nombre = v
-            total += v
-        print("    Total des notes par font:", total)
+        return allocation
                 
-        return notes_dict
-        
-    def fonts_bench(self):
-        """Calcul de l'efficacité par police
-        self.notes_in_corrected
-        self.notes_out
-        font_in_0 : 452
-        font_out_0 : 123
-        font_eff_0 = font_out_0 / font_in_0
+    def notes_allocation(self, all_notes):
+        """de
+        [
+        [4, 45, 127], [8, 45, 127], [2, 45, 127], ...
+        ]
+        répartition par font
+        {
+        0: 20, 1: 64 ....
+        }
         """
         
-        print("Dict des notes en entrée:")
-        notes_in = self.get_notes_dict(self.notes_in_corrected)
-        print("Dict des notes en sortie:")
-        notes_out = self.get_notes_dict(self.notes_out)
-        print(notes_in)
-        print(notes_out )
-        # notes_in = {0: 0, 1: 1725, 2: 38, 3: 741, 4: 1569, 5: 465, 6: 1180,
-        #             7: 0, 8: 0, 9: 1348}
-        score = 0
-        for p in range(10):
-            print(notes_in[p])
-            if notes_in[p] != 0:
-                score = notes_out[p] / notes_in[p]
-            # #print(score)
+        # Dict du résultat
+        allocation = {}
+        for i in range(10):
+            allocation[i] = 0
+
+        for note in all_notes:
+            allocation[note[0]] += 1
+
+        return allocation
+            
+    def fonts_bench(self, allocation_good, allocation_bad):
+        print("\nRapport mauvaises/bonnes:")
+        for i in range(10):
+            a = 0
+            if allocation_good[i] != 0:
+                a = allocation_bad[i] / allocation_good[i]
+            print("Police:", i, "ratio", a)
             
     def bench(self):
         """Compare l'entrées et la sortie"""
         
-        self.notes_bench_good()
-        self.notes_bench_bad()
-        #self.fonts_bench()
+        allocation_good = self.notes_bench_good()
+        allocation_bad = self.notes_bench_bad()
+        self.fonts_bench(allocation_good, allocation_bad)
 
             
 class BenchmarkBatch:
 
-    def __init__(self, dossier_in, dossier_out, essai):
+    def __init__(self, dossier_in, dossier_out, essai, test=0):
 
         self.dossier_in = dossier_in
         self.dossier_out = dossier_out
         self.essai = essai
+        self.test = test
+        
         self.mt = MyTools()
         
         # Liste de tous les sous-dossiers
         self.get_all_sub_directories()
         
     def get_all_sub_directories(self):
-        self.all_sub_directories = glob(self.dossier_out + "*/")
-
+        if not self.test:
+            self.all_sub_directories = glob(self.dossier_out + "*/")
+        else:
+            out = self.dossier_out[:-5]
+            self.all_sub_directories = glob(out + "*/")
+            
+        # Suppression du dossier 'test' de la liste
+        i = 0
+        for name in self.all_sub_directories:
+            if "test" in name:
+                break
+            i += 1
+        self.all_sub_directories.pop(i)
+        
         # Pour affichage
         n = 0
         print("\nListe des sous dossiers des résultats d'analyse:")
@@ -337,8 +356,10 @@ class BenchmarkBatch:
                                                             data)
                                                             
         date = '{0:%Y_%m_%d-%H_%M_%S}'.format(datetime.now())
-        fichier = DOSSIER_OUT + "zz_efficiency_" + date + ".txt"
-        
+        if not self.test:
+            fichier = DOSSIER_OUT + "zz_efficiency_" + date + ".txt"
+        else:
+            fichier = DOSSIER_OUT + str(self.test) + "_" + date + ".txt"
         print("Sauvegarde dans:")
         print("    ", fichier)
         self.mt.write_data_in_file(data, fichier, "w")
@@ -360,8 +381,7 @@ class BenchmarkBatch:
         
         for sb in self.all_sub_directories:
             name = Path(sb).name
-            # if name == "Dutronc_cactus":  # "zorro":
-            bm = Benchmark(name, self.essai)
+            bm = Benchmark(name, self.essai, self.test)
             data += "    Reconnue: " + str(bm.score) +\
                     "    Bad: " + str(bm.bad) +\
                     "    Name: " + name +\
@@ -381,8 +401,25 @@ class BenchmarkBatch:
         # Enregistrement dans un fichier
         self.save_efficiency(data)
 
-        
-if __name__ == "__main__":
-    
+
+def one_bench():
     bmb = BenchmarkBatch(DOSSIER_IN, DOSSIER_OUT, ESSAI)
     bmb.batch()
+
+
+def test():
+    """Pour bench fonction du temps d'apprentissage"""
+
+    for i in range (1, 4, 1):
+        indice = i * 1000
+        print("\n\n\n\n\n\n\n\n")
+        print("INDICE:    ", indice)
+        out = DOSSIER_OUT + str(indice) + "/"
+        print("DOSSIER_OUT", out)
+        bmb = BenchmarkBatch(DOSSIER_IN, out, ESSAI, test=indice)
+        bmb.batch()
+    
+if __name__ == "__main__":
+    
+    # #one_bench()
+    test()
