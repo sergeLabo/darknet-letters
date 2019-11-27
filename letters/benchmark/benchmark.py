@@ -325,17 +325,14 @@ class BenchmarkBatch:
         if not self.test:
             self.all_sub_directories = glob(self.dossier_out + "*/")
         else:
-            out = self.dossier_out[:-5]
+            out = "/media/serge/BACKUP/play_letters_shot/pl_shot_14_jpg/"
             self.all_sub_directories = glob(out + "*/")
             
         # Suppression du dossier 'test' de la liste
-        i = 0
-        for name in self.all_sub_directories:
-            if "test" in name:
-                break
-            i += 1
-        self.all_sub_directories.pop(i)
-        
+        for dossier in self.all_sub_directories:
+            if "test" in dossier:
+                self.all_sub_directories.remove(dossier)
+
         # Pour affichage
         n = 0
         print("\nListe des sous dossiers des résultats d'analyse:")
@@ -370,7 +367,10 @@ class BenchmarkBatch:
         for eff in efficiency:
             i += eff[1]
             o += eff[0]
-        final_check = round(o / i, 3)
+        if i > 0:
+            final_check = round(o / i, 3)
+        else:
+            final_check = "Erreur"
         print("\nEfficacité globale:", final_check)
         
         return final_check
@@ -410,7 +410,7 @@ def one_bench():
 def test():
     """Pour bench fonction du temps d'apprentissage"""
 
-    for i in range (1, 4, 1):
+    for i in range (1, 44, 1):
         indice = i * 1000
         print("\n\n\n\n\n\n\n\n")
         print("INDICE:    ", indice)
@@ -421,5 +421,5 @@ def test():
     
 if __name__ == "__main__":
     
-    # #one_bench()
-    test()
+    one_bench()
+    # #test()

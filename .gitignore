@@ -41,6 +41,7 @@ get_shot.json
 train.txt
 test.txt
 all_instruments*
+all_weigts/
 
 # doc
 *.mkv
