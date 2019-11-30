@@ -832,7 +832,7 @@ if __name__ == '__main__':
     # Set le volume à 127 partout dans les json
     FPS = 40
     volume = "flat"
-    # #create_all_json("./music/non_git/ia", FPS, volume)
+    create_all_json("./music/", FPS, volume)
     
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
@@ -853,8 +853,8 @@ if __name__ == '__main__':
     # ## Play de tous les midi
     # #play_all_midi_files(FPS, fonts)
             
-    # Joue les json
-    play_all_json("../midi/json_40/non_git/ia", FPS, fonts)
+    # ## Joue les json
+    # #play_all_json("../midi/json_40/non_git/ia", FPS, fonts)
 
     # ## Création d'un json pour to_image
     # #f = "./music/pas_pour_github/axel_f-crazy_frog.mid"

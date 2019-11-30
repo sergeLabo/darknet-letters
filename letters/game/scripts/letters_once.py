@@ -393,8 +393,12 @@ def write_instruments_text():
     """
 
     data = ""
+
+    # Nombre d'instruments maxi 10
+    nb = len(gl.instruments)
+    if nb > 10: nb = 10
     
-    for i in range(len(gl.instruments)):
+    for i in range(nb):
         # [[0, 39], false, ''] --> 0 39
         # Fonts par instrument
         # gl.fonts_list[i]

@@ -207,6 +207,10 @@ predict_image_letterbox = lib.network_predict_image_letterbox
 predict_image_letterbox.argtypes = [c_void_p, IMAGE]
 predict_image_letterbox.restype = POINTER(c_float)
 
+# ajout serge
+free_network = lib.api_free_network
+free_network.argtypes = [c_void_p]
+
 def array_to_image(arr):
     import numpy as np
     # need to return old values to avoid python freeing memory
@@ -250,7 +254,7 @@ def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False
     #custom_image = cv2.resize(custom_image,(lib.network_width(net), lib.network_height(net)), interpolation = cv2.INTER_LINEAR)
     #import scipy.misc
     #custom_image = scipy.misc.imread(image)
-    #im, arr = array_to_image(custom_image)		# you should comment line below: free_image(im)
+    #im, arr = array_to_image(custom_image)     # you should comment line below: free_image(im)
     num = c_int(0)
     if debug: print("Assigned num")
     pnum = pointer(num)
@@ -386,21 +390,21 @@ def performDetect(imagePath="data/dog.jpg", thresh= 0.25, configPath = "./cfg/yo
     if not os.path.exists(imagePath):
         raise ValueError("Invalid image path `"+os.path.abspath(imagePath)+"`")
     # Do the detection
-    #detections = detect(netMain, metaMain, imagePath, thresh)	# if is used cv2.imread(image)
+    #detections = detect(netMain, metaMain, imagePath, thresh)  # if is used cv2.imread(image)
     detections = detect(netMain, metaMain, imagePath.encode("ascii"), thresh)
     if showImage:
         try:
             from skimage import io, draw
             import numpy as np
             image = io.imread(imagePath)
-            print("*** "+str(len(detections))+" Results, color coded by confidence ***")
+            # #print("*** "+str(len(detections))+" Results, color coded by confidence ***")
             imcaption = []
             for detection in detections:
                 label = detection[0]
                 confidence = detection[1]
                 pstring = label+": "+str(np.rint(100 * confidence))+"%"
                 imcaption.append(pstring)
-                print(pstring)
+                # #print(pstring)
                 bounds = detection[2]
                 shape = image.shape
                 # x = shape[1]

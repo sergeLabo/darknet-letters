@@ -41,7 +41,7 @@ from bge import render
 
 # Ajout du dossier courant dans lequel se trouve le dossier my_pretty_midi
 CUR_DIR = Path.cwd()
-print("Chemin du dossier courant dans le BGE:", CUR_DIR.resolve())  # game
+#print("Chemin du dossier courant dans le BGE:", CUR_DIR.resolve())  # game
 
 # Chemin du dossier letters
 LETTERS_DIR = CUR_DIR.parent
@@ -491,14 +491,16 @@ def save_txt_file(datas, sub_dir):
 def save_shot(sub_dir):
     png = get_name_file_shot(sub_dir)
     render.makeScreenshot(png)
-    print(gl.frame-1, "Shot n°", gl.numero, "dans", png)
+    if gl.numero % 10 == 0:
+        print(gl.frame-1, "Shot n°", gl.numero, "dans", png)
 
 
 def save_music_to_shot_shot():
     # ./shot/5/shot_41254.png"""
     png = os.path.join(gl.music_to_shot_sub_directory, 's_j_to_i_' + str(gl.numero) + '.png')
     render.makeScreenshot(png)
-    print("Shot n°", gl.numero, "dans", png)
+    if gl.numero % 10 == 0:
+        print("Shot n°", gl.numero, "dans", png)
     
     return png
 
@@ -895,6 +897,10 @@ def end():
 
     # Limitation du nombre d'images pour test
     if gl.phase == "music to shot":
+        if gl.numero >= len(gl.partitions[0]):
+            print("Fin de la conversion du json en images avec moins de 2000 shot")
+            music_to_shot_init()
+                     
         if gl.numero >= gl.nombre_shot_total:
             print("Fin de la conversion du json en images")
             music_to_shot_init()

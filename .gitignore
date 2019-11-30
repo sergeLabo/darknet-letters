@@ -31,7 +31,10 @@ json_to_image_shot/
 # darknet
 *.conv.*
 *.so
+
 *.weights
+!yolov3-tiny_3l_22_8000.weights
+
 shot/
 shot_jpg/
 shot_control/

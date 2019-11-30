@@ -31,7 +31,7 @@ CONF = lp.conf
 tools = MyTools()
 
 # Nombre de shot à réaliser
-nbr = CONF["blend"]["total"]
+nbr = CONF["letters_shot"]["nombre_shot_total"]
 loop = int(nbr/115) + 1
 print("Nombre de boucle à réaliser", loop)
 
@@ -53,12 +53,27 @@ l = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 # [0, l[i]]
 
 """
+avec majuscules
 [[[1, 0]], [[2, 0]], [[3, 0]], [[4, 0]], [[5, 0]], [[6, 0]], [[7, 0]],
 [[8, 0]], [[9, 0]], [[10, 0]], [[20, 0]], [[30, 0]], [[40, 0]], [[50, 0]],
 [[60, 0]], [[70, 0]], [[80, 0]], [[90, 0]], [[100, 0]], [[0, 1]], [[0, 2]],
 [[0, 3]], [[0, 4]], [[0, 5]], [[0, 6]], [[0, 7]], [[0, 8]], [[0, 9]],
 [[0, 10]], [[0, 20]], [[0, 30]], [[0, 40]], [[0, 50]], [[0, 60]], [[0, 70]],
 [[0, 80]], [[0, 90]], [[0, 100]]]
+
+pour images avec soit minuscules soit majuscules
+# Minuscules
+for i in range(len(l)):
+    note, volume = l[i], 0
+    note_vol = [[note, volume]]
+    part.append(note_vol)
+
+# Majuscules
+for i in range(len(l)):
+    note, volume = 0, l[i]
+    note_vol = [[note, volume]]
+    part.append(note_vol)
+                
 """
 
 # Les 10 canaux
@@ -70,21 +85,15 @@ for n in range(10):
     part = []
     # Boucle pour arriver aux nombre de shot à faire
     for rep in range(loop):
-        # Répétition pour avoir une frame vide toutes les 114
-        for w in range(6):  # 3 avec majuscules, 6 sans
-            # Minuscules
-            for i in range(len(l)):
-                note, volume = l[i], 0
-                note_vol = [[note, volume]]
+        # Répétition pour avoir une frame vide toutes les ~100
+        for w in range(6):
+            nb_lettres = randint(10, 30)
+            for i in range(nb_lettres):
+                note = randint(0, 127)
+                note_vol = [[note, 0]]
                 part.append(note_vol)
-
-            # ## Majuscules
-            # #for i in range(len(l)):
-                # #note, volume = 0, l[i]
-                # #note_vol = [[note, volume]]
-                # #part.append(note_vol)
-
-        # Frame sans note tous les 114 (notes, volumes)
+                
+        # Frame sans note tous les ~100 (notes, volumes)
         part.append([])
 
     partitions.append(part)

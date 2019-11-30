@@ -34,7 +34,7 @@ class LettersConfig(MyConfig):
         
         config_file = letters_dir / 'letters.ini'
         super().__init__(config_file)
-        print("Configuration chargée !\n", self.conf)
+        print("Configuration chargée !\n")  # , self.conf)
 
         
 class LettersPath(LettersConfig):

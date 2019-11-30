@@ -50,7 +50,12 @@ from pymultilame import MyConfig, MyTools
 
 class YOLO:
 
-    def __init__(self, images_directory, essai, test=0, weights=""):
+    def __init__(self, images_directory, essai, save, test=0, weights=""):
+        """
+        essai = numéro del'eaasi dans ini
+        save = sauvegarde des notes en json
+        test = bidouilles pour passer une série de weights
+        """
 
         # Mes outils
         self.mt = MyTools()
@@ -58,7 +63,9 @@ class YOLO:
         self.lp = LettersPath()
         self.CONF = self.lp.conf
         self.essai = essai
+        self.save = save
         self.test = test
+
         self.weights = weights
         print("Fichier de poids utilisé:", self.weights)
         self.get_weights_file_indice()
@@ -87,8 +94,11 @@ class YOLO:
         # Windows
         cv2.namedWindow('Reglage')
         cv2.moveWindow('Reglage', 0, 25)
-        cv2.namedWindow('Letters')
-        cv2.moveWindow('Letters', 0, 25)
+        cv2.namedWindow('Letters', cv2.WND_PROP_FULLSCREEN)
+        cv2.setWindowProperty(  'Letters',
+                                cv2.WND_PROP_FULLSCREEN,
+                                cv2.WINDOW_FULLSCREEN)
+        #cv2.moveWindow('Letters', 0, 25)
 
         # Trackbars
         self.create_trackbar()
@@ -128,6 +138,13 @@ class YOLO:
         teste tous les
         yolov3-tiny_3l_22_xxxxxxx.weights
         du dossier backup
+
+        free_network = lib.api_free_network
+        free_network.argtypes = [c_void_p]
+
+        adapté à ce script:
+        free_network = darknet.lib.api_free_network
+        free_network.argtypes = [c_void_p]
         """
 
         configPath = self.CONF['play_letters']['configpath']
@@ -160,6 +177,9 @@ class YOLO:
                         self.altNames = [x.strip() for x in namesList]
             except TypeError:
                 print("Erreur self.altNames")
+
+        self.free_network = darknet.lib.api_free_network
+        # #self.free_network.argtypes = [c_void_p]
 
         # Create an image we reuse for each detect
         self.darknet_image = darknet.make_image(\
@@ -207,11 +227,11 @@ class YOLO:
         """
 
         self.reglage_img = np.zeros((100, 600, 3), np.uint8)
-        self.reglage_img = put_text(self.reglage_img,
-                                    self.filename,
-                                    (10, 50),
-                                    size=0.8,
-                                    thickness=2)
+        # #self.reglage_img = put_text(self.reglage_img,
+                                    # #self.filename,
+                                    # #(10, 50),
+                                    # #size=0.8,
+                                    # #thickness=2)
 
         cv2.createTrackbar('threshold_', 'Reglage', 0, 100,
                                             self.onChange_thresh)
@@ -351,13 +371,13 @@ class YOLO:
         if not self.weights:
             json_name = self.images_directory + "_" + str(self.essai) + ".json"
         else:
+            # Bidouille non générale
             a = len("/media/serge/BACKUP/play_letters_shot/pl_shot_14_jpg/")
             name = self.images_directory[a:] + "_"
             # les fichiers sont dans 1 sous dossier indice
             indice = str(self.get_weights_file_indice())
             doss = "/media/serge/BACKUP/play_letters_shot/pl_shot_14_jpg/test/"
             json_name = doss + indice + "/" + name + str(self.essai) + ".json"
-            # #print("json_name", json_name)
 
         with open(json_name, 'w') as f_out:
             json.dump(self.all_notes, f_out)
@@ -382,8 +402,6 @@ class YOLO:
             self.hier_thresh = cv2.getTrackbarPos('hier_thresh','Reglage')
             self.nms = cv2.getTrackbarPos('nms','Reglage')
 
-            # #im = cv2.resize(img, (640, 640), interpolation=cv2.INTER_LINEAR)
-
             img_resized = cv2.resize(img,
                                     (darknet.network_width(self.netMain),
                                      darknet.network_height(self.netMain)),
@@ -405,9 +423,18 @@ class YOLO:
             self.play_notes(notes)
 
             # Ajout des notes pour enregistrement à la fin
-            self.all_notes.append(notes)
+            if self.save:
+                self.all_notes.append(notes)
 
             image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
+
+            if i > 1500:
+                image = put_text(   image,
+                                    self.filename,
+                                    (10, 50),
+                                    size=0.8,
+                                    thickness=2)
+                                    
             # Affichage du Semaphore
             cv2.imshow('Letters', image)
             # Affichage des trackbars
@@ -429,18 +456,26 @@ class YOLO:
                 t_init = time.time()
                 fps = 0
 
-            # Echap pour quitter, attente
-            if cv2.waitKey(tempo) == 27:
+            # Space pour morceau suivant et attente
+            if cv2.waitKey(tempo) == 32:
                 self.loop = 0
 
             # Gestion de la fin du morceaux
             if i == len(self.shot_list) :
                 self.loop = 0
 
+            # Echap pour finir le script python
+            if cv2.waitKey(1) == 27:
+                os._exit(0)
+
         cv2.destroyAllWindows()
 
+        # Libération de la mémoire GPU
+        self.free_network(self.netMain)
+
         # Enregistrement des notes
-        self.save_all_notes()
+        if self.save:
+            self.save_all_notes()
 
         # Fin des fluidsynth
         for i in range(len(self.players)):
@@ -673,23 +708,17 @@ def cvDrawBoxes(detections, img):
     return img, letters
 
 
-def play_letters(dossier, essai, test, weights):
+def play_letters(dossier, essai, save, test, weights):
     """Joue les sous-dossiers du dossier"""
 
     sd_list = [x[0] for x in os.walk(dossier)]
-    #print("Liste des sous dossiers:", sd_list)
+
     for sd in sd_list:
         # Pas le dossier principal
         if sd != dossier:
             if not "test" in sd:
-                print("Répertoire:", sd)
-                yolo = YOLO(sd, essai, test, weights)
+                yolo = YOLO(sd, essai, save, test, weights)
                 yolo.detect()
-
-                # ## Reset de la RAM GPU
-                # #darknet.free_network(yolo.netMain)
-
-                print("\n\nMorceau suivant\n")
 
     print("Done")
 
@@ -724,7 +753,8 @@ if __name__ == "__main__":
     essai = CONF["benchmark"]["essai"]
 
     test = 0
-    play_letters(dossier, essai, test, "")
+    save = 0
+    play_letters(dossier, essai, save, test, "")
 
     # #test(dossier, essai)
 
