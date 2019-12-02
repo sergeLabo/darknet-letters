@@ -195,18 +195,18 @@ class YOLO:
 
     def get_instruments(self):
         """Récupère les infos de instruments.txt dans self.instruments."""
-        
+
         file_name = self.images_directory + "/instruments.txt"
         data = self.mt.read_file(file_name)
         lines = data.splitlines()
         for line in lines:
             line_list = line.split(" ")
             self.instruments.append(line_list)
-        
+
     def set_players(self):
         """Crée les players pour chaque canal
         Les drums ne sont pas sur le channel 9, complique et sert à rien
-        
+
         la font i est sur le canal i
         for i in range(len(self.instruments)):
         self.instruments = [[0, 12, 5], [0, 0, 1]]
@@ -225,7 +225,7 @@ class YOLO:
                                                     bank,
                                                     bank_number)
             i += 1
-            
+
         print("Nombre de player:", len(self.players))
 
     def create_trackbar(self):
@@ -307,10 +307,12 @@ class YOLO:
         """Charge en mémoire toutes les images du dossiers à lire par l'IA"""
 
         print("\n\nChargement de toutes les images en RAM. Patience ...\n\n")
+
         all_shot = []
         for shot_file in self.shot_list:
             img = cv2.imread(shot_file)
             all_shot.append(img)
+
         return all_shot
 
     def notes_cleaning(self, notes):
@@ -412,6 +414,10 @@ class YOLO:
         tempo = 1
         t_tempo = time.time()
 
+        # Si pas d'image, on passe la boucle
+        if not self.all_shot:
+            self.loop = 0
+
         while self.loop:
             # Récup d'une image
             img = self.all_shot[i]
@@ -448,7 +454,9 @@ class YOLO:
             image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
 
             if self.titre:
-                filename = self.filename.replace("_", " ")
+                filename = self.filename
+                filename = filename.replace("f_", "")
+                filename = filename.replace("_", " ")
                 filename = filename.replace("-", " ")
                 image = put_text(   image,
                                     filename,
@@ -485,7 +493,10 @@ class YOLO:
 
             # Affichage du titre si "i"
             if k == ord('i'):  # 105:
-                self.titre = 1
+                if not self.titre:
+                    self.titre = 1
+                else:
+                    self.titre = 0
 
             # Echap pour finir le script python
             if k == 27:
@@ -506,8 +517,8 @@ class YOLO:
             self.save_all_notes()
 
         # Fin des fluidsynth
-        for i in range(len(self.players)):
-            self.players[i].stop_audio()
+        for k,v in self.players.items():
+            self.players[k].stop_audio()
         time.sleep(0.3)
 
 
@@ -746,7 +757,7 @@ def play_letters(dossier, essai, save, test, weights):
     sd_list.remove(dossier)
 
     # Récup du dernier précédent au lancement
-    file_nbr = 0  #CONF["play_letters"]["file_nbr"]
+    file_nbr = CONF["play_letters"]["file_nbr"]
 
     while 1:
         sd = sd_list[file_nbr]

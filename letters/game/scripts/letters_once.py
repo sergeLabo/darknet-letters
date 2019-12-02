@@ -114,7 +114,7 @@ def set_variable():
 
     gl.previous_datas = ""
     gl.numero = 0
-        
+
     # Dimension des fenêtres
     gl.music_size = gl.conf["music_and_letters"]["music_size"]
 
@@ -128,7 +128,7 @@ def set_variable():
     # Avec ou sans majuscules
     gl.majuscules = gl.conf["play_letters_shot"]["volume"]
 
-    
+
 def get_obj_num():
     """Dict de correspondance nom de l'objet:numéro"""
 
@@ -216,7 +216,7 @@ def get_get_shot_json():
     with open(gl.midi_json) as f:
         data = json.load(f)
     f.close()
-    
+
     gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
     gl.instruments = data["instruments"]  # [instrument_1.program, ...
     gl.partition_nbr = len(gl.partitions)
@@ -237,10 +237,10 @@ def fonts_shuffle(name):
 
     gl.fonts_list = []
     n = gl.partition_nbr
-    
+
     if n >= 10:
         n = 10
-        
+
     for i in range(n):
         gl.fonts_list.append(L[i])
 
@@ -256,7 +256,7 @@ def fonts_shuffle(name):
     if "gaynor_i_will_survive" in name:
         gl.fonts_list = [6, 1, 2, 3, 4, 0, 9, 5]
     if "Dutronc_cactus" in name:
-        gl.fonts_list = [5, 0, 6, 8] 
+        gl.fonts_list = [5, 0, 6, 8]
 
 
 def get_channel():
@@ -313,10 +313,21 @@ def init_midi():
 
 
 def intro_init():
-    # Phases du jeu "intro" "music and letters" "get shot"
-    gl.phase = "intro"
+    """Phases du jeu 'intro' 'music and letters' 'get shot' 'music to shot'
+    Appelé aussi par always
+    """
+    gl.phase = gl.conf["blend"]["run"]
+    
+    if gl.phase == "music and letters":
+        music_and_letters_init()
+                
+    if gl.phase == "get shot":
+        get_shot_init()
 
+    if gl.phase == "music to shot":
+        music_to_shot_init()
 
+        
 def music_and_letters_init():
     get_conf()
     set_variable()
@@ -343,9 +354,9 @@ def get_shot_init():
     gl.fond = gl.conf["letters_shot"]["fond"]
     if gl.fond == "video":
         set_video()
-        
+
     gl.phase = "get shot"
-    
+
     # letters shot
     gl.nombre_shot_total = gl.conf['letters_shot']['nombre_shot_total']
     gl.shot_size = gl.conf["letters_shot"]["shot_size"]
@@ -353,7 +364,7 @@ def get_shot_init():
     gl.size_min = gl.conf["letters_shot"]["size_min"]
     gl.size_max = gl.conf["letters_shot"]["size_max"]
     gl.scale = gl.conf["letters_shot"]["letters_scale"]
-        
+
     # Pour occurence avec get shot
     gl.comptage = {}
 
@@ -389,7 +400,7 @@ def write_instruments_text():
             gl.midi_json.txt
         data = "0 39\n0 62\n....."
 
-        
+
     """
 
     data = ""
@@ -397,17 +408,17 @@ def write_instruments_text():
     # Nombre d'instruments maxi 10
     nb = len(gl.instruments)
     if nb > 10: nb = 10
-    
+
     for i in range(nb):
         # [[0, 39], false, ''] --> 0 39
         # Fonts par instrument
         # gl.fonts_list[i]
-        
+
         bank = str(gl.instruments[i][0][0])
         instr = str(gl.instruments[i][0][1])
         police = str(gl.fonts_list[i])
         data += bank + " " + instr + " " + police + "\n"
-        
+
     fichier = gl.music_to_shot_sub_directory + "/instruments.txt"
 
     # Ecriture
@@ -418,14 +429,14 @@ def write_instruments_text():
 
 def create_music_to_shot_subdirectories(name):
     """Création du ou des sous répertoires"""
-    
+
     gl.music_to_shot_sub_directory = gl.music_to_shot_directory + "/" + name
     gl.tools.create_directory(gl.music_to_shot_sub_directory)
-    
+
     # Fichier text
     write_instruments_text()
 
-        
+
 def get_midi_json():
     """
     json_data = {"partitions":  [partition_1, partition_2 ......],
@@ -437,19 +448,19 @@ def get_midi_json():
         gl.nbr = gl.conf["music_and_letters"]["file_nbr"]
         js = gl.conf["music_and_letters"]["json_files"]
         gl.tempo["cube"].reset()
-        
+
     if gl.phase == "music to shot":
         js = gl.conf["play_letters_shot"]["json_files"]
 
     all_json = gl.tools.get_all_files_list(js, ".json")
     # Tri des json alpha
     all_json = sorted(all_json)
-    
+
     if gl.phase == "music and letters":
         # Reset de gl.nbr si fini
         if gl.nbr >= len(all_json):
             gl.nbr = 0
-            
+
     if gl.phase == "music to shot":
         gl.nbr += 1
         if all_json == []:
@@ -459,12 +470,17 @@ def get_midi_json():
             print("Fin des conversions")
             sleep(1)
             os._exit(0)
-            
+
     gl.midi_json = all_json[gl.nbr]
 
     name = gl.midi_json.split("/")[-1]
-    print("\n    Fichier en cours", name[:-5], "\n")
-    
+    name = name[:-5]
+    name = name.replace("f_", "")
+    name = name.replace("_", " ")
+    name = name.replace("-", " ")
+    gl.midi_json_name = name
+    print("\n    Fichier en cours", name, "\n")
+
     # Enregistrement du numéro du prochain fichier à lire
     if gl.phase == "music and letters":
         section = "music_and_letters"
@@ -474,7 +490,7 @@ def get_midi_json():
     with open(gl.midi_json) as f:
         data = json.load(f)
     f.close()
-    
+
     gl.partitions = data["partitions"]  # [partition_1, partition_2 ..
     gl.instruments = data["instruments"]  # [instrument_1.program, ...
     gl.partition_nbr = len(gl.partitions)
@@ -483,14 +499,14 @@ def get_midi_json():
     if not len(gl.partitions) > 0:
         print("Json non valide:", name)
         os._exit(0)
-        
+
     # Pour choix 2 et 3
     fonts_shuffle(name)
 
     # Sous dossiers et fichier texte
     if gl.phase == "music to shot":
         create_music_to_shot_subdirectories(name[:-5])
-        
+
     print("Nombre d'instrument:", len(gl.instruments))
     for instr in gl.instruments:
         if instr[1]:
@@ -501,22 +517,22 @@ def get_midi_json():
                    format(instr[0][0], instr[0][1], drum, instr[2]))
     print("\n")
 
-    
+
 def music_to_shot_init():
-    
+
     # Reload de la conf
     get_conf()
 
     print("Nouveau json à convertir en image:")
-    
+
     set_variable()
-    
+
     # Dossiers des images
     gl.music_to_shot_directory = gl.conf["play_letters_shot"]["pl_shot"]
     gl.tools.create_directory(gl.music_to_shot_directory)
 
     gl.phase = "music to shot"
-    
+
     # Play letters shot
     gl.nombre_shot_total = gl.conf['play_letters_shot']['nombre_shot_total']
     gl.shot_size = gl.conf["play_letters_shot"]["shot_size"]
@@ -528,13 +544,13 @@ def music_to_shot_init():
     # Fond de l'image pour get shot
     # possible: noir ou brouillard ou video":
     gl.fond = gl.conf["play_letters_shot"]["fond"]
-    
+
     get_midi_json()
 
     if gl.fond == "video":
         set_video()
 
-    
+
 def main():
     """Lancé une seule fois à la 1ère frame au début du jeu par main_once."""
 

@@ -48,7 +48,19 @@ metapath = "../darknet/data_15/obj.data"
 ln -s /media/data/projets/darknet-letters/letters/darknet/data_15/ /media/data/projets/darknet/data_15
 
 export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}
+cd /media/data/projets/darknet/
 
 ./darknet partial data_15/yolov3-tiny_15.cfg yolov3-tiny.weights data_15/yolov3-tiny.conv.15 15
 
 ./darknet detector train data_15/obj.data data_15/yolov3-tiny_15.cfg data_15/yolov3-tiny.conv.15 -map
+
+nan avec subdivision 8 et 64
+
+retour à yolov3-tiny_3l_15.cfg
+
+export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}
+cd /media/data/projets/darknet/
+
+./darknet partial data_15/yolov3-tiny_3l_15.cfg yolov3-tiny.weights data_15/yolov3-tiny.conv.15 15
+
+./darknet detector train data_15/obj.data data_15/yolov3-tiny_3l_15.cfg data_15/yolov3-tiny.conv.15 -map

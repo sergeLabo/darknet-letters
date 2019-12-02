@@ -1,7 +1,6 @@
 #!/bin/bash
 # -*- coding: UTF-8 -*-
 
+cd ./letters/play_letters
 
-cd ./letters/game
-
-blenderplayer letters.blend
+python3 play_letters.py

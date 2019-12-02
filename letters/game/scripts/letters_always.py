@@ -45,8 +45,9 @@ CUR_DIR = Path.cwd()
 
 # Chemin du dossier letters
 LETTERS_DIR = CUR_DIR.parent
-sys.path.append(str(LETTERS_DIR) + "/midi")
 
+sys.path.append(str(LETTERS_DIR) + "/midi")
+print(sys.path)
 # analyse_play_midi est dans /midi
 from analyse_play_midi import AnalyseMidi
 
@@ -59,20 +60,21 @@ from scripts.letters_once import music_to_shot_init
 
 HELP = """
  1 - Lancement de Letters
-     SPACE pour changer de musique
-     Haut Bas Avancer Reculer
-     
+     SPACE    - Changer de musique
+     Haut Bas - Avancer Reculer
+     I        - Nom de la musique
+
  2 - Fabrication des shot
                 pour l'IA
-                        
+
  3 - Conversion des musiques en image
- 
+
  H - Help
- 
+
  Echap - Quitter
 """
 
-        
+
 def main():
 
     # Saisie clavier
@@ -81,7 +83,7 @@ def main():
     # Affichage si besoin
     display_info()
     gl.all_obj['Text_info'].resolution = 64
-    
+
     # Tous les update par frame
     gl.tempo.update()
     #print_frame_rate()
@@ -102,11 +104,11 @@ def main():
 def main_intro():
     # Aggrandissement de la fenêtre
     render.setWindowSize(1000, 1000)
-        
+
     if gl.info == "":
         gl.all_obj["Cube"].visible = False
         gl.all_obj["brouillard"].visible = False
-        gl.info = "H = Help"  
+        gl.info = "H = Help"
 
 
 def main_music_and_letters():
@@ -120,7 +122,7 @@ def main_music_and_letters():
         gl.all_obj["Cube"].visible = True
     else:
         gl.all_obj["Cube"].visible = False
-        
+
     gl.all_obj["brouillard"].visible = False
     # Reset de la liste des noms d'objet blender à afficher
     gl.obj_name_list_to_display = []
@@ -149,7 +151,7 @@ def main_get_shot():
 
     # Avance de la video
     video_refresh()
-    
+
     gl.all_obj["Cube"].visible = False
 
     if gl.fond == "video":
@@ -157,15 +159,15 @@ def main_get_shot():
         gl.all_obj["brouillard"].visible = False
 
     if gl.fond == "brouillard":
-        gl.all_obj["Video"].visible = False   
+        gl.all_obj["Video"].visible = False
         gl.all_obj["brouillard"].visible = True
 
     if gl.fond == "noir":
-        gl.all_obj["Video"].visible = False   
+        gl.all_obj["Video"].visible = False
         gl.all_obj["brouillard"].visible = False
 
     tempo = gl.tempo['shot'].tempo
-    
+
     if tempo == 5:
         # Reset de la liste des noms d'objets blender à afficher
         gl.obj_name_list_to_display = []
@@ -180,7 +182,7 @@ def main_get_shot():
 
         # Décalage des lettres non jouées
         hide_unplayed_letters()
-    
+
     # Save position des lettres frame avant d'enreg
     if tempo == 10:
         gl.previous_datas = get_objets_position_size()
@@ -194,7 +196,7 @@ def main_get_shot():
         sleep(0.01)
         gl.numero += 1
         print(gl.comptage[0])
-        
+
     # Fin du jeu
     end()
 
@@ -217,16 +219,16 @@ def main_music_to_shot():
         video_refresh()
 
     if gl.fond == "brouillard":
-        gl.all_obj["Video"].visible = False   
+        gl.all_obj["Video"].visible = False
         gl.all_obj["brouillard"].visible = True
-        
+
     if gl.fond == "noir":
-        gl.all_obj["Video"].visible = False   
-        gl.all_obj["brouillard"].visible = False   
+        gl.all_obj["Video"].visible = False
+        gl.all_obj["brouillard"].visible = False
 
     tempo = gl.tempo['shot'].tempo
 
-    if tempo == 5:  
+    if tempo == 5:
         # Reset de la liste des noms d'objets blender à afficher
         gl.obj_name_list_to_display = []
 
@@ -237,13 +239,13 @@ def main_music_to_shot():
 
         # Décalage des lettres non jouées
         hide_unplayed_letters()
-    
+
     # Save position des lettres frame avant d'enreg
-    if tempo == 10:  
+    if tempo == 10:
         gl.previous_datas = get_objets_position_size()
 
     # Enregistre les shots
-    if tempo == 15:  
+    if tempo == 15:
         gl.png = save_music_to_shot_shot()
         sleep(0.01)
         gl.numero += 1
@@ -251,7 +253,7 @@ def main_music_to_shot():
     # Fin du json
     end()
 
-    
+
 def video_refresh():
     """call this function every frame to ensure update of the texture."""
     if gl.fond == "video":
@@ -285,16 +287,16 @@ def get_frame_notes():
     if gl.frame < len(gl.partitions[0]):
         for partition in gl.partitions:
             frame_notes.append(partition[gl.frame])
-                
+
         gl.frame += 1
-        
+
     # Le morceaux est fini
     else:
         if gl.phase == "get shot":
             # Fin
             print("Fin de get_shot.json")
             os._exit(0)
-        if gl.phase == "music and letters":    
+        if gl.phase == "music and letters":
             # Kill de tous les threads et restart sur nouvelle musique
             new_music()
 
@@ -372,16 +374,16 @@ def get_sub_dir():
 
     # Nombre de fichiers par dossier
     nb = gl.nombre_shot_total/100
-    
+
     sub_dir = int(gl.numero/nb)
-    
+
     if sub_dir < 0:
         print("Sous dossier négatif", gl.numero)
         sub_dir = 0
     if sub_dir > 99:
         print("Sous dossier > 99", gl.numero)
         sub_dir = 99
-        
+
     return sub_dir
 
 
@@ -416,13 +418,13 @@ def get_size(obj):
 
     # Valeur de scale appliquée à l'objet
     scale = obj.worldScale
-    
+
     vl = get_plane_vertices_position(obj)
     sx = (vl[0][0] - vl[1][0])*scale[0]
     sy = (vl[1][2] - vl[3][2])*scale[0]
     return sx, sy
 
-    
+
 def get_objets_position_size():
     """De toutes les lettres:
     Tout ramené entre 0 et 1, soit 1 pour 10 réel, d'où relatif = 0.1
@@ -441,21 +443,21 @@ def get_objets_position_size():
         # ob = nom de l'objet
         pos = gl.all_obj[ob].worldPosition
         sx, sy = get_size(gl.all_obj[ob])
-        
+
         # origine en 5, -5, le y est le z du centre
         x = (pos[0] + 5) * relatif
         y = 1 - ((pos[2] + 5) * relatif)
         x = entre_zero_et_un(x)
         y = entre_zero_et_un(y)
-        
+
         # Dimension
         # gl.scale comprend le scale du rectangle englobant
         dim_x = abs(sx * relatif * gl.scale)
         dim_y = abs(sy * relatif * gl.scale)
-        
+
         dim_x = entre_zero_et_un(dim_x)
         dim_y = entre_zero_et_un(dim_y)
-        
+
         data =  str(gl.letters_num[ob]) + " " \
                 + str(round(x, 4)) + " " \
                 + str(round(y, 4)) + " " \
@@ -465,7 +467,7 @@ def get_objets_position_size():
         datas += data
     # Suppr du dernier fin de ligne
     datas = datas[:-2]
-    
+
     return datas
 
 
@@ -502,7 +504,7 @@ def save_music_to_shot_shot():
     render.makeScreenshot(png)
     if gl.numero % 100 == 0:
         print("Shot n°", gl.numero, "dans", png)
-    
+
     return png
 
 
@@ -513,10 +515,10 @@ def convert_to_jpg_and_delete_png(png):
 
     # Flou
     img = apply_blur(img)
-    
+
     # Remplacement de l'extension png en jpg
     jpg = str(Path(png).with_suffix('.jpg'))
-    
+
     cv2.imwrite(jpg, img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
     print("        Conversion:", jpg)
     sleep(0.10)
@@ -527,15 +529,15 @@ def convert_to_jpg_and_delete_png(png):
 
 
 def apply_blur(img):
-    
+
     blur = randint(gl.blur_min, gl.blur_max)
-    
+
     # Flou
     if blur != 0:
         img = cv2.blur(img, (blur, blur))
     return img
 
-        
+
 def get_name_file_shot(sub_dir):
     """gl.music_to_shot_sub_directory = letters/music_to_shot"""
 
@@ -626,15 +628,15 @@ def keyboard():
     if gl.keyboard.events[events.UPARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         gl.frame += 1000
         print("Avance rapide")
-        
+
     # music and letters recul lent
     elif gl.keyboard.events[events.DOWNARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         gl.frame -= 1000
-        
+
     # music and letters avance rapide
     elif gl.keyboard.events[events.RIGHTARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         gl.frame += 100
-        
+
     # music and letters recul rapide
     elif gl.keyboard.events[events.LEFTARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         gl.frame -= 100
@@ -648,42 +650,45 @@ def keyboard():
         pass
     if gl.frame < 0:
         gl.frame = 0
-        
+
     # Changement de music
     elif gl.keyboard.events[events.SPACEKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         if gl.phase == "music and letters":
             print("\nChangement de musique .............\n\n")
             new_music()
-        
+
     # music and letters
     elif gl.keyboard.events[events.PAD1] == gl.KX_INPUT_JUST_ACTIVATED or gl.keyboard.events[events.AKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de music and letters")
         gl.phase = "music and letters"
         gl.info = "Début de music and letters"
         gl.info_news = 1
-        music_and_letters_init()    
+        music_and_letters_init()
+
+    elif gl.keyboard.events[events.IKEY] == gl.KX_INPUT_JUST_ACTIVATED:
+        gl.info = gl.midi_json_name
 
     # get shot
     elif gl.keyboard.events[events.PAD2] == gl.KX_INPUT_JUST_ACTIVATED or gl.keyboard.events[events.BKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de get shot")
         gl.phase = "get shot"
         gl.info = "Début de get shot"
-        kill()   
+        kill()
         get_shot_init()
-        
+
     # conversion d'un json en image
     elif gl.keyboard.events[events.PAD3] == gl.KX_INPUT_JUST_ACTIVATED or gl.keyboard.events[events.CKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        print("Conversion d'un json en image") 
+        print("Conversion d'un json en image")
         music_to_shot_init()
-         
+
     # Help
     elif gl.keyboard.events[events.HKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         print("Début de help")
-        gl.all_obj["Cube"].visible = False     
+        gl.all_obj["Cube"].visible = False
         gl.info = HELP
-        gl.info_news = 1    
+        gl.info_news = 1
 
-        
+
 def display_info():
     """Lancé à chaque frame, tout le temps"""
 
@@ -693,7 +698,7 @@ def display_info():
         if gl.info_news:
             gl.tempo["info"].reset()
             gl.info_news = 0
-            
+
         if gl.tempo["info"].tempo > 175:
             gl.info = ""
 
@@ -872,7 +877,7 @@ def set_letter_unvisible(lettre):
 
 
 def set_sun_color_energy():
-    
+
     # Puissance de l'éclairage
     gl.sun.energy = uniform(gl.sun_energy_min, gl.sun_energy_max)
 
@@ -882,7 +887,7 @@ def set_sun_color_energy():
     color = uniform(a, b), uniform(a, b), uniform(a, b)
     gl.sun.color = color
 
-                 
+
 def end():
 
     # Fin de get_shot
@@ -901,7 +906,7 @@ def end():
         if gl.numero >= len(gl.partitions[0]):
             print("Fin de la conversion du json en images avec moins de 2000 shot")
             music_to_shot_init()
-                     
+
         if gl.numero >= gl.nombre_shot_total:
             print("Fin de la conversion du json en images")
             music_to_shot_init()
