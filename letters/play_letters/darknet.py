@@ -1,4 +1,5 @@
 #!python3
+
 """
 Python 3 wrapper for identifying objects in images
 
@@ -26,11 +27,15 @@ Windows Python 2.7 version: https://github.com/AlexeyAB/darknet/blob/fc496d52bf2
 @author: Philip Kahn
 @date: 20180503
 """
+
 #pylint: disable=R, W0401, W0614, W0703
 from ctypes import *
 import math
 import random
 import os
+
+# Pour modif free network serge
+GPU = 1
 
 def sample(probs):
     s = sum(probs)
@@ -208,8 +213,9 @@ predict_image_letterbox.argtypes = [c_void_p, IMAGE]
 predict_image_letterbox.restype = POINTER(c_float)
 
 # ajout serge
-free_network = lib.api_free_network
-free_network.argtypes = [c_void_p]
+if GPU:
+    free_network = lib.api_free_network
+    free_network.argtypes = [c_void_p]
 
 def array_to_image(arr):
     import numpy as np

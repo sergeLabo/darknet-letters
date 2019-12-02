@@ -491,15 +491,16 @@ def save_txt_file(datas, sub_dir):
 def save_shot(sub_dir):
     png = get_name_file_shot(sub_dir)
     render.makeScreenshot(png)
-    if gl.numero % 10 == 0:
+    if gl.numero % 100 == 0:
         print(gl.frame-1, "Shot n°", gl.numero, "dans", png)
 
 
 def save_music_to_shot_shot():
     # ./shot/5/shot_41254.png"""
-    png = os.path.join(gl.music_to_shot_sub_directory, 's_j_to_i_' + str(gl.numero) + '.png')
+    png = os.path.join(gl.music_to_shot_sub_directory,
+                        's_j_to_i_' + str(gl.numero) + '.png')
     render.makeScreenshot(png)
-    if gl.numero % 10 == 0:
+    if gl.numero % 100 == 0:
         print("Shot n°", gl.numero, "dans", png)
     
     return png
@@ -890,12 +891,12 @@ def end():
             print("Fin de get_shot")
             gl.endGame()
 
-    # Fin de la partition
-    if gl.partitions:  # bug
-        if gl.numero >= len(gl.partitions[0]):
-            gl.endGame()
+        # Fin de la partition
+        if gl.partitions:  # bug
+            if gl.numero >= len(gl.partitions[0]):
+                gl.endGame()
 
-    # Limitation du nombre d'images pour test
+    # Fin de music to shot
     if gl.phase == "music to shot":
         if gl.numero >= len(gl.partitions[0]):
             print("Fin de la conversion du json en images avec moins de 2000 shot")

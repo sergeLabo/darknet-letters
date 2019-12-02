@@ -250,7 +250,7 @@ def fonts_shuffle(name):
     if "zorro" in name:
         gl.fonts_list = [9, 4, 2]
     if "On Ira Tous Au Paradis" in name:
-        gl.fonts_list = [6, 9, 2, 0, 7, 4, 8, 5, 3, 1 ]
+        gl.fonts_list = [6, 9, 2, 0, 7, 4, 8, 5, 3, 1]
     if "jeux_interdits" in name:
         gl.fonts_list = [4, 9, 3, 8, 6, 2]
     if "gaynor_i_will_survive" in name:
@@ -412,6 +412,7 @@ def write_instruments_text():
 
     # Ecriture
     gl.tools.write_data_in_file(data, fichier, "w")
+    sleep(1)
     print("Fichier créé:", fichier)
 
 

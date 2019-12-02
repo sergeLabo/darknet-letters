@@ -47,6 +47,7 @@ sys.path.append(lp.get_midi_directory())
 from analyse_play_midi import OneInstrumentPlayer
 from pymultilame import MyConfig, MyTools
 
+GPU = 1
 
 class YOLO:
 
@@ -67,7 +68,8 @@ class YOLO:
         self.test = test
 
         self.weights = weights
-        print("Fichier de poids utilisé:", self.weights)
+        if self.weights:
+            print("Fichier de poids utilisé:", self.weights)
         self.get_weights_file_indice()
         if self.weights:
             self.create_test_subdir()
@@ -94,11 +96,15 @@ class YOLO:
         # Windows
         cv2.namedWindow('Reglage')
         cv2.moveWindow('Reglage', 0, 25)
-        cv2.namedWindow('Letters', cv2.WND_PROP_FULLSCREEN)
-        cv2.setWindowProperty(  'Letters',
-                                cv2.WND_PROP_FULLSCREEN,
-                                cv2.WINDOW_FULLSCREEN)
-        #cv2.moveWindow('Letters', 0, 25)
+        if self.CONF['play_letters']['fullscreen']:
+            cv2.namedWindow('Letters', cv2.WND_PROP_FULLSCREEN)
+            cv2.setWindowProperty(  'Letters',
+                                    cv2.WND_PROP_FULLSCREEN,
+                                    cv2.WINDOW_FULLSCREEN)
+        else:
+            cv2.namedWindow('Letters')
+            cv2.moveWindow('Letters', 0, 25)
+        self.titre = 0
 
         # Trackbars
         self.create_trackbar()
@@ -106,7 +112,8 @@ class YOLO:
 
         # Midi
         self.fonts = self.CONF['music_and_letters']['fonts']
-        self.set_canaux()
+        self.instruments = []
+        self.get_instruments()
         self.notes_en_cours = []
         self.players = {}
         self.set_players()
@@ -123,7 +130,6 @@ class YOLO:
         a = len("/media/data/projets/darknet-letters/letters/darknet/data_22/backup/yolov3-tiny_3l_22_")
         b = len(".weights")
         indice = str(self.weights[a:-b])
-        print("Indice du test:", indice)
 
         return indice
 
@@ -178,8 +184,8 @@ class YOLO:
             except TypeError:
                 print("Erreur self.altNames")
 
-        self.free_network = darknet.lib.api_free_network
-        # #self.free_network.argtypes = [c_void_p]
+        if GPU:
+            self.free_network = darknet.lib.api_free_network
 
         # Create an image we reuse for each detect
         self.darknet_image = darknet.make_image(\
@@ -187,36 +193,39 @@ class YOLO:
                                         darknet.network_height(self.netMain),
                                         3)
 
-    def set_canaux(self):
-        """Définit les canaux avec le fichier texte
-        0 39
-        0 62
-        ...
-        """
-        self.canaux = []
-
+    def get_instruments(self):
+        """Récupère les infos de instruments.txt dans self.instruments."""
+        
         file_name = self.images_directory + "/instruments.txt"
         data = self.mt.read_file(file_name)
         lines = data.splitlines()
         for line in lines:
             line_list = line.split(" ")
-            self.canaux.append(line_list)
-
+            self.instruments.append(line_list)
+        
     def set_players(self):
-        """Crée les players pour chaque canal"""
+        """Crée les players pour chaque canal
+        Les drums ne sont pas sur le channel 9, complique et sert à rien
+        
+        la font i est sur le canal i
+        for i in range(len(self.instruments)):
+        self.instruments = [[0, 12, 5], [0, 0, 1]]
+                            [bank,
+                               bank_number = instrument,
+                                                     font]
+        """
 
-        for i in range(len(self.canaux)):
-            if i < 10:
-                # Les drums ne sont pas sur le channel,
-                # complique et sert à rien
-                channel = i
-                bank = int(self.canaux[i][0])
-                bank_number = int(self.canaux[i][1])
-                self.players[i] = OneInstrumentPlayer(self.fonts,
-                                                     channel,
-                                                     bank,
-                                                     bank_number)
-
+        i = 0
+        for instrument in self.instruments:
+            channel = int(instrument[2])
+            bank = int(instrument[0])
+            bank_number = int(instrument[1])
+            self.players[channel] = OneInstrumentPlayer(self.fonts,
+                                                    channel,
+                                                    bank,
+                                                    bank_number)
+            i += 1
+            
         print("Nombre de player:", len(self.players))
 
     def create_trackbar(self):
@@ -313,26 +322,33 @@ class YOLO:
 
         # Validation des notes
         new_notes = []
-        for player, note, vol in notes:
-            # player 0 à len(self.canaux)
-            if player < 0 or player >= len(self.canaux):
-                player = None
+        for font, note, vol in notes:
+            # self.instruments = [[0, 12, 5], [0, 0, 1]]
+            all_fonts = []
+            for inst in self.instruments:
+                all_fonts.append(int(inst[2]))
+            if font not in all_fonts:
+                font = None
 
             # note 1 à 127
             if note < 1 or note > 127:
                 note = None
 
-            # Volume 0 à 127:
-            if vol > 127: vol = 127
-            if vol < 0: vol = 0
+            # ## Volume 0 à 127:
+            # #if vol > 127: vol = 127
+            # #if vol < 0: vol = 0
+            # Le volume est forcé à 127
+            vol = 127
 
-            if player and note and vol:
-                new_notes.append([player, note, vol])
+            if font is not None:
+                if note:
+                    new_notes.append([font, note, vol])
 
         return new_notes
 
     def play_notes(self, notes):
-        """new_notes = [(police, note, volume), ...] = [(45, 124, 2), ... ]
+        """new_notes = [(police, note, volume), ...] = [(5, 124, 127), ... ]
+        la police n'est pas le player
         self.players[i].thread_dict[key] = 0
         """
 
@@ -341,11 +357,13 @@ class YOLO:
         # Notes en en_cours ******************************************
         en_cours = []
         # 10 players
-        for i in range(len(self.players)):
-            # key=note, val=thread en cours 0 ou 1
-            for key, val in self.players[i].thread_dict.items():
+        #for i in range(len(self.players)):
+        # key=note, val=thread en cours 0 ou 1
+        # TODO erreur ici
+        for k, v in self.players.items():
+            for key, val in self.players[k].thread_dict.items():
                 if val != 0:
-                    en_cours.append((i, key))
+                    en_cours.append((k, key))
 
         # Fin des notes qui ne sont plus en en_cours *****************
         # notes = [(player, note, volume), ...]
@@ -359,6 +377,7 @@ class YOLO:
         # Lancement des nouvelles notes ******************************
         for player, note, vol in new_notes:
             if (player, note) not in en_cours:
+                # TODO erreur ici
                 self.players[player].thread_play_note(note, 127)  # vol)
 
     def save_all_notes(self):
@@ -428,14 +447,16 @@ class YOLO:
 
             image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
 
-            if i > 1500:
+            if self.titre:
+                filename = self.filename.replace("_", " ")
+                filename = filename.replace("-", " ")
                 image = put_text(   image,
-                                    self.filename,
+                                    filename,
                                     (10, 50),
                                     size=0.8,
                                     thickness=2)
-                                    
-            # Affichage du Semaphore
+
+            # Affichage
             cv2.imshow('Letters', image)
             # Affichage des trackbars
             cv2.imshow('Reglage', self.reglage_img)
@@ -456,22 +477,29 @@ class YOLO:
                 t_init = time.time()
                 fps = 0
 
+            k = cv2.waitKey(tempo)
+
             # Space pour morceau suivant et attente
-            if cv2.waitKey(tempo) == 32:
+            if k == 32:
                 self.loop = 0
+
+            # Affichage du titre si "i"
+            if k == ord('i'):  # 105:
+                self.titre = 1
+
+            # Echap pour finir le script python
+            if k == 27:
+                os._exit(0)
 
             # Gestion de la fin du morceaux
             if i == len(self.shot_list) :
                 self.loop = 0
 
-            # Echap pour finir le script python
-            if cv2.waitKey(1) == 27:
-                os._exit(0)
-
         cv2.destroyAllWindows()
 
         # Libération de la mémoire GPU
-        self.free_network(self.netMain)
+        if GPU:
+            self.free_network(self.netMain)
 
         # Enregistrement des notes
         if self.save:
@@ -626,6 +654,7 @@ def letters_to_notes(letters):
     for i in range(10):
         notes_d[i] = [0, 0]
         for letter in letters:
+            # le 5ème de "font_0_b" est la font
             police = int(letter[5])
             if police == i:
                 l = letter[7]
@@ -712,13 +741,24 @@ def play_letters(dossier, essai, save, test, weights):
     """Joue les sous-dossiers du dossier"""
 
     sd_list = [x[0] for x in os.walk(dossier)]
+    sd_list = sorted(sd_list)
+    # Pas le dossier principal
+    sd_list.remove(dossier)
 
-    for sd in sd_list:
-        # Pas le dossier principal
-        if sd != dossier:
-            if not "test" in sd:
-                yolo = YOLO(sd, essai, save, test, weights)
-                yolo.detect()
+    # Récup du dernier précédent au lancement
+    file_nbr = 0  #CONF["play_letters"]["file_nbr"]
+
+    while 1:
+        sd = sd_list[file_nbr]
+
+        # Enregistrement du numéro du prochain fichier
+        file_nbr += 1
+        if file_nbr >= len(sd_list):
+            file_nbr = 0
+        lp.save_config("play_letters", "file_nbr", file_nbr)
+
+        yolo = YOLO(sd, essai, save, test, weights)
+        yolo.detect()
 
     print("Done")
 
@@ -737,7 +777,8 @@ def test(dossier, essai):
 
     for w in w_list:
         # Pas le dossier principal
-        print("\n\nFichier de poids en cours:", w, "\n\n")
+        if w:
+            print("\n\nFichier de poids en cours:", w, "\n\n")
         if w != w_dir:
             play_letters(dossier, essai, test=1, weights=w)
 
