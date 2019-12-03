@@ -47,7 +47,7 @@ sys.path.append(lp.get_midi_directory())
 from analyse_play_midi import OneInstrumentPlayer
 from pymultilame import MyConfig, MyTools
 
-GPU = 1
+GPU = 0
 
 class YOLO:
 
@@ -94,18 +94,8 @@ class YOLO:
         self.nms = int(self.CONF['play_letters']['nms'])
 
         # Windows
-        cv2.namedWindow('Reglage')
-        cv2.moveWindow('Reglage', 0, 25)
-        if self.CONF['play_letters']['fullscreen']:
-            cv2.namedWindow('Letters', cv2.WND_PROP_FULLSCREEN)
-            cv2.setWindowProperty(  'Letters',
-                                    cv2.WND_PROP_FULLSCREEN,
-                                    cv2.WINDOW_FULLSCREEN)
-        else:
-            cv2.namedWindow('Letters')
-            cv2.moveWindow('Letters', 0, 25)
-        self.titre = 0
-
+        self.create_windows()
+        
         # Trackbars
         self.create_trackbar()
         self.set_init_tackbar_position()
@@ -118,7 +108,22 @@ class YOLO:
         self.players = {}
         self.set_players()
         self.all_notes = []
-
+        
+    def create_windows(self):
+        cv2.namedWindow('Reglage')
+        cv2.moveWindow('Reglage', 0, 25)
+        self.fullscreen = self.CONF['play_letters']['fullscreen']
+        if self.fullscreen:
+            cv2.namedWindow('Letters', cv2.WND_PROP_FULLSCREEN)
+            cv2.setWindowProperty(  'Letters',
+                                    cv2.WND_PROP_FULLSCREEN,
+                                    cv2.WINDOW_FULLSCREEN)
+        else:
+            cv2.namedWindow('Letters')
+            cv2.moveWindow('Letters', 0, 25)
+        self.titre = 0
+        self.black_image = np.zeros((416, 740, 3), np.uint8)
+        
     def get_weights_file_indice(self):
         """Uniquement pour test
         weightpath =
@@ -405,6 +410,41 @@ class YOLO:
         f_out.close()
         print('Enregistrement de:', json_name)
 
+    def put_titre(self, image):
+        """Insère le titre si i"""
+        
+        if self.titre:
+            filename = self.filename
+            filename = filename.replace("f_", "")
+            filename = filename.replace("_", " ")
+            filename = filename.replace("-", " ")
+            image = put_text(   image,
+                                filename,
+                                (10, 50),
+                                size=0.8,
+                                thickness=2)
+        return image
+
+    def apply_k(self, k, i):
+        # Space pour morceau suivant et attente
+        if k == 32:
+            self.loop = 0
+
+        # Affichage du titre si "i"
+        if k == ord('i'):  # 105:
+            if not self.titre:
+                self.titre = 1
+            else:
+                self.titre = 0
+
+        # Echap pour finir le script python
+        if k == 27:
+            os._exit(0)
+
+        # Gestion de la fin du morceaux
+        if i == len(self.shot_list) :
+            self.loop = 0
+                
     def detect(self):
         """FPS = 40 sur GTX1060"""
 
@@ -451,26 +491,23 @@ class YOLO:
             if self.save:
                 self.all_notes.append(notes)
 
-            image = cv2.resize(image, (800, 800), interpolation=cv2.INTER_LINEAR)
+            # Insertion du titre
+            image = self.put_titre(image)
 
-            if self.titre:
-                filename = self.filename
-                filename = filename.replace("f_", "")
-                filename = filename.replace("_", " ")
-                filename = filename.replace("-", " ")
-                image = put_text(   image,
-                                    filename,
-                                    (10, 50),
-                                    size=0.8,
-                                    thickness=2)
-
+            if not self.fullscreen:
+                image = cv2.resize(image, (800, 800),
+                                    interpolation=cv2.INTER_LINEAR)
+            else:
+                #gray[y1:y2, x1:x2]
+                self.black_image[0:416, 162:578] = image
+                
             # Affichage
-            cv2.imshow('Letters', image)
+            cv2.imshow('Letters', self.black_image)  # image)
             # Affichage des trackbars
             cv2.imshow('Reglage', self.reglage_img)
 
             # Comptage
-            i += 1
+            i += 1  # prochaine image
             fps += 1
             ta = time.time()
 
@@ -486,25 +523,7 @@ class YOLO:
                 fps = 0
 
             k = cv2.waitKey(tempo)
-
-            # Space pour morceau suivant et attente
-            if k == 32:
-                self.loop = 0
-
-            # Affichage du titre si "i"
-            if k == ord('i'):  # 105:
-                if not self.titre:
-                    self.titre = 1
-                else:
-                    self.titre = 0
-
-            # Echap pour finir le script python
-            if k == 27:
-                os._exit(0)
-
-            # Gestion de la fin du morceaux
-            if i == len(self.shot_list) :
-                self.loop = 0
+            self.apply_k(k, i)
 
         cv2.destroyAllWindows()
 
