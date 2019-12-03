@@ -3,7 +3,9 @@
 De l'Intelligence artificielle pour reconnaitre des lettres dans différentes polices,
 et en faire des cauchemars et de la musique en midi.
 
-<img src="/letters/doc/shot_43.jpg" width="400" height="400">
+<p align="center">
+<img src="/letters/doc/shot_43.jpg" width="400" height="400"/>
+</p>
 
 ### Contexte
 
