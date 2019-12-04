@@ -8,7 +8,7 @@ et en faire des cauchemars et de la musique en midi.
 </p>
 
 Regarder la video sur Vimeo:
-[![Watch the video](https://vimeo.com/377284950/200.jpg)](https://vimeo.com/377284950 "Letters")
+[![Watch the video](https://vimeo.com/377284950/200.jpg)](https://vimeo.com/377284950)
 
 ### Contexte
 
