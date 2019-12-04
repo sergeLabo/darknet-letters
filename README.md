@@ -6,7 +6,7 @@ et en faire des cauchemars et de la musique en midi.
 <p align="center">
 <img src="/letters/doc/shot_43.jpg" width="400" height="400"/>
 
-[![Regarder la video sur Vimeo]](https://vimeo.com/377284950)
+[![Regarder la video sur Vimeo](/letters/doc/shot_43.jpg)](https://vimeo.com/377284950)
 </p>
 
 ### Contexte
