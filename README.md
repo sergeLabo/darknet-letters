@@ -7,6 +7,8 @@ et en faire des cauchemars et de la musique en midi.
 <img src="/letters/doc/shot_43.jpg" width="400" height="400"/>
 </p>
 
+[![Watch the video](/letters/doc/shot_43.jpg)](https://vimeo.com/377284950)
+
 ### Contexte
 
 Réalisé avec:
