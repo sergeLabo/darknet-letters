@@ -5,9 +5,7 @@ et en faire des cauchemars et de la musique en midi.
 
 <p align="center">
 <img src="/letters/doc/shot_43.jpg" width="400" height="400"/>
-</p>
 
-<p align="center">
 Regarder la video sur Vimeo:
 [![Watch the video](https://vimeo.com/377284950/200.jpg)](https://vimeo.com/377284950)
 </p>
