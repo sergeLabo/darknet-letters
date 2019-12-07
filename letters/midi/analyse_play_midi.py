@@ -174,6 +174,10 @@ class AnalyseMidi:
             print("Instruments non récupérable dans le fichier midi\n")
             self.instruments_without_drums = []
 
+        # Si nombre d'instrument > 10 pour IA
+        if len(self.instruments) > 10:
+            return None, None
+            
         for instrument in self.instruments_without_drums:
             if instrument.is_drum:
                 drum = "Drum"
@@ -254,17 +258,18 @@ class AnalyseMidi:
         # Analyse du midi
         self.get_partitions_and_instruments()
 
-        # Création du json
-        json_data = {}
-        json_data["partitions"] = self.partitions
-        json_data["instruments"] = self.instruments
-        
-        # Save du json
-        json_name = self.get_json_name()
-        with open(json_name, 'w') as f_out:
-            json.dump(json_data, f_out)
-        f_out.close()
-        print('Enregistrement de:', json_name)
+        if len(self.instruments) < 11:
+            # Création du json
+            json_data = {}
+            json_data["partitions"] = self.partitions
+            json_data["instruments"] = self.instruments
+            
+            # Save du json
+            json_name = self.get_json_name()
+            with open(json_name, 'w') as f_out:
+                json.dump(json_data, f_out)
+            f_out.close()
+            print('Enregistrement de:', json_name)
 
         # Pour Blender
         self.end = 1
@@ -309,7 +314,6 @@ class AnalyseMidi:
         """
 
         json_name_abs = Path(json_name).absolute()
-        print("json_name en abs parts", json_name_abs.parts)
         
         # json_17 doit toujours exister, si existe on passe
         index_midi = json_name_abs.parts.index("midi")
@@ -539,9 +543,10 @@ class OneInstrumentPlayer:
     def stop_audio(self):
         """Stopper avant de détruire l'objet OneInstrumentPlayer"""
 
-        a = "    Player alsa stoppé: Channel {:>2} Bank {:>1} Number {:>3}"
-        print(a.\
-        format(self.channel, self.bank, self.bank_number))
+        if self.verbose:
+            a = "    Player alsa stoppé: Channel {:>2} Bank {:>1} Number {:>3}"
+            print(a.\
+            format(self.channel, self.bank, self.bank_number))
             
         self.fs.delete()
 
@@ -780,7 +785,7 @@ def save_all_instruments(all_instruments, FPS):
     """dans ./all_instruments"""
     
     # Save du json
-    json_name = "./all_instruments_" + str(FPS) + ".json"
+    json_name = "./all_instruments/all_instruments_" + str(FPS) + ".json"
     with open(json_name, 'w') as f_out:
         json.dump(all_instruments, f_out)
     f_out.close()
@@ -821,8 +826,14 @@ def play_all_midi_files(FPS, fonts):
 
         
 if __name__ == '__main__':
+    """Le nombre d'instruments est limité à 10 !!!
+    Les threads dans blender ne sont plus utilisés !
+    """
     
-    # Création de tous les json à FPS 60 pour blender display
+    midi_file = "/media/data/3D/projets/darknet-letters/letters/midi/music/non_git/jeux_interdits.mid"
+    create_one_json(midi_file, 60, "")
+    
+    # ## Création de tous les json à FPS 60 pour blender display
     # #FPS = 60
     # #volume = ""
     # #create_all_json("./music/", FPS, volume)
@@ -830,14 +841,14 @@ if __name__ == '__main__':
     # Création des json pour test de l'IA
     # Pour forcer le volume pour l'IA bête
     # Set le volume à 127 partout dans les json
-    FPS = 40
-    volume = "flat"
-    create_all_json("./music/", FPS, volume)
+    # #FPS = 30
+    # #volume = "flat"
+    # #create_all_json("./music/", FPS, volume)
     
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
     # #fonts = "./soundfont/MuseScore_General.sf3"
-    fonts = "./soundfont/MuseScore_General_Full.sf2"
+    # #fonts = "./soundfont/MuseScore_General_Full.sf2"
     # #fonts = "./soundfont/FluidR3_GM.sf2"
     # #fonts = "./soundfont/percussion/142-Cymbal Roll.sf2"
     
@@ -866,25 +877,3 @@ if __name__ == '__main__':
     # #pjm = PlayJsonFile(json_file, 17, fonts)
     # #pjm.play()
     # #del pjm
-
-
-        # #json_name_rel_parts = json_name_abs.parts[ind + 1:]
-        # #print("json_name en rel parts", json_name_rel_parts)
-        
-        # ## json_17 doit toujours exister, si existe on passe
-        # #print("Création du répertoire", json_name_rel_parts[0])
-        # #self.mytools.create_directory(json_name_rel_parts[0])
-
-        # ## Sous répertoires
-        # #if len(json_name_rel_parts) == 3:
-            # #print("sous dossier")
-            # #a = json_name_rel_parts[0] + "/" + json_name_rel_parts[1]
-            # #self.mytools.create_directory(a)
-            
-        # ## Sous sous répertoires
-        # #if len(json_name_rel_parts) == 4:
-            # #print("sous sous dossier")
-            # #a = json_name_rel_parts[0] + "/" \
-                # #+ json_name_rel_parts[1] + "/" \
-                # #+ json_name_rel_parts[2] 
-            # #self.mytools.create_directory(a)

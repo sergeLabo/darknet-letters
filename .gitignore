@@ -45,6 +45,7 @@ train.txt
 test.txt
 all_instruments*
 all_weigts/
+ia/
 
 # doc
 *.mkv

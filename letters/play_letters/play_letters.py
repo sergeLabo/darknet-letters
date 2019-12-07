@@ -415,7 +415,6 @@ class YOLO:
         
         if self.titre:
             filename = self.filename
-            filename = filename.replace("f_", "")
             filename = filename.replace("_", " ")
             filename = filename.replace("-", " ")
             image = put_text(   image,

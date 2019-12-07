@@ -47,7 +47,6 @@ CUR_DIR = Path.cwd()
 # Chemin du dossier letters
 LETTERS_DIR = CUR_DIR.parent
 sys.path.append(str(LETTERS_DIR) + "/midi")
-print(str(LETTERS_DIR))
 
 # analyse_play_midi est dans /midi
 from analyse_play_midi import OneInstrumentPlayer
@@ -65,7 +64,7 @@ def get_conf():
 
     # Dossier *.ini
     ini_file = gl.letters_dir + "/letters.ini"
-    gl.ma_conf = MyConfig(ini_file)
+    gl.ma_conf = MyConfig(ini_file, verbose=0)
     gl.conf = gl.ma_conf.conf
 
 
@@ -302,6 +301,8 @@ def init_midi():
     # Limitation du nombre d'instruments
     n = len(gl.instruments)
     if n > 10: n = 10
+
+    # Création de 10 player
     for i in range(n):
         instrum = gl.instruments[i]
         chan = channels[i]
@@ -453,8 +454,11 @@ def get_midi_json():
         js = gl.conf["play_letters_shot"]["json_files"]
 
     all_json = gl.tools.get_all_files_list(js, ".json")
-    # Tri des json alpha
-    all_json = sorted(all_json)
+    # Tri des json alpha ou pas
+    if gl.conf["music_and_letters"]["sorted"]:
+        all_json = sorted(all_json)
+    else:
+        random.shuffle(all_json)
 
     if gl.phase == "music and letters":
         # Reset de gl.nbr si fini
@@ -472,14 +476,11 @@ def get_midi_json():
             os._exit(0)
 
     gl.midi_json = all_json[gl.nbr]
-
     name = gl.midi_json.split("/")[-1]
-    name = name[:-5]
-    name = name.replace("f_", "")
     name = name.replace("_", " ")
     name = name.replace("-", " ")
-    gl.midi_json_name = name
-    print("\n    Fichier en cours", name, "\n")
+    gl.midi_json_name = name[:-5]
+    print("\n    ", gl.midi_json_name, "\n")
 
     # Enregistrement du numéro du prochain fichier à lire
     if gl.phase == "music and letters":

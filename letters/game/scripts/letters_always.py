@@ -47,7 +47,6 @@ CUR_DIR = Path.cwd()
 LETTERS_DIR = CUR_DIR.parent
 
 sys.path.append(str(LETTERS_DIR) + "/midi")
-print(sys.path)
 # analyse_play_midi est dans /midi
 from analyse_play_midi import AnalyseMidi
 
@@ -195,7 +194,9 @@ def main_get_shot():
         save_shot(sub_dir)
         sleep(0.01)
         gl.numero += 1
-        print(gl.comptage[0])
+        if gl.numero % 100 == 0:
+            for i in range(10):
+                print(gl.comptage[i])
 
     # Fin du jeu
     end()
@@ -323,8 +324,8 @@ def get_notes(frame_notes):
                 note = frame_notes[i][0][0]
                 volume = frame_notes[i][0][1]
                 notes.append((instrum, note, volume))
-    else:
-        print("Pas de notes")
+    # #else:
+        # #print("Pas de notes")
     return notes
 
 
@@ -581,13 +582,13 @@ def kill():
         for i in range(128):
             try:
                 th = gl.instruments_player[j].thread_dict[i]
-                if th == 1:
-                    print("thread en cours tué, instrument:", j, "thread:", j)
+                # #if th == 1:
+                    # #print("thread en cours tué, instrument:", j, "thread:", j)
                 gl.instruments_player[j].thread_dict[i] = 0
             except:
                 pass
     sleep(1)
-    print("Fin de tous les threads")
+    # #print("Fin de tous les threads")
 
     try:
         # Stop des fluidsynth.Synth() initiés
@@ -633,13 +634,21 @@ def keyboard():
     elif gl.keyboard.events[events.DOWNARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
         gl.frame -= 1000
 
-    # music and letters avance rapide
+    # music and letters avance d'un morceau
     elif gl.keyboard.events[events.RIGHTARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        gl.frame += 100
+        # Enregistrement du numéro du prochain fichier à lire
+        if gl.phase == "music and letters":
+            section = "music_and_letters"
+            gl.ma_conf.save_config(section, "file_nbr", gl.nbr + 1)
+        new_music()
 
-    # music and letters recul rapide
+    # music and letters recul d'un morceau
     elif gl.keyboard.events[events.LEFTARROWKEY] == gl.KX_INPUT_JUST_ACTIVATED:
-        gl.frame -= 100
+        # Enregistrement du numéro du prochain fichier à lire
+        if gl.phase == "music and letters":
+            section = "music_and_letters"
+            gl.ma_conf.save_config(section, "file_nbr", gl.nbr - 1)
+        new_music()
 
     # Pour rester dans les frames possibles
     try:

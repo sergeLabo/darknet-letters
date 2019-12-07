@@ -33,7 +33,7 @@ class LettersConfig(MyConfig):
         """letters_dir est un Path"""
 
         config_file = letters_dir / 'letters.ini'
-        super().__init__(config_file)
+        super().__init__(config_file, verbose=0)
         #print("Configuration chargée !\n")  # , self.conf)
 
 

@@ -35,7 +35,7 @@ import random
 import os
 
 # Pour modif free network serge
-GPU = 1
+GPU = 0
 
 def sample(probs):
     s = sum(probs)
