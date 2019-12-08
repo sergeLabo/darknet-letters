@@ -454,11 +454,13 @@ def get_midi_json():
         js = gl.conf["play_letters_shot"]["json_files"]
 
     all_json = gl.tools.get_all_files_list(js, ".json")
-    # Tri des json alpha ou pas
-    if gl.conf["music_and_letters"]["sorted"]:
-        all_json = sorted(all_json)
-    else:
-        random.shuffle(all_json)
+    
+    if gl.phase == "music and letters":
+        # Tri des json alpha ou pas
+        if gl.conf["music_and_letters"]["sorted"]:
+            all_json = sorted(all_json)
+        else:
+            random.shuffle(all_json)
 
     if gl.phase == "music and letters":
         # Reset de gl.nbr si fini

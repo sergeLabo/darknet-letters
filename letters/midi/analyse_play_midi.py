@@ -830,8 +830,8 @@ if __name__ == '__main__':
     Les threads dans blender ne sont plus utilisés !
     """
     
-    midi_file = "/media/data/3D/projets/darknet-letters/letters/midi/music/non_git/jeux_interdits.mid"
-    create_one_json(midi_file, 60, "")
+    # #midi_file = "..midi/music/non_git/jeux_interdits.mid"
+    # #create_one_json(midi_file, 60, "")
     
     # ## Création de tous les json à FPS 60 pour blender display
     # #FPS = 60
@@ -841,9 +841,9 @@ if __name__ == '__main__':
     # Création des json pour test de l'IA
     # Pour forcer le volume pour l'IA bête
     # Set le volume à 127 partout dans les json
-    # #FPS = 30
-    # #volume = "flat"
-    # #create_all_json("./music/", FPS, volume)
+    FPS = 40
+    volume = "flat"
+    create_all_json("./music/ia", FPS, volume)
     
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
