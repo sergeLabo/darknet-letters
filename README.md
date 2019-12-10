@@ -11,6 +11,8 @@ et en faire des cauchemars et de la musique en midi.
 
 * https://vimeo.com/377284950
 
+[![/letters/doc/data_22_vimeo.png](https://vimeo.com/377284950/0.jpg)](https://vimeo.com/377284950)
+
 ### Contexte
 
 Réalisé avec:
