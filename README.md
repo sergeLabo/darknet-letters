@@ -7,15 +7,7 @@ et en faire des cauchemars et de la musique en midi.
 <img src="/letters/doc/shot_43.jpg" width="400" height="400"/>
 </p>
 
-[![Regarder la video sur Vimeo](/letters/doc/data_22_vimeo.png)](https://vimeo.com/377284950)
-
-* https://vimeo.com/377284950
-
-[![/letters/doc/shot_43.jpg](https://vimeo.com/377284950/0.jpg)](https://vimeo.com/377284950)
-
-[![Little red ridning hood](http://i.imgur.com/7YTMFQp.png)](https://vimeo.com/3514904 "Little red riding hood - Click to Watch!")
-
-[![Letters sur Vimeo](https://raw.githubusercontent.com/sergeLabo/darknet-letters/master/letters/doc/shot_43.jpg)](https://vimeo.com/377284950 "Letters sur Vimeo - Click to Watch!")
+[![Letters sur Vimeo](https://raw.githubusercontent.com/sergeLabo/darknet-letters/master/letters/doc/letters_vimeo.png)](https://vimeo.com/377284950 "Letters sur Vimeo - Click to Watch!")
 
 ### Contexte
 
