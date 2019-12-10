@@ -15,7 +15,7 @@ et en faire des cauchemars et de la musique en midi.
 
 [![Little red ridning hood](http://i.imgur.com/7YTMFQp.png)](https://vimeo.com/3514904 "Little red riding hood - Click to Watch!")
 
-[![Letters sur Vimeo](/letters/doc/data_22_vimeo.png)](https://vimeo.com/377284950 "Letters sur Vimeo - Click to Watch!")
+[![Letters sur Vimeo](/letters/doc/letters_vimeo.png)](https://vimeo.com/377284950 "Letters sur Vimeo - Click to Watch!")
 
 ### Contexte
 
