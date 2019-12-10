@@ -840,7 +840,8 @@ def test(dossier, essai):
     """
     mt = MyTools()
 
-    w_dir = "/media/data/projets/darknet-letters/letters/darknet/data_22/backup/"
+    # Bidouille à renseigner
+    w_dir = "./darknet/data_23/backup/"
     w_list = mt.get_all_files_list(w_dir, ".weights")
     #print("\n\nTous les fichiers de poids:", w_list)
 
@@ -862,10 +863,10 @@ if __name__ == "__main__":
     # Définir le numéro de l'essai, utilisé dans le benchmark
     essai = CONF["benchmark"]["essai"]
 
-    test = 0
-    save = 0
-    play_letters(dossier, essai, save, test, "")
+    # #test = 0
+    # #save = 0
+    # #play_letters(dossier, essai, save, test, "")
 
-    # #test(dossier, essai)
+    test(dossier, essai)
 
     os._exit(0)

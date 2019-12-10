@@ -843,8 +843,8 @@ if __name__ == '__main__':
     # Set le volume à 127 partout dans les json
     FPS = 40
     volume = "flat"
-    create_all_json("./music/ia", FPS, volume)
-    
+    create_all_json("./music/non_git/ia", FPS, volume)
+
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
     # #fonts = "./soundfont/MuseScore_General.sf3"

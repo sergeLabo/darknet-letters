@@ -10,8 +10,9 @@ qui sont enregistrées dans zorro_4.json dans le dossier du dossier zorro
 
 Cette sortie est comparée avec le json d'origine qui a servi à créer les images
 à décoder: ../midi/json_40/non_git/ia
-"""
 
+Définir les valeurs de la section [benchmark] dans letters.ini
+"""
 
 import os, sys
 from glob import glob
@@ -28,31 +29,23 @@ from letters_path import LettersPath
 lp = LettersPath()
 
 
-# Définir le numéro de l'essai, utilisé dans play_letters
-# Se retrouve dans le nom des json
-ESSAI = lp.conf["benchmark"]["essai"]
-
-# Dossier avec les json de musique qui ont servi à fabriquer les pl_shot
-DOSSIER_IN = lp.conf["benchmark"]["dossier_in"]
-
-# Dossier des pl_shot avec les json _4.json
-DOSSIER_OUT = lp.conf["benchmark"]["dossier_out"]
-
-
 class Benchmark:
-
-    def __init__(self, name, essai, test=0):
+    """Fait le bench pour une musique, un json"""
+    
+    def __init__(self, d_in , d_out, name, essai, test=0):
         """Le nombre de notes de l'entrée doit être supérieur à la sortie
         Correspond à moins de 2000 images dans out !
         """
 
+        self.d_in = d_in
+        self.d_out = d_out
         self.name = name
         self.essai = str(essai)
         self.test = test
         
         self.mt = MyTools()
 
-        print("\nAnalyse de:    ", self.name)
+        print("Analyse de:    ", self.name)
                 
         # Notes en sortie 
         self.notes_out = self.get_notes_out()
@@ -86,7 +79,7 @@ class Benchmark:
                 
         # L'efficacité
         self.efficiency = 0
-        self.score = 0
+        self.good = 0
         self.bad = 0
         
         # Exécution du script
@@ -95,7 +88,7 @@ class Benchmark:
     def get_notes_in(self):
         """Toutes les notes de Musique in, pas seulement celles de frames"""
         
-        json_in = DOSSIER_IN + self.name + ".json"
+        json_in = self.d_in + self.name + ".json"
         notes_in = self.mt.get_json_file(json_in)["partitions"]
 
         return notes_in
@@ -104,17 +97,14 @@ class Benchmark:
         """Récupérées dans le json créé par play_letters dans le dossier
         des dossiers des images.
         """
+        
         if not self.test:        
-            out = DOSSIER_OUT + self.name + "_" + self.essai + ".json"
+            out = self.d_out + self.name + "_" + self.essai + ".json"
         else:
-            out = DOSSIER_OUT + "test/" +\
-                               str(self.test) +\
-                               "/" +\
-                               self.name +\
-                               "_" +\
-                               self.essai +\
-                               ".json"
-                  
+            print("Essai", self.essai, "Test", self.test)
+            # /media/data/3D/test_26/1000/Dutronc_cactus_26.json
+            out = self.d_out + self.name + "_" + self.essai + ".json"
+
         print("Fichier de sortie:", out)
         notes_out = self.mt.get_json_file(out)
                                           
@@ -125,9 +115,23 @@ class Benchmark:
         des pl_shots.
         L'attribution est forcée dans letters_once.py pour les morceaux de
         test, pour avoir toujours les mêmes pour chaque pl_shot_xx
+
+        Dans *.ini
+        [benchmark]
+        dossier_out = "/media/data/3D/pl_shot_99_jpg/test_27/"
         """
-        
-        instruments_txt = DOSSIER_OUT + self.name + "/" + "instruments.txt"
+
+        if not self.test:
+            instruments_txt = self.d_out + self.name + "/" + "instruments.txt"
+        else:
+            # Récup de /media/data/3D/pl_shot_99_jpg/
+            cur_dir = Path(self.d_out)
+            # Suppr des 2 derniers
+            l = list(cur_dir.parts)[:-2]
+            parent_dir = os.path.join(*l) + "/"
+            print("parent_dir", parent_dir)
+            instruments_txt = parent_dir + self.name + "/" + "instruments.txt"
+            
         instruments = self.mt.read_file(instruments_txt)
         font_table = []
         lines = instruments.splitlines()
@@ -171,7 +175,8 @@ class Benchmark:
                 else:
                     note.append([])
             notes_in_as_note_out.append(note)
-        print("Nombre de frame dans notes_in_as_note_out:", len(notes_in_as_note_out))
+        print("Nombre de frame dans notes_in_as_note_out:",
+                                    len(notes_in_as_note_out))
 
         return notes_in_as_note_out
 
@@ -223,22 +228,22 @@ class Benchmark:
         all_good_notes = []
         
         # Score des notes justes
-        for frame in range(self.frames):  # 2000
+        for frame in range(self.frames): # 2000 ou moins
             for note in self.notes_in_corrected[frame]:
                 if note:
                     self.count_in += 1
                 if note in self.notes_out[frame]:
-                    self.score += 1
+                    self.good += 1
                     all_good_notes.append(note)
                     
             # #print(frame, 'in ', self.notes_in_corrected[frame],
-                         # #'out', self.notes_out[frame], self.score,
+                         # #'out', self.notes_out[frame], self.good,
                          # #'self.count_in', self.count_in)
         print("Recomptage des notes en entrée:", self.count_in)
         
         if self.count_in != 0:
-            self.efficiency = round((self.score / self.count_in), 3)
-            print("Nombre de notes reconnues  =", self.score,
+            self.efficiency = round((self.good / self.count_in), 3)
+            print("Nombre de notes reconnues  =", self.good,
                   "soit", self.efficiency)
         else:
             print("Pas de notes en entrées")
@@ -265,8 +270,6 @@ class Benchmark:
         # Pour calcul par police
         allocation = self.notes_allocation(all_bad_notes)
         print("Répartition des mauvaises notes:", allocation)
-        
-        print("\nNombre de mauvaise notes:",  self.bad)
 
         return allocation
                 
@@ -308,13 +311,15 @@ class Benchmark:
 
             
 class BenchmarkBatch:
+    """Fait le bench pour un fichier de weigths, soit 6 json"""
+    
+    def __init__(self, d_in, d_out, essai, test=0):
 
-    def __init__(self, dossier_in, dossier_out, essai, test=0):
-
-        self.dossier_in = dossier_in
-        self.dossier_out = dossier_out
+        self.d_in = d_in
+        self.d_out = d_out
         self.essai = essai
         self.test = test
+        print("\n\n\n\nBenchmarkBatch de", d_in, d_out, essai, test)
         
         self.mt = MyTools()
         
@@ -322,11 +327,18 @@ class BenchmarkBatch:
         self.get_all_sub_directories()
         
     def get_all_sub_directories(self):
+        # Sous dossiers
         if not self.test:
-            self.all_sub_directories = glob(self.dossier_out + "*/")
+            self.all_sub_directories = glob(self.d_out + "*/")
         else:
-            out = "/media/serge/BACKUP/play_letters_shot/pl_shot_14_jpg/"
-            self.all_sub_directories = glob(out + "*/")
+            # Récup de /media/data/3D/pl_shot_99_jpg/
+            cur_dir = Path(self.d_out)
+            # Suppr des 2 derniers
+            l = list(cur_dir.parts)[:-2]
+            parent_dir = os.path.join(*l) + "/"
+            print("parent_dir", parent_dir)
+            
+            self.all_sub_directories = glob(parent_dir + "*/")
             
         # Suppression du dossier 'test' de la liste
         for dossier in self.all_sub_directories:
@@ -347,79 +359,113 @@ class BenchmarkBatch:
         
         # Info générale
         data = "\n\nDossier in: {}\nDossier out: {}\nEssai: {}\n{}".format(\
-                                                            self.dossier_in,
-                                                            self.dossier_out,
+                                                            self.d_in,
+                                                            self.d_out,
                                                             self.essai,
                                                             data)
-                                                            
+
+        # Sauvegarde
         date = '{0:%Y_%m_%d-%H_%M_%S}'.format(datetime.now())
         if not self.test:
-            fichier = DOSSIER_OUT + "zz_efficiency_" + date + ".txt"
+            fichier = self.d_out + "z_efficiency_" + date + ".txt"
         else:
-            fichier = DOSSIER_OUT + str(self.test) + "_" + date + ".txt"
+            fichier = self.d_out + str(self.test) + "_" + date + ".txt"
         print("Sauvegarde dans:")
         print("    ", fichier)
         self.mt.write_data_in_file(data, fichier, "w")
         
     def check(self, efficiency):
+        
         i = 0
         o = 0
         for eff in efficiency:
             i += eff[1]
             o += eff[0]
-        if i > 0:
-            final_check = round(o / i, 3)
-        else:
-            final_check = "Erreur"
-        print("\nEfficacité globale:", final_check)
         
-        return final_check
+        return o, i
 
     def batch(self):
         data = ""
-        efficiency = []
+        good = []
+        bad = []
         
         for sb in self.all_sub_directories:
             name = Path(sb).name
-            bm = Benchmark(name, self.essai, self.test)
-            data += "    Reconnue: " + str(bm.score) +\
-                    "    Bad: " + str(bm.bad) +\
+            bm = Benchmark(self.d_in, self.d_out, name, self.essai, self.test)
+            data += "    Bonnes: " + str(bm.good) +\
+                    "    Mauvaises: " + str(bm.bad) +\
                     "    Name: " + name +\
-                    "    Nombre de notes en entrées: " + str(bm.count_in) +\
-                    "    Efficacité: " + str(bm.efficiency) + "\n"
-
-            efficiency.append([bm.score, bm.count_in])
+                    "    Nombre de notes en entrées: " + str(bm.count_in) +"\n"
+            print(data)
+            
+            good.append([bm.good, bm.count_in])
+            bad.append([bm.bad, bm.count_in])
             
         # Vérification
-        final_check = self.check(efficiency)
-
-        data += "\nCheck final:" + str(final_check) + "\n"
+        final_good = self.check(good)
+        final_bad = self.check(bad)
                  
-        print("\n\n")
-        print(data)
-
         # Enregistrement dans un fichier
-        self.save_efficiency(data)
+        if not self.test:
+            self.save_efficiency(data)
 
+        # Verif pour multibenchbatch
+        print("% Bonne:", final_good, " - % Mauvaise:", final_bad)
+        
+        return final_good, final_bad
 
-def one_bench():
-    bmb = BenchmarkBatch(DOSSIER_IN, DOSSIER_OUT, ESSAI)
-    bmb.batch()
-
-
-def test():
-    """Pour bench fonction du temps d'apprentissage"""
-
-    for i in range (1, 44, 1):
-        indice = i * 1000
-        print("\n\n\n\n\n\n\n\n")
-        print("INDICE:    ", indice)
-        out = DOSSIER_OUT + str(indice) + "/"
-        print("DOSSIER_OUT", out)
-        bmb = BenchmarkBatch(DOSSIER_IN, out, ESSAI, test=indice)
-        bmb.batch()
     
+def benchbatch(d_in, d_out, essai, test=0):
+    bmb = BenchmarkBatch(d_in, d_out, essai, test=0)
+    bmb.batch()
+    
+
+def multibenchbatch(d_in, d_out, essai):
+    """Pour bench fonction du temps d'apprentissage
+    essai 26
+    d_in "../midi/json_40/non_git/ia/"
+    d_out "/media/data/3D/test_26/"
+    """
+
+    # A imprimer dans le txt à la fin, formater pour copie dans libre office
+    data = ""
+    
+    # Liste des sous dossiers
+    sd_out_list = glob(d_out + "*/")
+    
+    print("Liste des sous dossiers:", sd_out_list)
+    
+    for sd_out in sd_out_list:
+        bmb = BenchmarkBatch(d_in, sd_out, essai, test=essai)
+        final_good, final_bad = bmb.batch()
+        w = Path(sd_out).name
+        data += w + " " +\
+                str(final_good[1]) + " " +\
+                str(final_good[0]) + " " +\
+                str(final_bad[0]) + "\n"
+
+    print("\n\n\n\n")
+    print(data)
+    
+                
 if __name__ == "__main__":
     
-    one_bench()
-    # #test()
+    # Définir le numéro de l'essai, utilisé dans play_letters
+    # Se retrouve dans le nom des json
+    essai = lp.conf["benchmark"]["essai"]
+
+    # Dossier avec les json de musique qui ont servi à fabriquer les pl_shot
+    d_in = lp.conf["benchmark"]["dossier_in"]
+
+    # Dossier des pl_shot avec les json cactus_26.json
+    d_out = lp.conf["benchmark"]["dossier_out"]
+
+    print("Essai      :", essai)
+    print("Dossier in :", d_in)
+    print("Dossier out:", d_out)
+    
+    # ## Bench d'un fichier weights
+    # #benchbatch(d_in, d_out, essai, test=0)
+
+    # Bench d'une liste de weigths
+    multibenchbatch(d_in, d_out, essai)
