@@ -9,7 +9,7 @@ et en faire des cauchemars et de la musique en midi.
 
 [![Regarder la video sur Vimeo](/letters/doc/data_22_vimeo.png)](https://vimeo.com/377284950)
 
-[](https://vimeo.com/377284950)
+* https://vimeo.com/377284950
 
 ### Contexte
 
