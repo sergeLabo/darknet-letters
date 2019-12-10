@@ -1,0 +1,78 @@
+[data_essai_unused_section]
+essai = "shot_23"
+
+[music_and_letters]
+fonts = "../midi/soundfont/MuseScore_General_Full.sf2"
+file_nbr = 1
+json_files = "../midi/json_60/non_git/ia"
+music_size = 1000
+fullscreen = 1
+size_min = 0.3
+size_max = 1.0
+
+[blend]
+run = "intro"
+shot_every = 20
+plage_x = 4.5
+plage_y = 4.5
+sun_energy_min = 4
+sun_energy_max = 4
+sun_color_min = 1.0
+sun_color_max = 1.0
+
+[letters_shot]
+nombre_shot_total = 19000
+shot_size = 416
+fond = "video"
+letters_scale = 1.05
+shot = "../shot"
+size_min = 1.2
+size_max = 1.2
+
+[letters_shot_jpg]
+shot_size = 416
+blur_mini = 0
+blur_maxi = 0
+
+[pl_shot_essai_unused_section]
+essai = "pl_shot_15_jpg"
+
+[play_letters_shot]
+nombre_shot_total = 2000
+shot_size = 416
+fond = "noir"
+letters_scale = 1.05
+size_min = 1.2
+size_max = 1.2
+blur_min = 0
+blur_max = 0
+volume = 0
+json_files = "../midi/json_40/non_git"
+pl_shot = "/media/data/pl_shot_15"
+
+[play_letters]
+thresh = 30
+hier_thresh = 30
+nms = 30
+configpath = "../darknet/data_23/yolov3-tiny_3l_23.cfg"
+weightpath = "../darknet/data_23/backup/yolov3-tiny_3l_23_8000.weights"
+metapath = "../darknet/data_23/obj.data"
+file_nbr = 0
+fullscreen = 1
+
+[benchmark]
+essai = 20
+dossier_in = "../midi/json_40/non_git/ia/"
+dossier_out = "/media/serge/BACKUP/play_letters_shot/pl_shot_15_jpg/"
+
+
+
+ln -s /media/data/projets/darknet-letters/letters/darknet/data_23/ /media/data/projets/darknet/data_23
+
+cd /media/data/projets/darknet/
+
+export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}
+
+./darknet partial data_23/yolov3-tiny_3l_23.cfg yolov3-tiny.weights data_23/yolov3-tiny.conv.15 15
+
+./darknet detector train data_23/obj.data data_23/yolov3-tiny_3l_23.cfg data_23/yolov3-tiny.conv.15 -map
