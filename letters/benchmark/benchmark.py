@@ -104,7 +104,13 @@ class Benchmark:
             print("Essai", self.essai, "Test", self.test)
             # /media/data/3D/test_26/1000/Dutronc_cactus_26.json
             out = self.d_out + self.name + "_" + self.essai + ".json"
-
+            
+            # TODO bidouille provisoire 
+            out = out.replace("Dutronc_cactus", "Dutronc cactus")
+            out = out.replace("Michel - On ", "Michel   On ")
+            out = out.replace("jeux_interdits", "jeux interdits")
+            out = out.replace("gaynor_i_will_survive", "gaynor i will survive")
+                                   
         print("Fichier de sortie:", out)
         notes_out = self.mt.get_json_file(out)
                                           
@@ -464,8 +470,8 @@ if __name__ == "__main__":
     print("Dossier in :", d_in)
     print("Dossier out:", d_out)
     
-    # ## Bench d'un fichier weights
-    # #benchbatch(d_in, d_out, essai, test=0)
+    # Bench d'un fichier weights
+    benchbatch(d_in, d_out, essai, test=0)
 
-    # Bench d'une liste de weigths
-    multibenchbatch(d_in, d_out, essai)
+    # ## Bench d'une liste de weigths
+    # #multibenchbatch(d_in, d_out, essai)

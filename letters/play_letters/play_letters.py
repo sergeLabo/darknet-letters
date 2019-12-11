@@ -1,5 +1,21 @@
-#!python3
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
+
+########################################################################
+# This file is part of Darknet Letters.
+#
+# Darknet Letters is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Darknet Letters is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+########################################################################
+
 
 """
 Reconnaissance de lettres dans une image
@@ -32,7 +48,7 @@ import textwrap
 import cv2
 import numpy as np
 import darknet
-from random import randint, shuffle
+from random import randint
 import json
 
 # Import du dossier parent soit letters
@@ -473,7 +489,7 @@ class YOLO:
             self.loop = 0
 
         while self.loop:
-            #black_image = self.black_image.copy()
+            black_image = self.black_image.copy()
             # Récup d'une image
             img = self.all_shot[i]
 
@@ -522,11 +538,12 @@ class YOLO:
                 # #y2 = 416
                 # #black_image[y1:y2, x1:x2] = image
                 img = image  # black_image
-                img = put_text( img,
-                                  str(self.fps),
-                                  (10, 100),
-                                  size=0.5,
-                                  thickness=1)
+
+            img = put_text( img,
+                              str(self.fps),
+                              (10, 100),
+                              size=0.5,
+                              thickness=1)
 
             # Affichage
             cv2.imshow('Letters', img)  # image)
@@ -559,9 +576,6 @@ class YOLO:
         # Libération de la mémoire GPU
         if self.gpu:
             self.free_network(self.netMain)
-
-        # Delete images
-        del self.all_shot
 
         # Enregistrement des notes
         if self.save:
@@ -807,9 +821,7 @@ def play_letters(dossier, essai, save, test, weights):
     # Trié ou pas
     if CONF["play_letters"]["sorted"]:
         sd_list = sorted(sd_list)
-    else:
-        shuffle(sd_list)
-        
+
     # Pas le dossier principal
     sd_list.remove(dossier)
 
@@ -827,6 +839,15 @@ def play_letters(dossier, essai, save, test, weights):
 
         yolo = YOLO(sd, essai, save, test, weights)
         yolo.detect()
+
+        # Delete images
+        del yolo.all_shot
+        # Del les attributs darknet de yolo
+        del yolo.netMain
+        del yolo.metaMain
+        del yolo.free_network
+        del yolo.darknet_image
+        # Del l'object yolo
         del yolo
 
     print("Done")
@@ -840,8 +861,7 @@ def test(dossier, essai):
     """
     mt = MyTools()
 
-    # Bidouille à renseigner
-    w_dir = "./darknet/data_23/backup/"
+    w_dir = "/media/data/projets/darknet-letters/letters/darknet/data_22/backup/"
     w_list = mt.get_all_files_list(w_dir, ".weights")
     #print("\n\nTous les fichiers de poids:", w_list)
 
@@ -863,10 +883,19 @@ if __name__ == "__main__":
     # Définir le numéro de l'essai, utilisé dans le benchmark
     essai = CONF["benchmark"]["essai"]
 
-    # #test = 0
-    # #save = 0
-    # #play_letters(dossier, essai, save, test, "")
+    # Config pour tester avec benchmark
+    test = CONF["play_letters"]["test"]
+    save = CONF["play_letters"]["save"]
 
-    test(dossier, essai)
+    if not test:
+        # Joue seulement les morceaux en lisant les images
+        play_letters(dossier, essai, save, test, "")
+    else:
+        # Joue les morceaux, enregistre les résultats
+        if save:
+            test(dossier, essai)
+        else:
+            print("Mettre save = 1 dans letters.ini")
 
+    # Sortie du script python
     os._exit(0)

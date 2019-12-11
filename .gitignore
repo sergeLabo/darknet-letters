@@ -49,6 +49,7 @@ ia/
 
 # doc
 *.mkv
+*.mp4
 doc_projet.txt
 
 # Blender
