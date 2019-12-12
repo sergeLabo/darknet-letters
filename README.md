@@ -1,7 +1,7 @@
 # Darknet Letters
 
 De l'Intelligence artificielle pour reconnaitre des lettres dans différentes polices,
-et en faire des cauchemars et de la musique en midi.
+puis en faire des cauchemars et de la musique en midi.
 
 <p align="center">
 <img src="/letters/doc/shot_43.jpg" width="400" height="400"/>
