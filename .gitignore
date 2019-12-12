@@ -35,9 +35,7 @@ json_to_image_shot/
 *.weights
 !yolov3-tiny_3l_22_8000.weights
 
-shot/
-shot_jpg/
-shot_control/
+play_letters_shot_jpg/
 video/
 json_to_image/
 get_shot.json
