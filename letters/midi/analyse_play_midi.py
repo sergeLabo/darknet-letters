@@ -514,15 +514,14 @@ class OneInstrumentPlayer:
         self.verbose = verbose
         
         self.set_audio()
-
+        # Le thread
+        # #self.thread_note = {}
         # Pour gérer les threads
         self.thread_dict = {}
         # #self.volume = {}
         for i in range(128):
             # Pour gérer les notes
             self.thread_dict[i] = 0
-            # Pour gérer les volumes avec l'IA
-            # #self.volume[i] = 0
 
     def set_audio(self):
         """Spécifique à FluidR3_GM.sf2
@@ -545,8 +544,7 @@ class OneInstrumentPlayer:
 
         if self.verbose:
             a = "    Player alsa stoppé: Channel {:>2} Bank {:>1} Number {:>3}"
-            print(a.\
-            format(self.channel, self.bank, self.bank_number))
+            print(a.format(self.channel, self.bank, self.bank_number))
             
         self.fs.delete()
 
@@ -567,6 +565,8 @@ class OneInstrumentPlayer:
         while self.thread_dict[note]:
             sleep(0.0001)
 
+        # #self.thread_note[note].join()
+        
         # Sinon fin de la note
         if self.verbose:
             print("      Fin du thread: channel =", self.channel,
@@ -586,7 +586,7 @@ class OneInstrumentPlayer:
         if not self.thread_dict[note]:
             self.thread_dict[note] = 1
             thread_note = threading.Thread(target=self.play_note,
-                                      args=(note, volume))
+                                                args=(note, volume))
             thread_note.start()
 
 
@@ -842,13 +842,13 @@ if __name__ == '__main__':
     # Pour forcer le volume pour l'IA bête
     # Set le volume à 127 partout dans les json
     FPS = 40
-    volume = "flat"
-    create_all_json("./music/non_git/ia", FPS, volume)
+    # #volume = "flat"
+    # #create_all_json("./music/non_git/ia", FPS, volume)
 
     # #fonts = "./soundfont/TimGM6mb.sf2"
     # #fonts = "./soundfont/merlin_vienna.sf2"
     # #fonts = "./soundfont/MuseScore_General.sf3"
-    # #fonts = "./soundfont/MuseScore_General_Full.sf2"
+    fonts = "./soundfont/MuseScore_General_Full.sf2"
     # #fonts = "./soundfont/FluidR3_GM.sf2"
     # #fonts = "./soundfont/percussion/142-Cymbal Roll.sf2"
     
@@ -872,8 +872,8 @@ if __name__ == '__main__':
     # #am = AnalyseMidi(f, 17)
     # #am.save_midi_json()
     
-    # ## Play un json
-    # #json_file = "./json/pas_pour_github/axel_f-crazy_frog.json"
-    # #pjm = PlayJsonFile(json_file, 17, fonts)
-    # #pjm.play()
-    # #del pjm
+    # Play un json
+    json_file = "../midi/json_40/non_git/ia/gaynor_i_will_survive.json"
+    pjm = PlayJsonFile(json_file, 40, fonts)
+    pjm.play()
+    del pjm

@@ -526,7 +526,7 @@ class YOLO:
             image = self.put_titre(image)
 
             if not self.fullscreen:
-                img = cv2.resize(image, (850, 850),
+                img = cv2.resize(image, (600, 600),
                                  interpolation=cv2.INTER_LINEAR)
             else:
                 # gray[y1:y2, x1:x2] 162:578
