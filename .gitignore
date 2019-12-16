@@ -31,7 +31,6 @@ json_to_image_shot/
 # darknet
 *.conv.*
 
-
 *.weights
 !yolov3-tiny_3l_22_8000.weights
 !play_letters_shot_jpg/
@@ -43,7 +42,6 @@ train.txt
 test.txt
 all_instruments*
 all_weigts/
-ia/
 
 # doc
 *.mkv
